@@ -1,0 +1,174 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+/* Header Styling */
+.header {
+  width: 100%;
+  padding: 10px;
+  background-color: #004d25;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  color: white;
+}
+.header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+.profile-content {
+  flex-grow: 1;
+  padding: 40px;
+  background-color: white;
+}
+.profile-content .edit-section {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.profile-content h2 {
+  margin-bottom: 20px;
+}
+.profile-img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.info-label {
+  font-weight: bold;
+  margin-top: 10px;
+}
+.info-text {
+  margin-bottom: 10px;
+}
+.edit-btn,
+.save-btn,
+.delete-btn {
+  margin-top: 20px;
+  text-align: center;
+}
+.edit-btn button {
+  background-color: #ffc107;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+}
+.edit-btn button:hover {
+  background-color: #e0a800;
+}
+.save-btn button {
+  background-color: #28a745; /* Green color for save button */
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.save-btn button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+.delete-btn button {
+  background-color: red; /* Red color for delete button */
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.delete-btn button:hover {
+  background-color: darkred; /* Darker red on hover */
+}
+
+.save-delete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.save-btn button {
+  background-color: #ffc107;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.save-btn button:hover {
+  background-color: #e0a800;
+}
+
+.delete-btn button {
+  background-color: red;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-btn button:hover {
+  background-color: darkred;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="tel"],
+form input[type="password"],
+form input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.hidden {
+  display: none;
+}
+.profile-upload {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+}
+.profile-upload img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.profile-upload .upload-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #ffc107;
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  cursor: pointer;
+}
+.save-delete {
+  display: flex;
+  justify-content: space-between;
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar with Burger Menu</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <!-- Burger Menu Button -->
+    <div id="burger-menu" onclick="toggleSidebar()">
+        &#9776;
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <a href="javascript:void(0)" class="close-btn" onclick="toggleSidebar()">&times;</a>
+        <a href="#">Dashboard</a>
+        <a href="#">Budget (Overall)</a>
+        <a href="#">Purchases</a>
+        <a href="#">MOE</a>
+        <a href="#">Approval</a>
+        <a href="#">Activities</a>
+        <a href="#">Transactions</a>
+        <a href="#">Income and Expenses</a>
+        <a href="#">Reports</a>
+    </div>
+
+    <div class="content">
+        <!-- Your page content goes here -->
+        <h2>Welcome to the Events Page</h2>
+        <p>This is a sample content section.</p>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
