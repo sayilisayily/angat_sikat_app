@@ -217,7 +217,7 @@ $result = $conn->query($sql);
             <!-- Header End -->
 
             <div class="container mt-5 p-5">
-                <h2 class="mb-4">Expenses
+                <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Expenses
                     <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addExpenseModal"
                         style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
                         <i class="fa-solid fa-plus"></i> Add Expense

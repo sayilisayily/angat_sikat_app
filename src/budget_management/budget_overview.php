@@ -234,7 +234,7 @@
 
             <div class="container mt-5">
 
-                <h2 class="mb-3"> Budget Management </h2>
+                <h2 class="mb-3"><span class="text-warning fw-bold me-2">|</span> Budget Management </h2>
                 <!-- Balance Card -->
                 <div class="row">
                     <div class="col-md">

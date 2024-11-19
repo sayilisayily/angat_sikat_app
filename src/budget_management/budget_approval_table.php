@@ -213,7 +213,7 @@ include '../user_query.php';
             <!-- Header End -->
 
             <div class="container mt-4 p-5">
-                <h2>Budget Approvals <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal"
+                <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Budget Approvals <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal"
                         data-bs-target="#budgetApprovalModal"
                         style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
                         <i class="fa-solid fa-paper-plane"></i> Request Budget Approval
