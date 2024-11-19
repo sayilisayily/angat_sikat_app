@@ -3,11 +3,12 @@
 require 'connection.php';
 include '../session_check.php';
 include '../user_query.php';
+
 // Check if 'event_id' is passed in the URL
 if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
     $event_id = intval($_GET['event_id']); // Get and sanitize the event_id from the URL
 
-    // Prepare SQL query to fetch event details
+    // Fetch event details
     $stmt = $conn->prepare("SELECT * FROM events WHERE event_id = ?");
     if ($stmt === false) {
         die('Prepare failed: ' . $conn->error);
@@ -24,7 +25,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
         exit;
     }
 
-    // Fetch the items for Financial Plan
+    // Fetch items for Financial Plan
     $itemStmt = $conn->prepare("SELECT * FROM event_items WHERE event_id = ?");
     if ($itemStmt === false) {
         die('Prepare for items failed: ' . $conn->error);
@@ -38,19 +39,18 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
             $items[] = $row;
         }
     }
-    $stmt->close();
     $itemStmt->close();
 
-    // Fetch items for Financial Summary only if the event is accomplished
-    if ($event['accomplishment_status'] === 1) {
-        $summaryStmt = $conn->prepare("SELECT * FROM event_items WHERE event_id = ?");
+    // Fetch items for Financial Summary if the event is accomplished
+    $summaryItems = [];
+    if ($event['accomplishment_status'] == 1) { // Check accomplishment status
+        $summaryStmt = $conn->prepare("SELECT * FROM event_summary_items WHERE event_id = ?");
         if ($summaryStmt === false) {
             die('Prepare for summary items failed: ' . $conn->error);
         }
         $summaryStmt->bind_param("i", $event_id);
         $summaryStmt->execute();
         $summaryResult = $summaryStmt->get_result();
-        $summaryItems = [];
         if ($summaryResult->num_rows > 0) {
             while ($row = $summaryResult->fetch_assoc()) {
                 $summaryItems[] = $row;
@@ -118,8 +118,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
 
                 <div class="tab-content mt-4 mx-3">
                     <!-- Financial Plan Tab -->
-                    <div class="tab-pane fade show active" id="financial-plan" role="tabpanel"
-                        aria-labelledby="financial-plan-tab">
+                    <div class="tab-pane fade show active" id="financial-plan" role="tabpanel" aria-labelledby="financial-plan-tab">
 
                         <!-- Event Information -->
                         <h4>Title:
@@ -135,8 +134,9 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                             <?php echo $event['event_end_date']; ?>
                         </p>
 
-                        <h4>Items<button class="btn btn-sm btn-primary ms-3" data-bs-toggle="modal"
-                                data-bs-target="#addItemModal"><i class="fa-solid fa-plus"></i> Add Item</button></h4>
+                        <h4>Items<?php if ($event['accomplishment_status'] === 0): ?>
+                        <button class="btn btn-sm btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addItemModal"><i class="fa-solid fa-plus"></i> Add Item</button>
+                        <?php endif; ?></h4>
                         <table class="table">
                             <thead>
                                 <tr>
@@ -145,37 +145,44 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     <th>Unit</th>
                                     <th>Amount</th>
                                     <th>Total Amount</th>
-                                    <th>Actions</th>
+                                    <?php
+                                    if ($event['accomplishment_status'] === 0) {
+                                        echo "<th>Actions</th>";
+                                    }
+                                    ?>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php
-                    if (!empty($items)) {
-                        foreach ($items as $item) {
-                            $total_amount = $item['quantity'] * $item['amount'];
-                            echo "<tr>
-                                    <td>{$item['description']}</td>
-                                    <td>{$item['quantity']}</td>
-                                    <td>{$item['unit']}</td>
-                                    <td>{$item['amount']}</td>
-                                    <td>{$total_amount}</td>
-                                    <td>
-                                        <button class='btn edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#editItemModal' data-id='{$item['item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
-                                        <button class='btn delete-btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteItemModal' data-id='{$item['item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
-                                    </td>
-                                  </tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='6' class='text-center'>No items found</td></tr>";
-                    }
-                    ?>
+                                if (!empty($items)) {
+                                    foreach ($items as $item) {
+                                        $total_amount = $item['quantity'] * $item['amount'];
+                                        echo "<tr>
+                                                <td>{$item['description']}</td>
+                                                <td>{$item['quantity']}</td>
+                                                <td>{$item['unit']}</td>
+                                                <td>{$item['amount']}</td>
+                                                <td>{$total_amount}</td>
+                                                <td>";
+                                        if ($event['accomplishment_status'] === 0) {
+                                            echo "<button class='btn edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#editItemModal' data-id='{$item['item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
+                                                <button class='btn delete-btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteItemModal' data-id='{$item['item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>";
+                                        }
+                                        echo "</td>
+                                            </tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='6' class='text-center'>No items found</td></tr>";
+                                }
+                                ?>
                             </tbody>
                         </table>
+                        
                     </div>
 
                     <!-- Financial Summary Tab -->
-                    <div class="tab-pane fade" id="financial-summary" role="tabpanel"
-                        aria-labelledby="financial-summary-tab">
+                    <div class="tab-pane fade" id="financial-summary" role="tabpanel" aria-labelledby="financial-summary-tab">
                         <?php if ($event['accomplishment_status'] === 1): ?>
                         <!-- Event Information -->
                         <h4>Title:
@@ -191,9 +198,8 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                             <?php echo $event['event_end_date']; ?>
                         </p>
 
-                        <h4>Items<button class="btn btn-primary ms-3" data-bs-toggle="modal"
-                                data-bs-target="#summaryAddItemModal"><i class="fa-solid fa-plus"></i> Add Item</button>
-                        </h4>
+                        <h4>Items<button class="btn btn-sm btn-primary ms-3" data-bs-toggle="modal"
+                        data-bs-target="#summaryAddItemModal"><i class="fa-solid fa-plus"></i> Add Item</button></h4>
                         <table class="table">
                             <thead>
                                 <tr>
@@ -207,37 +213,33 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                             </thead>
                             <tbody>
                                 <?php
-                        if (!empty($summaryItems)) {
-                            foreach ($summaryItems as $item) {
-                                $total_amount = $item['quantity'] * $item['amount'];
-                                echo "<tr>
-                                        <td>{$item['description']}</td>
-                                        <td>{$item['quantity']}</td>
-                                        <td>{$item['unit']}</td>
-                                        <td>{$item['amount']}</td>
-                                        <td>{$total_amount}</td>
-                                        <td>
-                                        <button class='btn summary-edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#summaryEditItemModal' data-id='{$item['item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
-                                        <button class='btn summary-delete-btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#summaryDeleteItemModal' data-id='{$item['item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
-                                        </td>
-                                      </tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='5' class='text-center'>No summary items found</td></tr>";
-                        }
-                        ?>
+                                if (!empty($summaryItems)) {
+                                    foreach ($summaryItems as $item) {
+                                        $total_amount = $item['quantity'] * $item['amount'];
+                                        echo "<tr>
+                                                <td>{$item['description']}</td>
+                                                <td>{$item['quantity']}</td>
+                                                <td>{$item['unit']}</td>
+                                                <td>{$item['amount']}</td>
+                                                <td>{$total_amount}</td>
+                                                <td>
+                                                    <button class='btn summary-edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#summaryEditItemModal' data-id='{$item['summary_item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
+                                                    <button class='btn summary-delete-btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#summaryDeleteItemModal' data-id='{$item['summary_item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
+                                                </td>
+                                            </tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='5' class='text-center'>No summary items found</td></tr>";
+                                }
+                                ?>
                             </tbody>
                         </table>
                         <?php else: ?>
-                        <p>This event has not been accomplished yet. The financial summary will be available once the
-                            event is marked as accomplished.</p>
+                        <p>This event has not been accomplished yet. The financial summary will be available once the event is marked as accomplished.</p>
                         <?php endif; ?>
                     </div>
                 </div>
-                <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-secondary me-1" onclick="history.back()"> Cancel </button>
-                    <button type="button" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save </button>
-                </div>
+                
 
 
                 <!-- Plan Add Item Modal -->
@@ -427,10 +429,10 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                                 name="amount" required>
                                         </div>
                                     </div>
-                                    <div id="summarySuccessMessage" class="alert alert-success d-none mt-3"
+                                    <div id="successMessage4" class="alert alert-success d-none mt-3"
                                         role="alert">Item added successfully!</div>
-                                    <div id="summaryErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                                        <ul id="summaryErrorList"></ul>
+                                    <div id="errorMessage4" class="alert alert-danger d-none mt-3" role="alert">
+                                        <ul id="errorList4"></ul>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -480,11 +482,11 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                                 id="summary_edit_amount" name="amount" required>
                                         </div>
                                     </div>
-                                    <div id="summaryEditSuccessMessage" class="alert alert-success d-none mt-3"
+                                    <div id="successMessage5" class="alert alert-success d-none mt-3"
                                         role="alert">Item updated successfully!</div>
-                                    <div id="summaryEditErrorMessage" class="alert alert-danger d-none mt-3"
+                                    <div id="errorMessage5" class="alert alert-danger d-none mt-3"
                                         role="alert">
-                                        <ul id="summaryEditErrorList"></ul>
+                                        <ul id="editErrorList5"></ul>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
