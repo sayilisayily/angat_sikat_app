@@ -24,13 +24,6 @@
                         </a>
                         </li>
                         <li class="sidebar-item">
-                        <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false"
-                            data-tooltip="Manage Events">
-                            <i class="bx bx-calendar"></i>
-                            <span class="hide-menu">Manage Events</span>
-                        </a>
-                        </li>
-                        <li class="sidebar-item">
                         <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget">
                             <i class="bx bx-wallet"></i>
                             <span class="hide-menu">Budget</span>
@@ -41,6 +34,13 @@
                             <a href="#moe">› MOE</a>
                             <a href="../budget_management/budget_approval_table.php">› Approval</a>
                         </div>
+                        </li>
+                        <li class="sidebar-item">
+                        <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false"
+                            data-tooltip="Manage Events">
+                            <i class="bx bx-calendar"></i>
+                            <span class="hide-menu">Manage Events</span>
+                        </a>
                         </li>
                         <li class="sidebar-item">
                         <a class="sidebar-link" href="#transactions" aria-expanded="false" data-tooltip="Transactions">
