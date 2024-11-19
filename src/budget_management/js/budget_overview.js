@@ -1,29 +1,5 @@
 
 $(document).ready(function () {
-    // Trigger the modal opening
-    $('#editBeginningBalanceModal').on('show.bs.modal', function (event) {
-        var modal = $(this);
-        var organization_id = modal.find('input[name="organization_id"]').val();
-
-        // Fetch current beginning balance
-        $.ajax({
-            url: 'get_beginning_balance.php', // PHP script to fetch the balance
-            type: 'POST',
-            dataType: 'json',
-            data: { organization_id: organization_id },
-            success: function (response) {
-                if (response.success) {
-                    // Populate the input field with the current balance
-                    modal.find('#beginningBalance').val(response.beginning_balance);
-                } else {
-                    $('#editMessage').removeClass('d-none alert-success').addClass('alert-danger').text(response.message);
-                }
-            },
-            error: function () {
-                $('#editMessage').removeClass('d-none alert-success').addClass('alert-danger').text('Error fetching beginning balance.');
-            }
-        });
-    });
 
     // Submit Beginning Balance Form
     $('#editBeginningBalanceForm').on('submit', function (e) {
@@ -41,10 +17,10 @@ $(document).ready(function () {
 
                     if (response.success) {
                         // Hide any existing error messages
-                        $('#errorMessage').addClass('d-none');
+                        $('#errorMessage1').addClass('d-none');
     
                         // Show success message
-                        $('#successMessage').removeClass('d-none');
+                        $('#successMessage1').removeClass('d-none');
     
                         // Close the modal after a short delay
                         setTimeout(function() {
@@ -53,15 +29,15 @@ $(document).ready(function () {
                         }, 2000);
                     } else {
                         // Hide any existing success messages
-                        $('#successMessage').addClass('d-none');
+                        $('#successMessage1').addClass('d-none');
 
                         // Show validation errors
-                        $('#errorMessage').removeClass('d-none');
+                        $('#errorMessage1').removeClass('d-none');
                         let errorHtml = '';
                         for (let field in response.errors) {
                             errorHtml += `<li>${response.errors[field]}</li>`;
                         }
-                        $('#errorList').html(errorHtml);
+                        $('#errorList1').html(errorHtml);
                     }
                 } catch (error) {
                     console.error('Error parsing JSON response:', error);
@@ -96,78 +72,6 @@ $(document).ready(function () {
         });
     });
 
-    // Fetch and populate Cash on Hand
-    $('#editCashOnHandModal').on('show.bs.modal', function (event) {
-        var modal = $(this);
-        var organization_id = modal.find('input[name="organization_id"]').val();
-
-        $.ajax({
-            url: 'get_cash_on_hand.php',
-            type: 'POST',
-            dataType: 'json',
-            data: { organization_id: organization_id },
-            success: function (response) {
-                if (response.success) {
-                    modal.find('#cashOnHand').val(response.cash_on_hand);
-                } else {
-                    $('#editMessage').removeClass('d-none alert-success').addClass('alert-danger').text(response.message);
-                }
-            },
-            error: function () {
-                $('#editMessage').removeClass('d-none alert-success').addClass('alert-danger').text('Error fetching Cash on Hand.');
-            }
-        });
-    });
-
-    // Submit Cash on Bank form
-    $('#editCashOnBankForm').on('submit', function (e) {
-        e.preventDefault();
-
-        $.ajax({
-            url: 'update_cash_on_bank.php',
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function (response) {
-                try {
-                    // Parse the JSON response (ensure it's valid JSON)
-                    response = JSON.parse(response);
-                    console.log(response);
-
-                    if (response.success) {
-                        // Hide any existing error messages
-                        $('#errorMessage').addClass('d-none');
-    
-                        // Show success message
-                        $('#successMessage').removeClass('d-none');
-    
-                        // Close the modal after a short delay
-                        setTimeout(function() {
-                            $('#editCashOnBankModal').modal('hide');      
-                            location.reload(); 
-                        }, 2000);
-                    } else {
-                        // Hide any existing success messages
-                        $('#successMessage').addClass('d-none');
-
-                        // Show validation errors
-                        $('#errorMessage').removeClass('d-none');
-                        let errorHtml = '';
-                        for (let field in response.errors) {
-                            errorHtml += `<li>${response.errors[field]}</li>`;
-                        }
-                        $('#errorList').html(errorHtml);
-                    }
-                } catch (error) {
-                    console.error('Error parsing JSON response:', error);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error updating event:', error);
-                console.log(response);
-            }
-        });
-    });
-
     // Submit Cash on Hand form
     $('#editCashOnHandForm').on('submit', function (e) {
         e.preventDefault();
@@ -184,10 +88,10 @@ $(document).ready(function () {
 
                     if (response.success) {
                         // Hide any existing error messages
-                        $('#errorMessage').addClass('d-none');
+                        $('#errorMessage3').addClass('d-none');
     
                         // Show success message
-                        $('#successMessage').removeClass('d-none');
+                        $('#successMessage3').removeClass('d-none');
     
                         // Close the modal after a short delay
                         setTimeout(function() {
@@ -196,15 +100,15 @@ $(document).ready(function () {
                         }, 2000);
                     } else {
                         // Hide any existing success messages
-                        $('#successMessage').addClass('d-none');
+                        $('#successMessage3').addClass('d-none');
 
                         // Show validation errors
-                        $('#errorMessage').removeClass('d-none');
+                        $('#errorMessage3').removeClass('d-none');
                         let errorHtml = '';
                         for (let field in response.errors) {
                             errorHtml += `<li>${response.errors[field]}</li>`;
                         }
-                        $('#errorList').html(errorHtml);
+                        $('#errorList3').html(errorHtml);
                     }
                 } catch (error) {
                     console.error('Error parsing JSON response:', error);

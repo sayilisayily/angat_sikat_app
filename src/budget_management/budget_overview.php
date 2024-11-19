@@ -45,7 +45,7 @@
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Custom CSS for Budget Overview-->
-    <link rel="stylesheet" href="../budget_management/budget.css" />
+    <link rel="stylesheet" href="../budget_management/css/budget.css" />
     <!--Boxicon-->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <!--Font Awesome-->
@@ -360,8 +360,7 @@
 
             <!-- Modals -->
             <!-- Edit Beginning Balance Modal -->
-            <div class="modal fade" id="editBeginningBalanceModal" tabindex="-1"
-                aria-labelledby="editBeginningBalanceLabel" aria-hidden="true">
+            <div class="modal fade" id="editBeginningBalanceModal" tabindex="-1" aria-labelledby="editBeginningBalanceLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -370,36 +369,54 @@
                         </div>
                         <div class="modal-body">
                             <form id="editBeginningBalanceForm">
+                                <!-- Current Beginning Balance (Readonly) -->
                                 <div class="mb-3">
-                                    <label for="beginningBalance" class="form-label">Beginning Balance</label>
-                                    <input type="number" step="0.01" class="form-control" id="beginningBalance"
-                                        name="beginning_balance" required>
+                                    <label for="currentBeginningBalance" class="form-label">Beginning Balance</label>
+                                    <input type="number" step="0.01" class="form-control" id="currentBeginningBalance" 
+                                        name="current_beginning_balance" value="<?php echo $beginning_balance; ?>" readonly>
                                 </div>
-                                <input type="hidden" name="organization_id" value="<?php echo $organization_id; ?>">
-                            </form>
-                            <!-- Success Message Alert -->
-                            <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
-                                Beginning Balance updated successfully!
-                            </div>
-                            <!-- Error Message Alert -->
-                            <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                                <ul id="errorList"></ul> <!-- List for showing validation errors -->
-                            </div>
-                        </div>
+                                
+                                <!-- Add or Subtract Amount -->
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa-solid fa-plus"></i></span>
+                                            <input type="number" step="0.01" class="form-control" id="addAmount" name="add_amount">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa-solid fa-minus"></i></span>
+                                            <input type="number" step="0.01" class="form-control" id="subtractAmount" name="subtract_amount">
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <!-- Hidden Organization ID -->
+                                <input type="hidden" name="organization_id" value="<?php echo $organization_id; ?>">
+
+                                <!-- Success Message Alert -->
+                                <div id="successMessage1" class="alert alert-success d-none mt-3" role="alert">
+                                    Beginning Balance updated successfully!
+                                </div>
+                                
+                                <!-- Error Message Alert -->
+                                <div id="errorMessage1" class="alert alert-danger d-none mt-3" role="alert">
+                                    <ul id="errorList1"></ul>
+                                </div>
+                            </form>
+                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" form="editBeginningBalanceForm" class="btn btn-primary">Save
-                                changes</button>
+                            <button type="submit" form="editBeginningBalanceForm" class="btn btn-primary">Save Changes</button>
                         </div>
-
                     </div>
                 </div>
             </div>
 
+
             <!-- Edit Cash on Bank Modal -->
-            <div class="modal fade" id="editCashOnBankModal" tabindex="-1" aria-labelledby="editCashOnBankLabel"
-                aria-hidden="true">
+            <div class="modal fade" id="editCashOnBankModal" tabindex="-1" aria-labelledby="editCashOnBankLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -408,36 +425,50 @@
                         </div>
                         <div class="modal-body">
                             <form id="editCashOnBankForm">
+                                <!-- Current Cash on Bank (Readonly) -->
                                 <div class="mb-3">
-                                    <label for="cashOnBank" class="form-label">Cash on Bank</label>
-                                    <input type="number" step="0.01" class="form-control" id="cashOnBank"
-                                        name="cash_on_bank" required>
+                                    <label for="currentCashOnBank" class="form-label">Current Cash on Bank</label>
+                                    <input type="number" step="0.01" class="form-control" id="currentCashOnBank" name="current_cash_on_bank" value="<?php echo $cash_on_bank; ?>" readonly>
+                                </div>
+                                <!-- Add or Subtract Amount -->
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa-solid fa-plus"></i></span>
+                                            <input type="number" step="0.01" class="form-control" id="addCashOnBank" name="add_cash_on_bank">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa-solid fa-minus"></i></span>
+                                            <input type="number" step="0.01" class="form-control" id="subtractCashOnBank" name="subtract_cash_on_bank">
+                                        </div>
+                                    </div>
                                 </div>
                                 <input type="hidden" name="organization_id" value="<?php echo $organization_id; ?>">
                             </form>
                             <!-- Success Message Alert -->
-                            <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
+                            <div id="successMessage2" class="alert alert-success d-none mt-3" role="alert">
                                 Cash on Bank updated successfully!
                             </div>
                             <!-- Error Message Alert -->
-                            <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                                <ul id="errorList"></ul> <!-- List for showing validation errors -->
+                            <div id="errorMessage2" class="alert alert-danger d-none mt-3" role="alert">
+                                <ul id="errorList2"></ul> <!-- List for showing validation errors -->
                             </div>
                         </div>
-
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" form="editCashOnBankForm" class="btn btn-primary">Save
-                                changes</button>
+                            <button type="submit" form="editCashOnBankForm" class="btn btn-primary">Save changes</button>
                         </div>
-
                     </div>
                 </div>
             </div>
 
+
             <!-- Edit Cash on Hand Modal -->
-            <div class="modal fade" id="editCashOnHandModal" tabindex="-1" aria-labelledby="editCashOnHandLabel"
-                aria-hidden="true">
+            <div class="modal fade" id="editCashOnHandModal" tabindex="-1" aria-labelledby="editCashOnHandLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -446,32 +477,47 @@
                         </div>
                         <div class="modal-body">
                             <form id="editCashOnHandForm">
+                                <!-- Current Cash on Hand (Readonly) -->
                                 <div class="mb-3">
-                                    <label for="cashOnHand" class="form-label">Cash on Hand</label>
-                                    <input type="number" step="0.01" class="form-control" id="cashOnHand"
-                                        name="cash_on_hand" required>
+                                    <label for="currentCashOnHand" class="form-label">Current Cash on Hand</label>
+                                    <input type="number" step="0.01" class="form-control" id="currentCashOnHand" name="current_cash_on_hand" value="<?php echo $cash_on_hand; ?>" readonly>
+                                </div>
+                                <!-- Add or Subtract Amount -->
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa-solid fa-plus"></i></span>
+                                            <input type="number" step="0.01" class="form-control" id="addCashOnHand" name="add_cash_on_hand">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa-solid fa-minus"></i></span>
+                                            <input type="number" step="0.01" class="form-control" id="subtractCashOnHand" name="subtract_cash_on_hand">
+                                        </div>
+                                    </div>
                                 </div>
                                 <input type="hidden" name="organization_id" value="<?php echo $organization_id; ?>">
                             </form>
-
                             <!-- Success Message Alert -->
-                            <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
+                            <div id="successMessage3" class="alert alert-success d-none mt-3" role="alert">
                                 Cash on Hand updated successfully!
                             </div>
                             <!-- Error Message Alert -->
-                            <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                                <ul id="errorList"></ul> <!-- List for showing validation errors -->
+                            <div id="errorMessage3" class="alert alert-danger d-none mt-3" role="alert">
+                                <ul id="errorList3"></ul> <!-- List for showing validation errors -->
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" form="editCashOnHandForm" class="btn btn-primary">Save
-                                changes</button>
+                            <button type="submit" form="editCashOnHandForm" class="btn btn-primary">Save changes</button>
                         </div>
-
                     </div>
                 </div>
             </div>
+
 
             <!-- Edit Budget Modal -->
             <div class="modal fade" id="editBudgetModal" tabindex="-1" aria-labelledby="editBudgetModalLabel"

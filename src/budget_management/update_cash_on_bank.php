@@ -8,12 +8,21 @@ $data = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Validate Cash on Bank input
-    if (!isset($_POST['cash_on_bank']) || $_POST['cash_on_bank'] === '') {
-        $errors['cash_on_bank'] = 'Cash on Bank is required.';
+    // Validate organization ID
+    if (!isset($_POST['organization_id']) || !is_numeric($_POST['organization_id'])) {
+        $errors['organization_id'] = 'Invalid organization ID.';
     }
 
-    // If there are errors, return early to prevent further processing
+    // Validate Add and Subtract inputs
+    $add_cash_on_bank = isset($_POST['add_cash_on_bank']) ? (float)$_POST['add_cash_on_bank'] : 0;
+    $subtract_cash_on_bank = isset($_POST['subtract_cash_on_bank']) ? (float)$_POST['subtract_cash_on_bank'] : 0;
+
+    // Ensure at least one field (add or subtract) is provided
+    if ($add_cash_on_bank === 0 && $subtract_cash_on_bank === 0) {
+        $errors['cash_on_bank'] = 'Please enter an amount to add or subtract.';
+    }
+
+    // If there are errors, return early
     if (!empty($errors)) {
         $data['success'] = false;
         $data['errors'] = $errors;
@@ -23,32 +32,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Sanitize and assign variables
     $organization_id = (int)$_POST['organization_id'];
-    $cash_on_bank = (float)$_POST['cash_on_bank'];
 
-    // Fetch current cash_on_hand and balance from the database
-    $fetch_query = "SELECT cash_on_hand, balance FROM organizations WHERE organization_id = ?";
+    // Fetch current cash_on_bank, cash_on_hand, and balance from the database
+    $fetch_query = "SELECT cash_on_bank, cash_on_hand, balance FROM organizations WHERE organization_id = ?";
     $fetch_stmt = $conn->prepare($fetch_query);
-    
+
     if ($fetch_stmt) {
         $fetch_stmt->bind_param('i', $organization_id);
         $fetch_stmt->execute();
-        $fetch_stmt->bind_result($cash_on_hand, $balance);
+        $fetch_stmt->bind_result($current_cash_on_bank, $cash_on_hand, $balance);
         $fetch_stmt->fetch();
         $fetch_stmt->close();
 
-        // Check if the new cash_on_bank plus cash_on_hand is greater than the balance
-        if (($cash_on_bank + $cash_on_hand) > $balance) {
-            // If the condition is not met, return an error message
-            $errors['cash_on_bank'] = 'Cash on Bank plus Cash on Hand cannot exceed the Balance.';
+        // Calculate the new cash_on_bank value
+        $new_cash_on_bank = $current_cash_on_bank + $add_cash_on_bank - $subtract_cash_on_bank;
+
+        // Check if the new cash_on_bank plus cash_on_hand exceeds the balance
+        if (($new_cash_on_bank + $cash_on_hand) > $balance) {
+            $errors['cash_on_bank'] = 'The total of Cash on Bank and Cash on Hand cannot exceed the Balance.';
+            $data['success'] = false;
+            $data['errors'] = $errors;
+        } elseif ($new_cash_on_bank < 0) {
+            $errors['cash_on_bank'] = 'Cash on Bank cannot be negative.';
             $data['success'] = false;
             $data['errors'] = $errors;
         } else {
-            // Proceed with the update if the condition is met
+            // Proceed with the update if validations pass
             $update_query = "UPDATE organizations SET cash_on_bank = ? WHERE organization_id = ?";
             $update_stmt = $conn->prepare($update_query);
 
             if ($update_stmt) {
-                $update_stmt->bind_param('di', $cash_on_bank, $organization_id);
+                $update_stmt->bind_param('di', $new_cash_on_bank, $organization_id);
 
                 if ($update_stmt->execute()) {
                     $data['success'] = true;
