@@ -132,10 +132,10 @@ $('#editEventForm').on('submit', function(event) {
 
                 if (response.success) {
                     // Hide any existing error messages
-                    $('#errorMessage').addClass('d-none');
+                    $('#errorMessage2').addClass('d-none');
 
                     // Show success message
-                    $('#successMessage').removeClass('d-none');
+                    $('#successMessage2').removeClass('d-none');
 
                     // Close the modal after a short delay
                     setTimeout(function() {
@@ -143,19 +143,19 @@ $('#editEventForm').on('submit', function(event) {
 
                         // Reset the form and hide the success message
                         $('#editEventForm')[0].reset();
-                        $('#successMessage').addClass('d-none');
+                        $('#successMessage2').addClass('d-none');
                         location.reload(); 
                     }, 2000); 
                 } else {
                     // Show validation errors
-                    $('#editsuccessMessage').addClass('d-none');
+                    $('#successMessage2').addClass('d-none');
 
-                    $('#errorMessage').removeClass('d-none');
+                    $('#errorMessage2').removeClass('d-none');
                       let errorHtml = '';
                       for (let field in response.errors) {
                           errorHtml += `<li>${response.errors[field]}</li>`;
                       }
-                      $('#errorList').html(errorHtml);
+                      $('#errorList2').html(errorHtml);
                 }
             } catch (error) {
                 console.error('Error parsing JSON:', error);
@@ -187,22 +187,43 @@ $('#editEventForm').on('submit', function(event) {
           data: { event_id: eventId },
           dataType: 'json',
           success: function(response) {
-              if (response.success) {
+              try { 
+                if (response.success) {
                   // Show success message (optional)
                   console.log(response.message);
+                    // Hide any existing error messages
+                    $('#errorMessage3').addClass('d-none');
 
-                  // Reload the DataTable to remove the archived event from the list
-                  location.reload();// Reload without resetting pagination
+                    // Show success message
+                    $('#successMessage3').removeClass('d-none');
+
+                    // Close the modal after a short delay
+                    setTimeout(function() {
+                        $('#archiveModal').modal('hide'); 
+
+                        // Reset the form and hide the success message
+                        $('#editEventForm')[0].reset();
+                        $('#successMessage3').addClass('d-none');
+                        location.reload(); 
+                    }, 2000);
               } else {
-                  // Show error message (optional)
-                  alert("Error archiving event: " + response.message);
-              }
+                  // Show validation errors
+                  $('#editsuccessMessage3').addClass('d-none');
 
-              // Close the modal after archiving
-              $('#archiveModal').modal('hide');
+                  $('#errorMessage3').removeClass('d-none');
+                    let errorHtml = '';
+                    for (let field in response.errors) {
+                        errorHtml += `<li>${response.errors[field]}</li>`;
+                    }
+                    $('#errorList3').html(errorHtml);
+                }
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+            }
           },
           error: function(xhr, status, error) {
-              console.error("AJAX Error: ", error);
+            console.error('Error archiving event:', error);
+            console.log(xhr.responseText);
           }
       });
   });

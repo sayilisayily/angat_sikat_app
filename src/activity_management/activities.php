@@ -251,12 +251,12 @@ $result = $conn->query($sql);
                         <input type="hidden" id="editAccomplishmentStatus" name="accomplishment_status">
 
                         <!-- Success Message Alert -->
-                        <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
+                        <div id="successMessage2" class="alert alert-success d-none mt-3" role="alert">
                             Event updated successfully!
                         </div>
                         <!-- Error Message Alert -->
-                        <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                            <ul id="errorList"></ul> <!-- List for showing validation errors -->
+                        <div id="errorMessage2" class="alert alert-danger d-none mt-3" role="alert">
+                            <ul id="errorList2"></ul> <!-- List for showing validation errors -->
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -280,6 +280,14 @@ $result = $conn->query($sql);
                 <div class="modal-body">
                     Are you sure you want to archive this event?
                     <input type="hidden" id="archiveEventId">
+                    <!-- Success Message Alert -->
+                    <div id="successMessage3" class="alert alert-success d-none mt-3" role="alert">
+                            Event archived successfully!
+                        </div>
+                        <!-- Error Message Alert -->
+                        <div id="errorMessage3" class="alert alert-danger d-none mt-3" role="alert">
+                            <ul id="errorList3"></ul> <!-- List for showing validation errors -->
+                        </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

@@ -85,13 +85,9 @@ if (!empty($errors)) {
         if (empty($category)) {
             $errors['category'] = 'Event title not found in category';
         } else {
-            // Hardcoded organization_id and created_by
-            $organization_id = 2;
-            $created_by = 1;
-            
             // Insert into the budget_approvals table
-            $insert_query = "INSERT INTO budget_approvals (title, category, attachment, status, organization_id, created_by) 
-                             VALUES ('$title', '$category', '$attachment', '$status', $organization_id, $created_by)";
+            $insert_query = "INSERT INTO budget_approvals (title, category, attachment, status, organization_id) 
+                             VALUES ('$title', '$category', '$attachment', '$status', $organization_id)";
     
             if (mysqli_query($conn, $insert_query)) {
                 $data['success'] = true;

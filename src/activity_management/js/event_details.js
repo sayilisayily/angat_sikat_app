@@ -101,26 +101,26 @@ $('#editItemForm').on('submit', function(e) {
             console.log(response);
             if (result.success) {
                 // Hide any existing error messages
-                $('#errorMessage').addClass('d-none')
+                $('#errorMessage2').addClass('d-none')
                 // Show success message
-                $('#successMessage').removeClass('d-none');
+                $('#successMessage2').removeClass('d-none');
                 
                 setTimeout(function() {
                     $('#editItemModal').modal('hide')
                     // Reset the form and hide the success message
                     $('#editItemForm')[0].reset();
-                    $('#successMessage').addClass('d-none');
+                    $('#successMessage2').addClass('d-none');
                     location.reload();
                 }, 2000); 
             } else {
                 // Show validation errors
-                $('#editsuccessMessage').addClass('d-none')
-                $('#errorMessage').removeClass('d-none');
+                $('#successMessage2').addClass('d-none')
+                $('#errorMessage2').removeClass('d-none');
                 let errorHtml = '';
                 for (let field in response.errors) {
                     errorHtml += `<li>${response.errors[field]}</li>`;
                 }
-                $('#errorList').html(errorHtml);
+                $('#errorList2').html(errorHtml);
             }
         },
         error: function() {
@@ -136,36 +136,57 @@ $(document).on("click", ".delete-btn", function () {
     console.log('Selected Item ID: ' + itemId);
 });
 
-// JavaScript for handling the delete form submission
-$("#deleteItemForm").on("submit", function (e) {
-    e.preventDefault();
+$('#confirmDeleteBtn').on('click', function() {
+    var itemId = $('#delete_item_id').val(); // Get the item ID from the hidden input field
     
-    const itemId = $("#delete_item_id").val();  // Get the item_id from the hidden input field
-    
-
+    // Send an AJAX request to delete the item
     $.ajax({
-        type: "POST",
-        url: "delete_item.php",
-        data: $(this).serialize(),  // Send only item_id to the PHP file
-        success: function (response) {
-            var result = JSON.parse(response);
-            console.log('Item ID: ' + itemId);
-            console.log(response);
-            if (response.success) {
-                
-                setTimeout(function() {
-                    $("#deleteItemModal").modal("hide");
-                    location.reload();
-                }, 2000); 
-            } else {
-                console.log(response.message);
+        url: 'delete_item.php', // PHP file to handle deletion
+        type: 'POST',
+        data: { item_id: itemId },
+        dataType: 'json',
+        success: function(response) {
+            try { 
+                if (response.success) {
+                    // Show success message (optional)
+                    console.log(response.message);
+                    
+                    // Hide any existing error messages
+                    $('#errorMessage3').addClass('d-none');
+
+                    // Show success message
+                    $('#successMessage3').removeClass('d-none').text(response.message);
+
+                    // Close the modal after a short delay
+                    setTimeout(function() {
+                        $('#deleteItemModal').modal('hide'); 
+
+                        // Reset the form and hide the success message
+                        $('#successMessage3').addClass('d-none');
+                        location.reload(); 
+                    }, 2000);
+                } else {
+                    // Show validation errors
+                    $('#successMessage3').addClass('d-none');
+
+                    $('#errorMessage3').removeClass('d-none');
+                    let errorHtml = '';
+                    for (let field in response.errors) {
+                        errorHtml += `<li>${response.errors[field]}</li>`;
+                    }
+                    $('#errorList3').html(errorHtml);
+                }
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
             }
         },
-        error: function () {
-            console.log(response.message);
+        error: function(xhr, status, error) {
+            console.error('Error deleting item:', error);
+            console.log(xhr.responseText);
         }
     });
 });
+
 
 $(document).ready(function () {
     // Check localStorage for the last active tab

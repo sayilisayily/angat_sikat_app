@@ -1,6 +1,7 @@
 <?php
 include 'connection.php';
 
+$errors = [];
 $data = [];
 
 if (isset($_POST['event_id'])) {

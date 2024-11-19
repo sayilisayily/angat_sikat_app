@@ -1,50 +1,50 @@
 <?php
-// Include the database connection file
-include 'connection.php';
+include('connection.php');
 
-// Initialize response array
-$response = ['success' => false, 'message' => 'An error occurred.'];
+// Initialize an array to hold validation errors
+$errors = [];
+$data = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['item_id'])) {
-        $item_id = $_POST['item_id'];
-    
-        // Prepare and execute the delete query
+    // Retrieve the item_id from POST
+    $item_id = $_POST['item_id'];
+
+    // Validate input
+    if (empty($item_id)) {
+        $errors[] = 'Item ID is required.';
+    }
+
+    // Check for validation errors before proceeding
+    if (!empty($errors)) {
+        $data['success'] = false;
+        $data['errors'] = $errors;
+        echo json_encode($data);
+        exit;
+    } else {
+        // Prepare the SQL query using a prepared statement
         $query = "DELETE FROM event_items WHERE item_id = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $item_id);
-                
-        if ($stmt = $conn->prepare($query)) {
-            // Bind parameters and execute the statement
-            $stmt->bind_param("i", $item_id);
-            
+
+        if ($stmt) {
+            // Bind parameters and execute the query
+            $stmt->bind_param('i', $item_id);
+
             if ($stmt->execute()) {
-                // Check if the item was successfully deleted
-                if ($stmt->affected_rows > 0) {
-                    $response['success'] = true;
-                    $response['message'] = 'Item deleted successfully.';
-                } else {
-                    $response['message'] = 'Item not found or already deleted.';
-                }
+                $data['success'] = true;
+                $data['message'] = 'Item deleted successfully!';
             } else {
-                $response['message'] = 'Failed to execute the query.';
+                $data['success'] = false;
+                $data['errors'] = ['database' => 'Failed to delete item from the database.'];
             }
-            // Close the statement
+
             $stmt->close();
         } else {
-            $response['message'] = 'Failed to prepare the SQL statement.';
+            $data['success'] = false;
+            $data['errors'] = ['database' => 'Failed to prepare the delete statement.'];
         }
-    } else {
-        $response['message'] = 'Invalid item or event ID.';
     }
-} else {
-    $response['message'] = 'Invalid request method.';
 }
 
-// Return the response as JSON
-header('Content-Type: application/json');
-echo json_encode($response);
-
-// Close the database connection
-$conn->close();
+// Output the JSON response
+echo json_encode($data);
 ?>

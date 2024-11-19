@@ -75,7 +75,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Custom CSS for Budget Overview-->
-    <link rel="stylesheet" href="../budget_management/budget.css" />
+    <link rel="stylesheet" href="../budget_management/css/budget.css" />
     <!--Boxicon-->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <!--Font Awesome-->
@@ -135,7 +135,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                             <?php echo $event['event_end_date']; ?>
                         </p>
 
-                        <h4>Items<button class="btn btn-primary ms-3" data-bs-toggle="modal"
+                        <h4>Items<button class="btn btn-sm btn-primary ms-3" data-bs-toggle="modal"
                                 data-bs-target="#addItemModal"><i class="fa-solid fa-plus"></i> Add Item</button></h4>
                         <table class="table">
                             <thead>
@@ -338,12 +338,12 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     </div>
 
                                     <!-- Success Message Alert -->
-                                    <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
+                                    <div id="successMessage2" class="alert alert-success d-none mt-3" role="alert">
                                         Item updated successfully!
                                     </div>
                                     <!-- Error Message Alert -->
-                                    <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                                        <ul id="errorList"></ul> <!-- List for showing validation errors -->
+                                    <div id="errorMessage2" class="alert alert-danger d-none mt-3" role="alert">
+                                        <ul id="errorList2"></ul> <!-- List for showing validation errors -->
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -358,31 +358,38 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
 
 
                 <!-- Delete Item Modal -->
-                <div class="modal fade" id="deleteItemModal" tabindex="-1" aria-labelledby="deleteItemModalLabel"
-                    aria-hidden="true">
+                <div class="modal fade" id="deleteItemModal" tabindex="-1" aria-labelledby="deleteItemModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="deleteItemModalLabel">Delete Item</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                <h5 class="modal-title">Delete Item</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <p>Are you sure you want to delete this item?</p>
-                                <form id="deleteItemForm">
-                                    <input type="hidden" name="item_id" id="delete_item_id">
-                                    <input type="hidden" id="delete_event_id" name="event_id"
-                                        value="<?php echo $event_id; ?>">
 
+                                <!-- Hidden form for item and event IDs -->
+                                <form id="deleteItemForm">
+                                    <input type="hidden" name="item_id" id="delete_item_id"> <!-- Item ID -->
+                                    <input type="hidden" name="event_id" id="delete_event_id" value="<?php echo $event_id; ?>"> <!-- Event ID -->
                                 </form>
+
+                                <!-- Success message -->
+                                <div id="successMessage3" class="alert alert-success d-none"></div>
+                                
+                                <!-- Error message -->
+                                <div id="errorMessage3" class="alert alert-danger d-none">
+                                    <ul id="errorList3"></ul>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-danger">Delete</button>
+                                <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <!-- Add Item Modal for Summary Tab -->
                 <div class="modal fade" id="summaryAddItemModal" tabindex="-1"
                     aria-labelledby="summaryAddItemModalLabel" aria-hidden="true">
