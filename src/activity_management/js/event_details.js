@@ -52,6 +52,28 @@ $(document).ready(function () {
             });
         });
     
+        // Add an event listener to the item selector dropdown
+        document.getElementById("item_selector").addEventListener("change", function () {
+            const selectedItem = this.value;
+
+            if (selectedItem) {
+                // Parse the selected item's JSON data
+                const itemData = JSON.parse(selectedItem);
+
+                // Populate the modal fields with the item data
+                document.getElementById("summary_description").value = itemData.description || "";
+                document.getElementById("summary_quantity").value = itemData.quantity || "";
+                document.getElementById("summary_unit").value = itemData.unit || "";
+                document.getElementById("summary_amount").value = itemData.amount || "";
+            } else {
+                // Clear the fields if no item is selected
+                document.getElementById("summary_description").value = "";
+                document.getElementById("summary_quantity").value = "";
+                document.getElementById("summary_unit").value = "";
+                document.getElementById("summary_amount").value = "";
+            }
+        });
+
 
     //Submit Add Item Form
     $('#summaryAddItemForm').on('submit', function(event) {
@@ -155,7 +177,7 @@ $(document).ready(function () {
                 console.log(response);
                 if (response.success) {
                     // Populate the modal fields with the item data
-                    $('#summary_edit_item_id').val(response.data.item_id);
+                    $('#summary_edit_item_id').val(response.data.summary_item_id);
                     $('#summary_edit_description').val(response.data.description);
                     $('#summary_edit_quantity').val(response.data.quantity);
                     $('#summary_edit_unit').val(response.data.unit);
@@ -237,9 +259,9 @@ $('#summaryEditItemForm').on('submit', function(e) {
                 $('#successMessage5').removeClass('d-none');
                 
                 setTimeout(function() {
-                    $('#editItemModal').modal('hide')
+                    $('#summaryEditItemModal').modal('hide')
                     // Reset the form and hide the success message
-                    $('#editItemForm')[0].reset();
+                    $('#summaryEditItemForm')[0].reset();
                     $('#successMessage5').addClass('d-none');
                     location.reload();
                 }, 2000); 
@@ -258,6 +280,13 @@ $('#summaryEditItemForm').on('submit', function(e) {
             console.error('Error updating event:', error);
         }
     });
+});
+
+// JavaScript for the delete button click event
+$(document).on("click", ".summary-delete-btn", function () {
+    var itemId = $(this).data("id");  // Retrieve item_id from button's data attribute
+    $("#summary_delete_item_id").val(itemId);        // Set item_id in the modal form's hidden input field
+    console.log('Selected Item ID: ' + itemId);
 });
 
 // JavaScript for the delete button click event
@@ -306,6 +335,57 @@ $('#confirmDeleteBtn').on('click', function() {
                         errorHtml += `<li>${response.errors[field]}</li>`;
                     }
                     $('#errorList3').html(errorHtml);
+                }
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error deleting item:', error);
+            console.log(xhr.responseText);
+        }
+    });
+});
+
+$('#summaryConfirmDeleteBtn').on('click', function() {
+    var itemId = $('#summary_delete_item_id').val(); // Get the item ID from the hidden input field
+    
+    // Send an AJAX request to delete the item
+    $.ajax({
+        url: 'delete_summary_item.php', // PHP file to handle deletion
+        type: 'POST',
+        data: { item_id: itemId },
+        dataType: 'json',
+        success: function(response) {
+            try { 
+                if (response.success) {
+                    // Show success message (optional)
+                    console.log(response.message);
+                    
+                    // Hide any existing error messages
+                    $('#errorMessage6').addClass('d-none');
+
+                    // Show success message
+                    $('#successMessage6').removeClass('d-none').text(response.message);
+
+                    // Close the modal after a short delay
+                    setTimeout(function() {
+                        $('#summaryDeleteItemModal').modal('hide'); 
+
+                        // Reset the form and hide the success message
+                        $('#successMessage6').addClass('d-none');
+                        location.reload(); 
+                    }, 2000);
+                } else {
+                    // Show validation errors
+                    $('#successMessage6').addClass('d-none');
+
+                    $('#errorMessage6').removeClass('d-none');
+                    let errorHtml = '';
+                    for (let field in response.errors) {
+                        errorHtml += `<li>${response.errors[field]}</li>`;
+                    }
+                    $('#errorList6').html(errorHtml);
                 }
             } catch (error) {
                 console.error('Error parsing JSON:', error);

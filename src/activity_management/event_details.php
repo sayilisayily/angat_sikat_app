@@ -144,6 +144,11 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     <th>Quantity</th>
                                     <th>Unit</th>
                                     <th>Amount</th>
+                                    <?php
+                                    if ($event['event_type'] === 'Income') {
+                                        echo "<th> Markup </th>";
+                                    }
+                                    ?>
                                     <th>Total Amount</th>
                                     <?php
                                     if ($event['accomplishment_status'] === 0) {
@@ -207,7 +212,13 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     <th>Quantity</th>
                                     <th>Unit</th>
                                     <th>Amount</th>
+                                    <?php
+                                    if ($event['event_type'] === 'Income') {
+                                        echo "<th> Markup </th>";
+                                    }
+                                    ?>
                                     <th>Total Amount</th>
+                                    <th>References</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -405,6 +416,23 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                 </div>
                                 <div class="modal-body">
                                     <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
+                                    <!-- Dropdown to select an event -->
+                                    <div class="form-group row mb-2">
+                                        <label for="item_selector" class="form-label">Select Item</label>
+                                        <select class="form-control" id="item_selector" name="selected_item">
+                                            <option value="">-- Select an Item --</option>
+                                            <?php
+                                            // Fetch events from the database
+
+                                            foreach ($items as $item) {
+                                                echo '<option value="' . htmlspecialchars(json_encode($item), ENT_QUOTES, 'UTF-8') . '">'
+                                                    . htmlspecialchars($item['description']) . '</option>';
+                                            }
+
+                                            $stmt->close();
+                                            ?>
+                                        </select>
+                                    </div>
                                     <div class="form-group row mb-2">
                                         <div class="col">
                                             <label for="summary_description">Description</label>
@@ -455,7 +483,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <input type="hidden" id="summary_edit_item_id" name="item_id">
+                                    <input type="hidden" id="summary_edit_item_id" name="summary_item_id">
                                     <input type="hidden" id="summary_edit_event_id" name="event_id"
                                         value="<?php echo $event_id; ?>">
                                     <div class="form-group row mb-2">
@@ -497,24 +525,34 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                     </div>
                 </div>
 
-                <!-- Delete Item Modal for Summary Tab -->
-                <div class="modal fade" id="summaryDeleteItemModal" tabindex="-1"
-                    aria-labelledby="summaryDeleteItemModalLabel" aria-hidden="true">
+                <!-- Delete Item Modal for Summary -->
+                <div class="modal fade" id="summaryDeleteItemModal" tabindex="-1" aria-labelledby="summaryDeleteItemModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="summaryDeleteItemModalLabel">Delete Item</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                <h5 class="modal-title">Delete Item</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <p>Are you sure you want to delete this item?</p>
+
+                                <!-- Hidden form for item and event IDs -->
                                 <form id="summaryDeleteItemForm">
-                                    <input type="hidden" name="item_id" id="summary_delete_item_id">
-                                    <input type="hidden" name="event_id" id="summary_delete_event_id"
-                                        value="<?php echo $event_id; ?>">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                    <input type="hidden" name="item_id" id="summary_delete_item_id"> <!-- Item ID -->
+                                    <input type="hidden" name="event_id" id="summary_delete_event_id" value="<?php echo $event_id; ?>"> <!-- Event ID -->
                                 </form>
+
+                                <!-- Success message -->
+                                <div id="successMessage6" class="alert alert-success d-none"></div>
+                                
+                                <!-- Error message -->
+                                <div id="errorMessage6" class="alert alert-danger d-none">
+                                    <ul id="errorList6"></ul>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger" id="summaryConfirmDeleteBtn">Delete</button>
                             </div>
                         </div>
                     </div>
