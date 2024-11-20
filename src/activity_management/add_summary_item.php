@@ -5,15 +5,15 @@ require 'connection.php';
 $response = array('success' => false, 'errors' => array());
 
 // Check if the required fields are set
-if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST['unit'], $_POST['amount'])) {
+if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST['unit'], $_POST['amount']) && isset($_FILES['reference'])) {
+    // Retrieve and sanitize input data
     $event_id = intval($_POST['event_id']);
     $description = trim($_POST['description']);
     $quantity = intval($_POST['quantity']);
     $unit = trim($_POST['unit']);
     $amount = floatval($_POST['amount']);
-    $total_amount = $quantity * $amount;
 
-    // Check for validation errors
+    // Validation errors
     if (empty($description)) {
         $response['errors']['description'] = 'Description is required';
     }
@@ -27,27 +27,66 @@ if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST[
         $response['errors']['amount'] = 'Amount must be greater than zero';
     }
 
-    // If there are no validation errors
+    // Handle file upload
+    $reference_path = null;
+    if ($_FILES['reference']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = 'uploads/references/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true); // Create the directory if it doesn't exist
+        }
+
+        $file_name = basename($_FILES['reference']['name']);
+        $file_tmp = $_FILES['reference']['tmp_name'];
+        $reference_path = $upload_dir . uniqid() . '_' . $file_name;
+
+        if (!move_uploaded_file($file_tmp, $reference_path)) {
+            $response['errors']['reference'] = 'Failed to upload reference file.';
+        }
+    } else {
+        $response['errors']['reference'] = 'Reference file is required.';
+    }
+
+    // Check for duplicate descriptions
+    if (empty($response['errors'])) {
+        $checkStmt = $conn->prepare("SELECT COUNT(*) FROM event_summary_items WHERE event_id = ? AND description = ?");
+        if ($checkStmt === false) {
+            $response['errors']['database'] = 'Failed to prepare duplicate check statement: ' . $conn->error;
+        } else {
+            $checkStmt->bind_param("is", $event_id, $description);
+            $checkStmt->execute();
+            $checkStmt->bind_result($count);
+            $checkStmt->fetch();
+            $checkStmt->close();
+
+            if ($count > 0) {
+                $response['errors']['duplicate'] = 'Description already exists for this event.';
+            }
+        }
+    }
+
+    // Proceed only if no errors
     if (empty($response['errors'])) {
         // Prepare the SQL statement
-        $stmt = $conn->prepare("INSERT INTO event_summary_items (event_id, description, quantity, unit, amount, total_amount) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO event_summary_items (event_id, description, quantity, unit, amount, reference) VALUES (?, ?, ?, ?, ?, ?)");
         
+        // Check if preparation was successful
         if ($stmt === false) {
-            die('Prepare failed: ' . $conn->error);
-        }
-
-        // Bind the parameters
-        $stmt->bind_param("isidis", $event_id, $description, $quantity, $unit, $amount, $total_amount);
-
-        // Execute the query
-        if ($stmt->execute()) {
-            $response['success'] = true;
+            $response['errors']['prepare'] = 'Prepare failed: ' . $conn->error;
         } else {
-            $response['errors']['database'] = 'Failed to add summary item: ' . $stmt->error;
+            // Bind the parameters
+            if (!$stmt->bind_param("isids", $event_id, $description, $quantity, $unit, $amount, $reference_path)) {
+                $response['errors']['bind'] = 'Bind failed: ' . $stmt->error;
+            } else {
+                // Execute the query
+                if ($stmt->execute()) {
+                    $response['success'] = true;
+                } else {
+                    $response['errors']['execute'] = 'Failed to add summary item: ' . $stmt->error;
+                }
+            }
+            // Close the statement
+            $stmt->close();
         }
-
-        // Close the statement
-        $stmt->close();
     }
 } else {
     $response['errors']['form'] = 'Required fields are missing';

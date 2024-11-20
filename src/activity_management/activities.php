@@ -19,7 +19,7 @@ $result = $conn->query($sql);
 <html lang="en">
 
 <head>
-    <title>Events Table</title>
+    <title>Activities Table</title>
     <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
@@ -76,7 +76,7 @@ $result = $conn->query($sql);
                 <tr>
                     <th rowspan=2>Title</th>
                     <th rowspan=2>Venue</th>
-                    <th colspan=2> Date </th>
+                    <th colspan=2 style="text-align: center;"> Date </th>
                     <th rowspan=2>Type</th>
                     <th rowspan=2>Status</th>
                     <th rowspan=2>Accomplished</th>

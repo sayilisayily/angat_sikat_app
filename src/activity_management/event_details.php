@@ -182,8 +182,24 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                 }
                                 ?>
                             </tbody>
+                            
                         </table>
-                        
+                        <?php
+                                // Query to calculate the total amount for the event
+                                //$total_query = "SELECT SUM(total_amount) AS total FROM event_items WHERE event_id = ?";
+                                //$stmt = $conn->prepare($total_query);
+//
+                                //if ($stmt) {
+                                //    $stmt->bind_param("i", $event_id);
+                                //    $stmt->execute();
+                                //    $stmt->bind_result($event_total);
+                                //    $stmt->fetch();
+                                //    $stmt->close();
+                                //} else {
+                                //    $event_total = 0; // Default value in case of a query failure
+                                //}
+                            ?>
+                                <h6 class="flex-end">Total Amount: <?= number_format($event_total, 2); ?></h6>    
                     </div>
 
                     <!-- Financial Summary Tab -->
@@ -233,6 +249,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                                 <td>{$item['unit']}</td>
                                                 <td>{$item['amount']}</td>
                                                 <td>{$total_amount}</td>
+                                                <td>{$item['reference']}</td>
                                                 <td>
                                                     <button class='btn summary-edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#summaryEditItemModal' data-id='{$item['summary_item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
                                                     <button class='btn summary-delete-btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#summaryDeleteItemModal' data-id='{$item['summary_item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
@@ -417,10 +434,10 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                 <div class="modal-body">
                                     <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
                                     <!-- Dropdown to select an event -->
-                                    <div class="form-group row mb-2">
-                                        <label for="item_selector" class="form-label">Select Item</label>
+                                    <div class="form-group mb-2">
+                                        <label for="item_selector">Select Item</label>
                                         <select class="form-control" id="item_selector" name="selected_item">
-                                            <option value="">-- Select an Item --</option>
+                                            <option value="">Select Item</option>
                                             <?php
                                             // Fetch events from the database
 
@@ -456,6 +473,10 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                             <input type="number" step="0.01" class="form-control" id="summary_amount"
                                                 name="amount" required>
                                         </div>
+                                    </div>
+                                    <div class="form-group">
+                                            <label for="reference">Reference</label>
+                                            <input type="file" class="form-control" id="reference" name="reference" required>
                                     </div>
                                     <div id="successMessage4" class="alert alert-success d-none mt-3"
                                         role="alert">Item added successfully!</div>

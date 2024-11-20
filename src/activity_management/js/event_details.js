@@ -120,10 +120,12 @@ $(document).ready(function () {
                     }
                 } catch (error) {
                     console.error('Error parsing JSON:', error);
+                    console.log(response);
                 }
             },
             error: function(xhr, status, error) {
                 console.error('Error adding item:', error);
+                console.log(response);
             }
         });
     });
