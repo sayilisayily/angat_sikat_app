@@ -83,6 +83,12 @@ table {
   border-color: #00b415;
 }
 
+.btn-danger {
+  background-color: #e02329;
+  border-color: #e02329;
+  color: #fff;
+}
+
 /* Approved Badge (Green) */
 .badge.rounded-pill.approved {
   background-color: #00b415;

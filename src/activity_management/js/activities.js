@@ -10,22 +10,98 @@ $(document).ready(function() {
     });
 });
 
-  function toggleAccomplishment(eventId, isChecked) {
-      $.ajax({
-          url: 'update_accomplishment.php',
-          type: 'POST',
-          data: {
-              event_id: eventId,
-              accomplishment_status: isChecked ? 1 : 0
-          },
-          success: function(response) {
-              console.log('Accomplishment status updated successfully:', response);
-          },
-          error: function(xhr, status, error) {
-              console.error('Error updating accomplishment status:', error);
-          }
-      });
-  }
+// Global variables to store event details
+let eventIdToUpdate;
+let newStatus;
+
+// Show confirmation modal and store event details
+function showConfirmationModal(eventId, isChecked) {
+    eventIdToUpdate = eventId;  // Store the event ID
+    newStatus = isChecked ? 1 : 0;  // Store the new accomplishment status
+
+    // Show the confirmation modal
+    $('#confirmationModal').modal('show');
+}
+
+// Handle confirmation when "Confirm" button in modal is clicked
+$('#confirmUpdateBtn').on('click', function() {
+    // Get event ID and new status from global variables
+    var eventId = eventIdToUpdate;
+    var status = newStatus;
+
+    // Send an AJAX request to update the accomplishment status
+    $.ajax({
+        url: 'update_accomplishment.php', // PHP file to handle status update
+        type: 'POST',
+        data: {
+            event_id: eventId,
+            accomplishment_status: status
+        },
+        dataType: 'json',
+        success: function(response) {
+            try {
+                if (response.success) {
+                    // Show success message
+                    $('#successMessage').removeClass('d-none').text(response.message);
+                    // Hide any existing error messages
+                    $('#errorMessage').addClass('d-none');
+
+                    // Close the modal after a short delay
+                    setTimeout(function() {
+                        $('#confirmationModal').modal('hide');
+                        // Optionally, you can reload the page or update the table if necessary
+                        location.reload(); // or update the checkbox or table directly
+                    }, 2000);
+                } else {
+                    // Show validation errors
+                    $('#successMessage').addClass('d-none');
+                    $('#errorMessage').removeClass('d-none');
+                    
+                    let errorHtml = '';
+                    for (let field in response.errors) {
+                        errorHtml += `<li>${response.errors[field]}</li>`;
+                    }
+                    $('#errorList').html(errorHtml);
+                }
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error updating accomplishment status:', error);
+            console.log(xhr.responseText);
+        }
+    });
+});
+
+// Reset modal and close when the cancel button is clicked
+$('#confirmationModal .btn-secondary').on('click', function() {
+    // Hide any error or success messages
+    $('#successMessage').addClass('d-none');
+    $('#errorMessage').addClass('d-none');
+
+    setTimeout(function() {
+        // Optionally, you can reload the page or update the table if necessary
+        location.reload(); // or update the checkbox or table directly
+    }, 500);
+});
+
+// function toggleAccomplishment(eventId, isChecked) {
+//     $.ajax({
+//         url: 'update_accomplishment.php',
+//         type: 'POST',
+//         data: {
+//             event_id: eventId,
+//             accomplishment_status: isChecked ? 1 : 0
+//         },
+//         success: function(response) {
+//             console.log('Accomplishment status updated successfully:', response);
+//         },
+//         error: function(xhr, status, error) {
+//             console.error('Error updating accomplishment status:', error);
+//         }
+//     });
+// }
 
 
   // Handle Add Event Form Submission
@@ -44,10 +120,10 @@ $(document).ready(function() {
 
                   if (response.success) {
                       // Hide any existing error messages
-                      $('#errorMessage').addClass('d-none');
+                      $('#errorMessage1').addClass('d-none');
 
                       // Show success message
-                      $('#successMessage').removeClass('d-none');
+                      $('#successMessage1').removeClass('d-none');
 
                       // Close the modal after a short delay
                       setTimeout(function() {
@@ -55,7 +131,7 @@ $(document).ready(function() {
 
                           // Reset the form and hide the success message
                           $('#addEventForm')[0].reset();
-                          $('#successMessage').addClass('d-none');
+                          $('#successMessage1').addClass('d-none');
 
                           // Reload the page to reflect the new event
                           location.reload();
@@ -63,15 +139,15 @@ $(document).ready(function() {
 
                   } else {
                       // Hide any existing success messages
-                      $('#successMessage').addClass('d-none');
+                      $('#successMessage1').addClass('d-none');
 
                       // Show error messages
-                      $('#errorMessage').removeClass('d-none');
+                      $('#errorMessage1').removeClass('d-none');
                       let errorHtml = '';
                       for (let field in response.errors) {
                           errorHtml += `<li>${response.errors[field]}</li>`;
                       }
-                      $('#errorList').html(errorHtml);
+                      $('#errorList1').html(errorHtml);
                   }
               } catch (error) {
                   console.error('Error parsing JSON:', error);
