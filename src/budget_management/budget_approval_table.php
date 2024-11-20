@@ -287,7 +287,7 @@ include '../user_query.php';
             <!-- Add Budget Approval Modal -->
             <div class="modal fade" id="budgetApprovalModal" tabindex="-1" aria-labelledby="budgetApprovalModalLabel"
                 aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="budgetApprovalModalLabel">Budget Approval Request</h5>
