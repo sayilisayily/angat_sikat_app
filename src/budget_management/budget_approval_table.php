@@ -17,7 +17,7 @@ include '../user_query.php';
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Custom CSS for Budget Overview-->
-    <link rel="stylesheet" href="../budget_management/budget.css" />
+    <link rel="stylesheet" href="../budget_management/css/budget.css" />
     <!--Boxicon-->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <!--Font Awesome-->

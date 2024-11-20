@@ -22,7 +22,7 @@ include '../user_query.php';
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Custom CSS for Budget Overview-->
-    <link rel="stylesheet" href="../budget_management/budget.css" />
+    <link rel="stylesheet" href="../budget_management/css/budget.css" />
     <!--Boxicon-->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <!--Font Awesome-->
@@ -218,7 +218,7 @@ include '../user_query.php';
     </div>
 
     <div class="container p-4" style="margin-top: 50px;">
-        <h2>Budget Approvals</h2>
+        <h2><span class="text-warning fw-bold me-2">|</span> Budget Approvals</h2>
 
         <!-- Approval Table -->
         <table class="table mt-4" id="approvalsTable">
@@ -279,22 +279,22 @@ include '../user_query.php';
                         </span>
                     </td>
                     <td>
-                        <div class="d-inline-flex gap-2">
-                            <form action="admin_budget_approval.php" method="POST">
-                                <input type="hidden" name="id" value="<?php echo $id; ?>">
-                                <input type="hidden" name="action" value="approve">
-                                <button type="submit" class="btn btn-sm" style="background-color: green; color: white;">
-                                    <i class="fa-solid fa-check"></i> Approve
-                                </button>
-                            </form>
-                            <form action="admin_budget_approval.php" method="POST">
-                                <input type="hidden" name="id" value="<?php echo $id; ?>">
-                                <input type="hidden" name="action" value="disapprove">
-                                <button type="submit" class="btn btn-sm" style="background-color: red; color: white;">
-                                    <i class="fa-solid fa-xmark"></i> Disapprove
-                                </button>
-                            </form>
-                        </div>
+                    <button type="button" class="btn btn-sm btn-success mb-3" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#confirmationModal" 
+                            data-action="approve" 
+                            data-id="<?php echo $id; ?>">
+                        <i class="fa-solid fa-check"></i> Approve
+                    </button>
+
+                    <!-- Disapprove Button -->
+                    <button type="button" class="btn btn-sm btn-danger mb-3"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#confirmationModal" 
+                            data-action="disapprove" 
+                            data-id="<?php echo $id; ?>">
+                        <i class="fa-solid fa-xmark"></i> Disapprove
+                    </button>
                     </td>
                 </tr>
                 <?php
@@ -302,6 +302,37 @@ include '../user_query.php';
             ?>
             </tbody>
         </table>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to <span id="actionText"></span> this budget request?
+                    <!-- Success Message Alert -->
+                    <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
+                            Event added successfully!
+                        </div>
+                        <!-- Error Message Alert -->
+                        <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                            <ul id="errorList"></ul> <!-- List for showing validation errors -->
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <form id="confirmationForm" action="admin_budget_approval.php" method="POST">
+                        <input type="hidden" name="id" id="confirmId">
+                        <input type="hidden" name="action" id="confirmAction">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -318,11 +349,72 @@ include '../user_query.php';
             });
         });
 
+        // JavaScript to handle the modal data population
         document.addEventListener('DOMContentLoaded', function () {
-            var alertMessageText = document.getElementById('alertMessage').innerText;
-            if (alertMessageText !== '') {
-                document.getElementById('alertBox').classList.remove('d-none');
-            }
+            const confirmationModal = document.getElementById('confirmationModal');
+            const confirmIdInput = document.getElementById('confirmId');
+            const confirmActionInput = document.getElementById('confirmAction');
+            const actionText = document.getElementById('actionText');
+
+            confirmationModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                const action = button.getAttribute('data-action'); // Extract action from data attributes
+                const id = button.getAttribute('data-id'); // Extract ID from data attributes
+
+                // Set the form values
+                confirmIdInput.value = id;
+                confirmActionInput.value = action;
+
+                // Update modal text
+                actionText.textContent = action === 'approve' ? 'approve' : 'disapprove';
+            });
+        });
+
+        // Handle confirmation when "Confirm" button in modal is clicked
+        $('#confirmationForm').on('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            var formData = $(this).serialize(); // Serialize the form data
+
+            // Send an AJAX request to process the approval/disapproval
+            $.ajax({
+                url: 'admin_budget_approval.php', // PHP file to handle the action
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function (response) {
+                    try {
+                        if (response.success) {
+                            // Show success message
+                            $('#successMessage').removeClass('d-none').text(response.message);
+
+                            // Hide the error message if previously shown
+                            $('#errorMessage').addClass('d-none');
+
+                            // Close the modal and reload the table after a delay
+                            setTimeout(function () {
+                                $('#confirmationModal').modal('hide');
+                                $('#successMessage').addClass('d-none');
+                                location.reload(); // Reload the page to reflect changes
+                            }, 2000);
+                        } else {
+                            // Show validation or other errors
+                            $('#errorMessage').removeClass('d-none');
+                            let errorHtml = '';
+                            for (let field in response.errors) {
+                                errorHtml += `<li>${response.errors[field]}</li>`;
+                            }
+                            $('#errorList').html(errorHtml);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error processing approval/disapproval:', error);
+                    console.log(xhr.responseText);
+                }
+            });
         });
 
     </script>

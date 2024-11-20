@@ -13,6 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $unit = $_POST['unit'];
     $amount = $_POST['amount'];
 
+    // Calculate total amount
+    $total_amount = $quantity * $amount;
+
     // Validate input
     if (empty($description) || empty($quantity) || empty($unit) || empty($amount)) {
         $errors[] = 'All fields are required.';
@@ -26,12 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     } else {
         // Prepare the SQL query using a prepared statement
-        $query = "UPDATE event_summary_items SET description = ?, quantity = ?, unit = ?, amount = ? WHERE summary_item_id = ?";
+        $query = "UPDATE event_summary_items 
+                  SET description = ?, quantity = ?, unit = ?, amount = ?, total_amount = ? 
+                  WHERE summary_item_id = ?";
         $stmt = $conn->prepare($query);
 
         if ($stmt) {
             // Bind parameters and execute the query
-            $stmt->bind_param('sidsi', $description, $quantity, $unit, $amount, $item_id);
+            $stmt->bind_param('sidsii', $description, $quantity, $unit, $amount, $total_amount, $item_id);
 
             if ($stmt->execute()) {
                 $data['success'] = true;
