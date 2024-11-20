@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('#eventsTable').DataTable({
+    $('#financialPlanTable').DataTable({
         "paging": true,
         "searching": true,
         "info": true,

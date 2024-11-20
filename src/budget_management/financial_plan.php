@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'officer') {
     exit();
 }
 
-$sql = "SELECT * FROM events WHERE archived = 0 AND organization_id = $organization_id";
+$sql = "SELECT * FROM financial_plan WHERE organization_id = $organization_id";
 $result = $conn->query($sql);
 
 ?>
@@ -71,44 +71,109 @@ $result = $conn->query($sql);
                 <i class="fa-solid fa-plus"></i> Add Activity
             </button>
         </h2>
-        <table id="eventsTable" class="table">
+        <table id="financialPlanTable" class="table">
             <thead>
                 <tr>
-                    <th> Projected Expenses</th>        
-                    <th> Date </th>
-                    <th> Amount</th>
-                    <th> Actions</th>
+                    <th>Projected Income</th>
+                    <th style="text-align: center;">Time Frame</th>
+                    <th style="text-align: center;">Amount</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
+                $has_income = false;
+                $has_expenses = false;
+
                 if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                       
-                        echo "<tr>
-                                <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
-                                <td>{$row['event_start_date']}</td>
-                                <td>{$row['event_total']}</td>
-                                <td>
-                                    <button class='btn btn-primary btn-sm edit-btn mb-3' 
-                                            data-bs-toggle='modal' 
-                                            data-bs-target='#editEventModal' 
-                                            data-id='{$row['event_id']}'>
-                                        <i class='fa-solid fa-pen'></i> Edit
-                                    </button>
-                                    <button class='btn btn-danger btn-sm archive-btn mb-3' 
-                                            data-id='{$row['event_id']}'>
-                                        <i class='fa-solid fa-box-archive'></i> Archive
-                                    </button>
-                                </td>
-                            </tr>";
+                    // Loop through income records
+                    while ($row = $result->fetch_assoc()) {
+                        if ($row['type'] === 'income') {
+                            $has_income = true;
+                            echo "<tr>
+                                    <td>{$row['title']}</td>
+                                    <td style='text-align: center;'>{$row['date']}</td>
+                                    <td style='text-align: center;'>{$row['amount']}</td>
+                                    <td>
+                                        <button class='btn btn-primary btn-sm edit-btn mb-3' 
+                                                data-bs-toggle='modal' 
+                                                data-bs-target='#editEventModal' 
+                                                data-id='{$row['plan_id']}'>
+                                            <i class='fa-solid fa-pen'></i> Edit
+                                        </button>
+                                        <button class='btn btn-danger btn-sm archive-btn mb-3' 
+                                                data-id='{$row['plan_id']}'>
+                                            <i class='fa-solid fa-box-archive'></i> Archive
+                                        </button>
+                                    </td>
+                                </tr>";
+                        }
+                    }
+
+                    if (!$has_income) {
+                        echo "<tr><td colspan='4' class='text-center'>No projected income found</td></tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='9' class='text-center'>No events found</td></tr>";
+                    echo "<tr><td colspan='4' class='text-center'>No records found</td></tr>";
+                }
+                ?>
+            </tbody>
+
+            <thead>
+                <tr>
+                    <th colspan="4">Projected Expenses</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Reset result pointer for expense segregation
+                $result->data_seek(0); // Move back to the beginning of the result set
+
+                $categories = ['Activities', 'Purchases', 'Maintenance and Other Expenses'];
+                foreach ($categories as $category) {
+                    echo "<tr><th colspan='4'>$category</th></tr>";
+
+                    // Loop through expense records by category
+                    $has_expenses_for_category = false;
+                    while ($row = $result->fetch_assoc()) {
+                        if ($row['type'] === 'expense' && $row['category'] === $category) {
+                            $has_expenses = true;
+                            $has_expenses_for_category = true;
+                            echo "<tr>
+                                    <td>{$row['title']}</td>
+                                    <td style='text-align: center;'>{$row['date']}</td>
+                                    <td style='text-align: center;'>{$row['amount']}</td>
+                                    <td>
+                                        <button class='btn btn-primary btn-sm edit-btn mb-3' 
+                                                data-bs-toggle='modal' 
+                                                data-bs-target='#editEventModal' 
+                                                data-id='{$row['plan_id']}'>
+                                            <i class='fa-solid fa-pen'></i> Edit
+                                        </button>
+                                        <button class='btn btn-danger btn-sm archive-btn mb-3' 
+                                                data-id='{$row['plan_id']}'>
+                                            <i class='fa-solid fa-box-archive'></i> Archive
+                                        </button>
+                                    </td>
+                                </tr>";
+                        }
+                    }
+
+                    if (!$has_expenses_for_category) {
+                        echo "<tr><td colspan='4' class='text-center'>No expenses for $category</td></tr>";
+                    }
+
+                    // Reset pointer for the next category
+                    $result->data_seek(0);
+                }
+
+                if (!$has_expenses) {
+                    echo "<tr><td colspan='4' class='text-center'>No projected expenses found</td></tr>";
                 }
                 ?>
             </tbody>
         </table>
+
     </div>
 
     <!-- Confirmation Modal -->
