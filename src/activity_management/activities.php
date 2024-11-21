@@ -169,7 +169,6 @@ $result = $conn->query($sql);
         </div>
     </div>
 
-
     <!-- Add Event Modal -->
     <div class="modal fade" id="addEventModal" tabindex="-1" role="dialog" aria-labelledby="addEventLabel"
         aria-hidden="true">
@@ -185,7 +184,24 @@ $result = $conn->query($sql);
                         <div class="form-group row mb-2">
                             <div class="col">
                                 <label for="title">Event Title</label>
-                                <input type="text" class="form-control" id="title" name="title">
+                                <!-- Event title dropdown -->
+                                <<select class="form-control" id="title" name="title">
+                                    <option value="">Select Event Title</option>
+                                    <?php
+                                    // Query to fetch titles with category 'Activities'
+                                    $title_query = "SELECT title, date, type FROM financial_plan WHERE category = 'Activities' OR type = 'Income' AND organization_id = $organization_id";
+                                    $result = mysqli_query($conn, $title_query);
+
+                                    if ($result && mysqli_num_rows($result) > 0) {
+                                        while ($row = mysqli_fetch_assoc($result)) {
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" data-date="' . htmlspecialchars($row['date']) . '" data-type="' . htmlspecialchars($row['type']) . '">' . htmlspecialchars($row['title']) . '</option>';
+                                        }
+                                    } else {
+                                        echo '<option value="">No titles available</option>';
+                                    }
+                                    ?>
+                                </select>
+
                             </div>
                             <div class="col">
                                 <label for="venue">Venue</label>
@@ -195,7 +211,7 @@ $result = $conn->query($sql);
                         <div class="form-group row mb-2">
                             <div class="col">
                                 <label for="start_date">Start Date</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date">
+                                <input type="date" class="form-control" id="start_date" name="start_date" readonly>
                             </div>
                             <div class="col">
                                 <label for="end_date">End Date</label>
@@ -205,10 +221,7 @@ $result = $conn->query($sql);
                         <div class="form-group row mb-2">
                             <div class="col">
                                 <label for="type">Event Type</label>
-                                <select class="form-control" id="type" name="type">
-                                    <option value="Income">Income</option>
-                                    <option value="Expense">Expense</option>
-                                </select>
+                                <input type="text" class="form-control" id="type" name="type" readonly>                                 
                             </div>
                         </div>
 

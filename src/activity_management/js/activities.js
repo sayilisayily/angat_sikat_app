@@ -86,24 +86,26 @@ $('#confirmationModal .btn-secondary').on('click', function() {
     }, 500);
 });
 
-// function toggleAccomplishment(eventId, isChecked) {
-//     $.ajax({
-//         url: 'update_accomplishment.php',
-//         type: 'POST',
-//         data: {
-//             event_id: eventId,
-//             accomplishment_status: isChecked ? 1 : 0
-//         },
-//         success: function(response) {
-//             console.log('Accomplishment status updated successfully:', response);
-//         },
-//         error: function(xhr, status, error) {
-//             console.error('Error updating accomplishment status:', error);
-//         }
-//     });
-// }
-
-
+    // Add an event listener to the title selector dropdown
+    document.getElementById("title").addEventListener("change", function () {
+        const selectedOption = this.options[this.selectedIndex];
+    
+        if (selectedOption && selectedOption.value) {
+            // Extract data from the selected option
+            const startDate = selectedOption.getAttribute("data-date") || "";
+            const type = selectedOption.getAttribute("data-type") || "";
+    
+            // Populate the modal fields
+            document.getElementById("start_date").value = startDate;
+            document.getElementById("type").value = type;
+        } else {
+            // Clear the fields if no title is selected
+            document.getElementById("start_date").value = "";
+            document.getElementById("type").value = "";
+        }
+    });
+    
+    
   // Handle Add Event Form Submission
   $('#addEventForm').on('submit', function(event) {
       event.preventDefault(); 
@@ -276,9 +278,6 @@ $('#editEventForm').on('submit', function(event) {
                     // Close the modal after a short delay
                     setTimeout(function() {
                         $('#archiveModal').modal('hide'); 
-
-                        // Reset the form and hide the success message
-                        $('#editEventForm')[0].reset();
                         $('#successMessage3').addClass('d-none');
                         location.reload(); 
                     }, 2000);
