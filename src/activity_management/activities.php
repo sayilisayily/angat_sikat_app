@@ -96,8 +96,8 @@ $result = $conn->query($sql);
                         echo "<tr>
                                 <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
                                 <td>{$row['event_venue']}</td>
-                                <td>{$row['event_start_date']}</td>
-                                <td>{$row['event_end_date']}</td>
+                                <td>" . date('F j, Y', strtotime($row['event_start_date'])) . "</td>
+                                <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
                                 <td>{$row['event_type']}</td>
                                 <td>";
                                   if ($row['event_status'] == 'Pending') {

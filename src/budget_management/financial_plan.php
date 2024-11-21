@@ -66,7 +66,7 @@ $result = $conn->query($sql);
     
     <div class="container mt-5 p-5">
         <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Financial Plan
-            <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addEventModal"
+            <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addPlanModal"
              style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
                 <i class="fa-solid fa-plus"></i> Add Activity
             </button>
@@ -75,7 +75,7 @@ $result = $conn->query($sql);
             <thead>
                 <tr>
                     <th>Projected Income</th>
-                    <th style="text-align: center;">Time Frame</th>
+                    <th style="text-align: center;">Proposed Date</th>
                     <th style="text-align: center;">Amount</th>
                     <th>Actions</th>
                 </tr>
@@ -88,22 +88,22 @@ $result = $conn->query($sql);
                 if ($result->num_rows > 0) {
                     // Loop through income records
                     while ($row = $result->fetch_assoc()) {
-                        if ($row['type'] === 'income') {
+                        if ($row['type'] === 'Income') {
                             $has_income = true;
                             echo "<tr>
                                     <td>{$row['title']}</td>
-                                    <td style='text-align: center;'>{$row['date']}</td>
+                                    <td style='text-align: center;'>" . date('F j, Y', strtotime($row['date'])) . "</td>
                                     <td style='text-align: center;'>{$row['amount']}</td>
                                     <td>
                                         <button class='btn btn-primary btn-sm edit-btn mb-3' 
                                                 data-bs-toggle='modal' 
-                                                data-bs-target='#editEventModal' 
+                                                data-bs-target='#editPlanModal' 
                                                 data-id='{$row['plan_id']}'>
                                             <i class='fa-solid fa-pen'></i> Edit
                                         </button>
-                                        <button class='btn btn-danger btn-sm archive-btn mb-3' 
+                                        <button class='btn btn-danger btn-sm delete-btn mb-3' 
                                                 data-id='{$row['plan_id']}'>
-                                            <i class='fa-solid fa-box-archive'></i> Archive
+                                            <i class='fa-solid fa-trash'></i> Delete
                                         </button>
                                     </td>
                                 </tr>";
@@ -136,23 +136,30 @@ $result = $conn->query($sql);
                     // Loop through expense records by category
                     $has_expenses_for_category = false;
                     while ($row = $result->fetch_assoc()) {
-                        if ($row['type'] === 'expense' && $row['category'] === $category) {
+                        if ($row['type'] === 'Expense' && $row['category'] === $category) {
                             $has_expenses = true;
                             $has_expenses_for_category = true;
                             echo "<tr>
-                                    <td>{$row['title']}</td>
-                                    <td style='text-align: center;'>{$row['date']}</td>
+                                    <td>{$row['title']}</td>";
+                        
+                            if ($category === 'Activities') {
+                                echo "<td style='text-align: center;'>" . date('F j, Y', strtotime($row['date'])) . "</td>";
+                            } else {
+                                echo "<td></td>";
+                            }
+                                    
+                                    echo "
                                     <td style='text-align: center;'>{$row['amount']}</td>
                                     <td>
                                         <button class='btn btn-primary btn-sm edit-btn mb-3' 
                                                 data-bs-toggle='modal' 
-                                                data-bs-target='#editEventModal' 
+                                                data-bs-target='#editPlanModal' 
                                                 data-id='{$row['plan_id']}'>
                                             <i class='fa-solid fa-pen'></i> Edit
                                         </button>
-                                        <button class='btn btn-danger btn-sm archive-btn mb-3' 
+                                        <button class='btn btn-danger btn-sm delete-btn mb-3' 
                                                 data-id='{$row['plan_id']}'>
-                                            <i class='fa-solid fa-box-archive'></i> Archive
+                                            <i class='fa-solid fa-trash'></i> Delete
                                         </button>
                                     </td>
                                 </tr>";
@@ -176,80 +183,58 @@ $result = $conn->query($sql);
 
     </div>
 
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Accomplishment Status Change</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to change the accomplishment status of this event?
-                    <!-- Success Message Alert -->
-                    <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
-                        Status updated successfully!
-                    </div>
-                    <!-- Error Message Alert -->
-                    <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                        <ul id="errorList"></ul> <!-- List for showing validation errors -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="confirmUpdateBtn">Confirm</button>
-                </div>
-                
-            </div>
-        </div>
-    </div>
 
-
-    <!-- Add Event Modal -->
-    <div class="modal fade" id="addEventModal" tabindex="-1" role="dialog" aria-labelledby="addEventLabel"
-        aria-hidden="true">
+    <!-- Add Plan Modal -->
+    <div class="modal fade" id="addPlanModal" tabindex="-1" role="dialog" aria-labelledby="addPlanLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <form id="addEventForm">
+                <form id="addPlanForm">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addEventLabel">Add New Event</h5>
+                        <h5 class="modal-title" id="addPlanLabel">Add New Plan</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <!-- Form fields -->
-                        <div class="form-group row mb-2">
+                        <div class="form-group mb-2">
                             <div class="col">
-                                <label for="title">Event Title</label>
-                                <input type="text" class="form-control" id="title" name="title">
+                                <label for="title">Title</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
                             </div>
-                            <div class="col">
-                                <label for="venue">Venue</label>
-                                <input type="text" class="form-control" id="venue" name="venue">
-                            </div>
+                            
                         </div>
                         <div class="form-group row mb-2">
                             <div class="col">
-                                <label for="start_date">Start Date</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date">
-                            </div>
-                            <div class="col">
-                                <label for="end_date">End Date</label>
-                                <input type="date" class="form-control" id="end_date" name="end_date">
-                            </div>
-                        </div>
-                        <div class="form-group row mb-2">
-                            <div class="col">
-                                <label for="type">Event Type</label>
-                                <select class="form-control" id="type" name="type">
+                                <label for="type">Type</label>
+                                <select class="form-control" id="type" name="type" required>
+                                    <option value="">Select Type</option>
                                     <option value="Income">Income</option>
                                     <option value="Expense">Expense</option>
                                 </select>
+                            </div>
+                            <div class="col">
+                                <label for="category">Category</label>
+                                <select class="form-control" id="category" name="category" disabled required>
+                                    <option value="">Select Category</option>
+                                    <option value="Activities">Activities</option>
+                                    <option value="Purchases">Purchases</option>
+                                    <option value="Maintenance and Other Expenses">Maintenance and Other Expenses</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-2">
+                            <div class="col">
+                                <label for="date">Proposed Date</label>
+                                <input type="date" class="form-control" id="date" name="date" required>
+                            </div>
+                            <div class="col">
+                                <label for="amount">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="amount" min="0" step="0.01" required>
                             </div>
                         </div>
 
                         <!-- Success Message Alert -->
                         <div id="successMessage1" class="alert alert-success d-none mt-3" role="alert">
-                            Event added successfully!
+                            Plan added successfully!
                         </div>
                         <!-- Error Message Alert -->
                         <div id="errorMessage1" class="alert alert-danger d-none mt-3" role="alert">
@@ -258,69 +243,73 @@ $result = $conn->query($sql);
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add Event</button>
+                        <button type="submit" class="btn btn-primary">Add Plan</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Edit Event Modal -->
-    <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModalLabel"
+
+    <!-- Edit Plan Modal -->
+    <div class="modal fade" id="editPlanModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <form id="editEventForm">
+                <form id="editPlanForm">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
+                        <h5 class="modal-title" id="editPlanModalLabel">Edit Plan</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <!-- Hidden field for event ID -->
-                        <input type="hidden" id="editEventId" name="event_id">
+                        <!-- Hidden field for plan ID -->
+                        <input type="hidden" id="editPlanId" name="plan_id">
 
-                        <!-- Other form fields -->
-                        <div class="form-group row mb-2">
-                            <div class="col">
-                                <label for="editEventTitle">Event Title</label>
-                                <input type="text" class="form-control" id="editEventTitle" name="title" required>
-                            </div>
-                            <div class="col">
-                                <label for="editEventVenue">Event Venue</label>
-                                <input type="text" class="form-control" id="editEventVenue" name="event_venue" required>
-                            </div>
+                        <!-- Title -->
+                        <div class="form-group mb-2">
+                            <label for="editTitle">Title</label>
+                            <input type="text" class="form-control" id="editTitle" name="title" required>
                         </div>
+
+                        <!-- Type and Category -->
                         <div class="form-group row mb-2">
                             <div class="col">
-                                <label for="editEventStartDate">Start Date</label>
-                                <input type="date" class="form-control" id="editEventStartDate" name="event_start_date"
-                                    required>
-                            </div>
-                            <div class="col">
-                                <label for="editEventEndDate">End Date</label>
-                                <input type="date" class="form-control" id="editEventEndDate" name="event_end_date"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="form-group row mb-2">
-                            <div class="col">
-                                <label for="editEventType">Event Type</label>
-                                <select class="form-control" id="editEventType" name="event_type" required>
+                                <label for="editType">Type</label>
+                                <select class="form-control" id="editType" name="type" required>
+                                    <option value="">Select Type</option>
                                     <option value="Income">Income</option>
                                     <option value="Expense">Expense</option>
                                 </select>
                             </div>
+                            <div class="col">
+                                <label for="editCategory">Category</label>
+                                <select class="form-control" id="editCategory" name="category" disabled>
+                                    <option value="">Select Category</option>
+                                    <option value="Activities">Activities</option>
+                                    <option value="Purchases">Purchases</option>
+                                    <option value="Maintenance and Other Expenses">Maintenance and Other Expenses</option>
+                                </select>
+                            </div>
                         </div>
-                        <input type="hidden" id="editEventStatus" name="event_status">
-                        <input type="hidden" id="editAccomplishmentStatus" name="accomplishment_status">
 
-                        <!-- Success Message Alert -->
-                        <div id="successMessage2" class="alert alert-success d-none mt-3" role="alert">
-                            Event updated successfully!
+                        <!-- Date and Amount -->
+                        <div class="form-group row mb-2">
+                            <div class="col">
+                                <label for="editDate">Proposed Date</label>
+                                <input type="date" class="form-control" id="editDate" name="date">
+                            </div>
+                            <div class="col">
+                                <label for="editAmount">Amount</label>
+                                <input type="number" class="form-control" id="editAmount" name="amount" min="0" step="0.01" required>
+                            </div>
                         </div>
-                        <!-- Error Message Alert -->
+
+                        <!-- Alerts -->
+                        <div id="successMessage2" class="alert alert-success d-none mt-3" role="alert">
+                            Plan updated successfully!
+                        </div>
                         <div id="errorMessage2" class="alert alert-danger d-none mt-3" role="alert">
-                            <ul id="errorList2"></ul> <!-- List for showing validation errors -->
+                            <ul id="errorList2"></ul>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -333,20 +322,21 @@ $result = $conn->query($sql);
     </div>
 
 
-    <!-- Archive Confirmation Modal -->
-    <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="archiveModalLabel">Archive Event</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Archive Event</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to archive this event?
-                    <input type="hidden" id="archiveEventId">
+                    Are you sure you want to delete this plan?
+                    <input type="hidden" id="deletePlanId">
                     <!-- Success Message Alert -->
                     <div id="successMessage3" class="alert alert-success d-none mt-3" role="alert">
-                            Event archived successfully!
+                            Plan deleted successfully!
                         </div>
                         <!-- Error Message Alert -->
                         <div id="errorMessage3" class="alert alert-danger d-none mt-3" role="alert">
@@ -355,7 +345,7 @@ $result = $conn->query($sql);
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="confirmArchiveBtn" class="btn btn-danger">Archive</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
                 </div>
             </div>
         </div>

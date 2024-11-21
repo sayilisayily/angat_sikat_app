@@ -15,12 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $event_id = mysqli_real_escape_string($conn, $_POST['event_id']); // Set $event_id for use
 
         // Check for duplicate event title
-        //$query = "SELECT * FROM events WHERE title = '$title' AND event_id != '$event_id'";
-        //$result = mysqli_query($conn, $query);
-//
-        //if (mysqli_num_rows($result) > 0) {
-        //    $errors[] = 'An event with this title already exists.';
-        //}
+        $query = "SELECT * FROM events WHERE title = '$title' AND event_id != '$event_id'";
+        $result = mysqli_query($conn, $query);
+
+        if (mysqli_num_rows($result) > 0) {
+            $errors[] = 'An event with this title already exists.';
+        }
     }
 
     if (empty($_POST['event_venue'])) {
