@@ -1,37 +1,34 @@
 <?php
-include 'connection.php'; // Include database connection
+include 'connection.php';
 
-$response = [];
+$response = ['success' => false];
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['allocation_id'])) {
-    $allocation_id = $_POST['allocation_id'];
+// Validate allocation_id
+if (isset($_POST['allocation_id']) && is_numeric($_POST['allocation_id'])) {
+    $allocation_id = (int) $_POST['allocation_id'];
 
-    // Query to fetch the budget allocation details
-    $query = "SELECT * FROM budget_allocation WHERE allocation_id = ?";
+    // Query to fetch allocation data
+    $query = "SELECT allocation_id, allocated_budget, organization_id, category FROM budget_allocation WHERE allocation_id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param('i', $allocation_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if ($stmt->execute()) {
-        $result = $stmt->get_result();
+    if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
-
-        if ($row) {
-            $response['success'] = true;
-            $response['allocated_budget'] = $row['allocated_budget'];
-        } else {
-            $response['success'] = false;
-            $response['message'] = 'No data found';
-        }
+        $response['success'] = true;
+        $response['allocation_id'] = $row['allocation_id'];
+        $response['organization_id'] = $row['organization_id'];
+        $response['allocated_budget'] = $row['allocated_budget'];
+        $response['category'] = $row['category'];
     } else {
-        $response['success'] = false;
-        $response['message'] = 'Query failed';
+        $response['message'] = 'No budget allocation found for the provided ID.';
     }
 
     $stmt->close();
 } else {
-    $response['success'] = false;
-    $response['message'] = 'Invalid request';
+    $response['message'] = 'Invalid allocation ID.';
 }
 
-echo json_encode($response); // Return response in JSON format
+echo json_encode($response);
 ?>

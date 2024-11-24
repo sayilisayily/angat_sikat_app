@@ -316,7 +316,10 @@
                 </div>
 
                 <div class="tablecontainer mt-3 p-4">
-                    <h4 class="mb-4"> Budget Allocation </h4>
+                    <h4 class="mb-4"> Budget Allocation <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addBudgetModal"
+                    style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                        <i class="fa-solid fa-plus"></i> Add Budget
+                    </button></h4>
                     <table class="table">
                         <thead class="thead-light">
                             <tr>
@@ -328,7 +331,7 @@
                         </thead>
                         <tbody>
                             <?php
-                                $query = "SELECT * FROM budget_allocation";
+                                $query = "SELECT * FROM budget_allocation WHERE organization_id=$organization_id";
                                 $result = mysqli_query($conn, $query);
                 
                                 if (!$result) {
@@ -518,6 +521,67 @@
                 </div>
             </div>
 
+            <!-- Add Budget Modal -->
+<div class="modal fade" id="addBudgetModal" tabindex="-1" aria-labelledby="addBudgetModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addBudgetModalLabel">Add Budget</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addBudgetForm">
+                    <input type="hidden" id="allocationId" name="allocation_id">
+                    <!-- Hidden input for allocation ID -->
+                    <div class="mb-3">
+                        <label for="allocated_budget" class="form-label">Allocated Budget</label>
+                        <input type="number" class="form-control" id="allocated_budget" name="allocated_budget" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-control" id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <?php
+                            // Fetch categories
+                            $category_query = "SELECT category_id, category FROM categories"; // Updated column names as per convention
+                            $category_result = mysqli_query($conn, $category_query);
+
+                            if (!$category_result) {
+                                // Query error
+                                echo '<option value="">Error loading categories</option>';
+                            } else {
+                                if (mysqli_num_rows($category_result) > 0) {
+                                    while ($category_row = mysqli_fetch_assoc($category_result)) {
+                                        // Use htmlspecialchars to prevent XSS
+                                        echo '<option value="' . htmlspecialchars($category_row['category_id']) . '">' . htmlspecialchars($category_row['category']) . '</option>';
+                                    }
+                                } else {
+                                    // No categories available
+                                    echo '<option value="">No categories available</option>';
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <input type="hidden" name="organization_id" value="<?php echo htmlspecialchars($organization_id); ?>">
+                </form>
+                <!-- Success Message Alert -->
+                <div id="successMessage4" class="alert alert-success d-none mt-3" role="alert">
+                    Budget allocation added successfully!
+                </div>
+                <!-- Error Message Alert -->
+                <div id="errorMessage4" class="alert alert-danger d-none mt-3" role="alert">
+                    <ul id="errorList4"></ul> <!-- List for showing validation errors -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="addBudgetForm" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
             <!-- Edit Budget Modal -->
             <div class="modal fade" id="editBudgetModal" tabindex="-1" aria-labelledby="editBudgetModalLabel"
@@ -530,14 +594,33 @@
                         </div>
                         <div class="modal-body">
                             <form id="editBudgetForm">
-                                <input type="hidden" id="allocationId" name="allocation_id">
+                                <input type="hidden" id="edit_allocation_id" name="edit_allocation_id">
+                                <input type="hidden" name="edit_organization_id" value="<?php echo $organization_id; ?>">
                                 <!-- Hidden input for allocation ID -->
                                 <div class="mb-3">
-                                    <label for="allocated_budget" class="form-label">Allocated Budget</label>
-                                    <input type="number" class="form-control" id="allocated_budget"
-                                        name="allocated_budget" required>
+                                    <label for="edit_allocated_budget" class="form-label">Allocated Budget</label>
+                                    <input type="number" class="form-control" id="edit_allocated_budget"
+                                        name="edit_allocated_budget" readonly>
                                 </div>
-                                <input type="hidden" name="organization_id" value="<?php echo $organization_id; ?>">
+                                <!-- Add or Subtract Amount -->
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa-solid fa-plus"></i></span>
+                                            <input type="number" step="0.01" class="form-control" id="addBudget" name="add_budget">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa-solid fa-minus"></i></span>
+                                            <input type="number" step="0.01" class="form-control" id="subtractBudget" name="subtract_budget">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
                             </form>
                             <!-- Success Message Alert -->
                             <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">

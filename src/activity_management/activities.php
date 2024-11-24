@@ -185,7 +185,7 @@ $result = $conn->query($sql);
                             <div class="col">
                                 <label for="title">Event Title</label>
                                 <!-- Event title dropdown -->
-                                <<select class="form-control" id="title" name="title">
+                                <select class="form-control" id="title" name="title">
                                     <option value="">Select Event Title</option>
                                     <?php
                                     // Query to fetch titles with category 'Activities'
@@ -283,10 +283,7 @@ $result = $conn->query($sql);
                         <div class="form-group row mb-2">
                             <div class="col">
                                 <label for="editEventType">Event Type</label>
-                                <select class="form-control" id="editEventType" name="event_type" required>
-                                    <option value="Income">Income</option>
-                                    <option value="Expense">Expense</option>
-                                </select>
+                                <input class="form-control" id="editEventType" name="event_type" readonly>
                             </div>
                         </div>
                         <input type="hidden" id="editEventStatus" name="event_status">
