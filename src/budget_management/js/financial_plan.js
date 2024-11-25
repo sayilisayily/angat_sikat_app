@@ -94,52 +94,95 @@ $(document).ready(function() {
       });
   });
 
-  $('.edit-btn').on('click', function () {
-    // Get the Plan ID from the clicked button
-    var planId = $(this).data('id'); 
-    console.log("Selected Plan ID:", planId); // Log for debugging
 
-    // Check if the Plan ID is valid
+  document.getElementById('add-btn').addEventListener('click', function () {
+    fetch('get_totals.php')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Current planned amounts by category:");
+            data.forEach(item => {
+                console.log(`Category: ${item.category}, Total Amount: ${item.total_amount}`);
+            });
+
+            // Ensure only one event listener is attached to the form
+            const form = document.getElementById('addPlanForm');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission behavior
+
+                // Get input values from the form
+                const category = document.getElementById('category').value;
+                const inputAmount = parseFloat(document.getElementById('amount').value);
+
+                if (isNaN(inputAmount) || inputAmount <= 0) {
+                    console.error("Invalid amount entered.");
+                    return;
+                }
+
+                // Find the current total for the selected category
+                const currentTotal = data.find(item => item.category === category)?.total_amount || 0;
+
+                // Calculate the new total
+                const newTotal = currentTotal + inputAmount;
+
+                console.log(`Category: ${category}`);
+                console.log(`Input Amount: ${inputAmount}`);
+                console.log(`Current Total: ${currentTotal}`);
+                console.log(`New Total (after addition): ${newTotal}`);
+            });
+        })
+        .catch(error => console.error('Error fetching totals:', error));
+});
+
+
+$('.edit-btn').on('click', function () {
+    // Get the Plan ID from the clicked button
+    var planId = $(this).data('id');
+    console.log("Selected Plan ID:", planId); // Log Plan ID for debugging
+
+    // Validate Plan ID
     if (!planId) {
         console.error("Plan ID is missing.");
+        alert("Plan ID is missing. Please refresh and try again.");
         return;
     }
 
-    // Send an AJAX request to fetch the plan details using the Plan ID
+    // Send AJAX request to fetch plan details
     $.ajax({
-        url: 'get_plan_details.php', // PHP file to fetch plan data
+        url: 'get_plan_details.php', // PHP file to fetch data
         type: 'POST',
         data: { plan_id: planId },
         dataType: 'json',
         success: function (response) {
             if (response.success) {
-                // Populate the edit modal with the fetched plan data
-                $('#editPlanId').val(response.data.plan_id);  // Hidden field for Plan ID
-                $('#editTitle').val(response.data.title);  
+                // Populate the modal with fetched data
+                $('#editPlanId').val(response.data.plan_id); // Hidden field
+                $('#editTitle').val(response.data.title);
                 $('#editDate').val(response.data.date);
                 $('#editAmount').val(response.data.amount);
                 $('#editType').val(response.data.type);
 
-                // Enable or disable the Category field based on the Type
+                // Enable or disable Category field based on Type
                 if (response.data.type === "Expense") {
                     $('#editCategory').removeAttr('disabled').val(response.data.category);
                 } else {
                     $('#editCategory').attr('disabled', 'disabled').val("");
                 }
 
-                // Show the edit modal
+                // Show the modal
                 $('#editPlanModal').modal('show');
             } else {
-                console.error("Error fetching data: ", response.message);
-                alert("Failed to fetch plan details. Please try again.");
+                console.error("Error fetching plan details:", response.message);
+                alert(response.message || "Failed to fetch plan details.");
             }
         },
         error: function (xhr, status, error) {
-            console.error("AJAX Error: ", error);
-            alert("An error occurred while fetching plan details. Please check your network or try again later.");
+            console.error("AJAX Error:", error);
+            console.error("Response Text:", xhr.responseText); // Log server response for debugging
+            alert("An error occurred while fetching plan details. Please try again later.");
         }
     });
 });
+
 
  
 
@@ -154,7 +197,7 @@ $('#editPlanForm').on('submit', function(event) {
         success: function(response) {
             try {
                 // Parse the JSON response (ensure it's valid JSON)
-                response = JSON.parse(response);
+                response = JSON.stringify(response);
                 console.log(response);
 
                 if (response.success) {

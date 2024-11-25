@@ -66,9 +66,9 @@ $result = $conn->query($sql);
     
     <div class="container mt-5 p-5">
         <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Financial Plan
-            <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addPlanModal"
+            <button class="btn add-btn btn-primary ms-3" id="add-btn" data-bs-toggle="modal" data-bs-target="#addPlanModal"
              style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                <i class="fa-solid fa-plus"></i> Add Activity
+                <i class="fa-solid fa-plus"></i> Add Plan
             </button>
         </h2>
         <table id="financialPlanTable" class="table">
@@ -212,12 +212,29 @@ $result = $conn->query($sql);
                                 </select>
                             </div>
                             <div class="col">
-                                <label for="category">Category</label>
-                                <select class="form-control" id="category" name="category" disabled required>
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-control" id="category" name="category" required>
                                     <option value="">Select Category</option>
-                                    <option value="Activities">Activities</option>
-                                    <option value="Purchases">Purchases</option>
-                                    <option value="Maintenance and Other Expenses">Maintenance and Other Expenses</option>
+                                    <?php
+                                    // Fetch categories
+                                    $category_query = "SELECT category FROM categories"; // Only fetch the category column
+                                    $category_result = mysqli_query($conn, $category_query);
+
+                                    if (!$category_result) {
+                                        // Query error
+                                        echo '<option value="">Error loading categories</option>';
+                                    } else {
+                                        if (mysqli_num_rows($category_result) > 0) {
+                                            while ($category_row = mysqli_fetch_assoc($category_result)) {
+                                                // Use htmlspecialchars to prevent XSS
+                                                echo '<option value="' . htmlspecialchars($category_row['category']) . '">' . htmlspecialchars($category_row['category']) . '</option>';
+                                            }
+                                        } else {
+                                            // No categories available
+                                            echo '<option value="">No categories available</option>';
+                                        }
+                                    }
+                                    ?>
                                 </select>
                             </div>
                         </div>
@@ -243,7 +260,7 @@ $result = $conn->query($sql);
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add Plan</button>
+                        <button type="submit" class="btn btn-primary" id="submit-btn">Add Plan</button>
                     </div>
                 </form>
             </div>
@@ -263,19 +280,19 @@ $result = $conn->query($sql);
                     </div>
                     <div class="modal-body">
                         <!-- Hidden field for plan ID -->
-                        <input type="hidden" id="editPlanId" name="plan_id">
+                        <input type="hidden" id="editPlanId" name="edit_plan_id">
 
                         <!-- Title -->
                         <div class="form-group mb-2">
                             <label for="editTitle">Title</label>
-                            <input type="text" class="form-control" id="editTitle" name="title" required>
+                            <input type="text" class="form-control" id="editTitle" name="edit_title" required>
                         </div>
 
                         <!-- Type and Category -->
                         <div class="form-group row mb-2">
                             <div class="col">
                                 <label for="editType">Type</label>
-                                <select class="form-control" id="editType" name="type" required>
+                                <select class="form-control" id="editType" name="edit_type" required>
                                     <option value="">Select Type</option>
                                     <option value="Income">Income</option>
                                     <option value="Expense">Expense</option>
@@ -283,11 +300,28 @@ $result = $conn->query($sql);
                             </div>
                             <div class="col">
                                 <label for="editCategory">Category</label>
-                                <select class="form-control" id="editCategory" name="category" disabled>
+                                <select class="form-control" id="editCategory" name="edit_category" required>
                                     <option value="">Select Category</option>
-                                    <option value="Activities">Activities</option>
-                                    <option value="Purchases">Purchases</option>
-                                    <option value="Maintenance and Other Expenses">Maintenance and Other Expenses</option>
+                                    <?php
+                                    // Fetch categories
+                                    $category_query = "SELECT category FROM categories"; // Only fetch the category column
+                                    $category_result = mysqli_query($conn, $category_query);
+
+                                    if (!$category_result) {
+                                        // Query error
+                                        echo '<option value="">Error loading categories</option>';
+                                    } else {
+                                        if (mysqli_num_rows($category_result) > 0) {
+                                            while ($category_row = mysqli_fetch_assoc($category_result)) {
+                                                // Use htmlspecialchars to prevent XSS
+                                                echo '<option value="' . htmlspecialchars($category_row['category']) . '">' . htmlspecialchars($category_row['category']) . '</option>';
+                                            }
+                                        } else {
+                                            // No categories available
+                                            echo '<option value="">No categories available</option>';
+                                        }
+                                    }
+                                    ?>
                                 </select>
                             </div>
                         </div>
@@ -296,11 +330,11 @@ $result = $conn->query($sql);
                         <div class="form-group row mb-2">
                             <div class="col">
                                 <label for="editDate">Proposed Date</label>
-                                <input type="date" class="form-control" id="editDate" name="date">
+                                <input type="date" class="form-control" id="editDate" name="edit_date">
                             </div>
                             <div class="col">
                                 <label for="editAmount">Amount</label>
-                                <input type="number" class="form-control" id="editAmount" name="amount" min="0" step="0.01" required>
+                                <input type="number" class="form-control" id="editAmount" name="edit_amount" min="0" step="0.01" required>
                             </div>
                         </div>
 

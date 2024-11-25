@@ -2,6 +2,7 @@
 // Include database connection
 include('connection.php');
 include '../session_check.php';
+
 // Initialize an array to hold validation errors
 $errors = [];
 $data = [];
@@ -54,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Validate date (required for Activities or Income plans)
-    if (isset($_POST['edit_date']) && ($_POST['edit_type'] === 'Income' || ($_POST['edit_type'] === 'Expense' && $category === 'Activities'))) {
+    if (isset($_POST['edit_date']) && ($_POST['edit_type'] === 'Income' || ($_POST['type'] === 'Expense' && $category === 'Activities'))) {
         if (empty($_POST['date'])) {
             $errors['date'] = 'Plan date is required for Income plans or Activities category.';
         } else {

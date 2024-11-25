@@ -55,6 +55,35 @@ if (empty($_POST['amount']) || !is_numeric($_POST['amount']) || $_POST['amount']
     $amount = mysqli_real_escape_string($conn, $_POST['amount']);
 }
 
+// Validate if total plans in the category exceed allocated budget
+if ($_POST['type'] === 'Expense' && !empty($category)) {
+    // Fetch the total amount of plans in the same category
+    $sum_query = "SELECT SUM(amount) as total_plans_in_category 
+                  FROM financial_plan 
+                  WHERE category = '$category' AND organization_id = $organization_id";
+    $sum_result = mysqli_query($conn, $sum_query);
+    $sum_row = mysqli_fetch_assoc($sum_result);
+    $total_plans_in_category = $sum_row['total_plans_in_category'] ?? 0;
+
+    // Fetch the allocated budget for the category
+    $allocation_query = "SELECT allocated_budget 
+                         FROM budget_allocation 
+                         WHERE category = '$category' AND organization_id = $organization_id";
+    $allocation_result = mysqli_query($conn, $allocation_query);
+    $allocation_row = mysqli_fetch_assoc($allocation_result);
+    $allocated_budget = $allocation_row['allocated_budget'] ?? 0;
+
+    // Debugging logs
+    error_log("Total plans in category: $total_plans_in_category");
+    error_log("Allocated budget: $allocated_budget");
+    error_log("Proposed plan amount: $amount");
+
+    // Check if the total plans plus the new plan amount exceeds the allocated budget
+    if (($total_plans_in_category + $amount) > $allocated_budget) {
+        $errors['budget'] = 'Total amount for plans in this category exceeds the allocated budget.';
+    }
+}
+
 // If there are no errors, proceed to insert the financial plan
 if (!empty($errors)) {
     $data['success'] = false;
