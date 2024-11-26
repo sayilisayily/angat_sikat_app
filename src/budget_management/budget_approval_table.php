@@ -24,17 +24,14 @@ include '../user_query.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <!-- Lordicon (for animated icons) -->
     <script src="https://cdn.lordicon.com/lordicon.js"></script>
-    <!-- Selectize -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css"
-        integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+    <!--Bootstrap Script-->
+    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <!-- solar icons -->
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+    <!-- DataTables JavaScript for table interactions and pagination -->
+    <script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.1.7/js/dataTables.bootstrap5.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.bootstrap.min.css" />
 </head>
 
 <body>
@@ -433,7 +430,7 @@ include '../user_query.php';
                 </div>
             </div>
 
-
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>                                
             <script>
                 $(document).ready(function () {
                     $('#budgetApprovalsTable').DataTable({
@@ -610,16 +607,6 @@ include '../user_query.php';
         <!-- End of 2nd Body Wrapper -->
     </div>
     <!-- End of Overall Body Wrapper -->
-
-    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/sidebarmenu.js"></script>
-    <script src="../assets/js/app.min.js"></script>
-    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
-    <!-- solar icons -->
-    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 </body>
 
 </html>
