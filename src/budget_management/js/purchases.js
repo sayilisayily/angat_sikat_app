@@ -83,25 +83,22 @@ function toggleCompletion(purchaseId, isChecked) {
 });
 
 $('.edit-btn').on('click', function() {
-    var purchaseId = $(this).data('id'); // Get purchase_id from the button
-    console.log("Selected Purchase ID:", purchaseId); // Log the purchase ID for debugging
+    var purchaseId = $(this).data('id');
+    console.log("Selected Purchase ID:", purchaseId);
 
-    // Send an AJAX request to fetch the purchase details using the purchase ID
     $.ajax({
-        url: 'get_purchase_details.php', // PHP file to fetch purchase data
+        url: 'get_purchase_details.php',
         type: 'POST',
         data: { purchase_id: purchaseId },
         dataType: 'json',
         success: function(response) {
-            if(response.success) {
-                // Populate the form with purchase data
-                
-                $('#editPurchaseTitle').val(response.data.title);  
-                
-                // Show the modal
+            console.log("AJAX Response:", response); // Log response
+            if (response.success) {
+                $('#editPurchaseId').val(response.data.purchase_id);
+                $('#editPurchaseTitle').val(response.data.title);
                 $('#editPurchaseModal').modal('show');
             } else {
-                console.log("Error fetching data: ", response.message);
+                console.error("Error fetching data:", response.message);
             }
         },
         error: function(xhr, status, error) {
@@ -111,47 +108,57 @@ $('.edit-btn').on('click', function() {
 });
 
 
-// Handle Edit Event Form Submission
-$('#editPurchaseForm').on('submit', function(event) {
-  event.preventDefault(); // Prevent the form from submitting the default way
 
-  // Get the form data
-  var formData = $(this).serialize();
+// Handle Edit Purchase Form Submission
+$('#editPurchaseForm').on('submit', function (event) {
+    event.preventDefault(); // Prevent default form submission
 
-  $.ajax({
-      url: 'update_purchase.php', // PHP script that handles updating the purchase in the database
-      type: 'POST',
-      data: formData,  // Send form data to update_purchase.php
-      success: function(response) {
-          try {
-              // Parse the JSON response (ensure it's valid JSON)
-              response = JSON.parse(response);
+    $.ajax({
+        url: 'update_purchase.php', // PHP script for updating the purchase
+        type: 'POST',
+        data: $(this).serialize(), // Serialize form data
+        success: function (response) {
+            try {
+                // Parse the JSON response
+                response = JSON.parse(response);
+                console.log(response);
 
-              if (response.success) {
-                  // Hide any existing error messages
-                  $('#errorMessage').addClass('d-none');
+                if (response.success) {
+                    // Hide error messages if present
+                    $('#errorMessage2').addClass('d-none');
 
-                  // Show success message
-                  $('#successMessage').removeClass('d-none').text(response.message);
+                    // Show success message
+                    $('#successMessage2').removeClass('d-none').text(response.message);
 
-                  // Close the modal after a short delay
-                  setTimeout(function() {
-                      $('#editPurchaseModal').modal('hide'); // Hide the modal
-                      location.reload();                   
-                  }, 2000); // Adjust delay as needed (e.g., 2 seconds)
-              } else {
-                  // Show validation errors
-                  $('#errorMessage').removeClass('d-none').html(response.errors);
-              }
-          } catch (error) {
-              console.error('Error parsing JSON response:', error);
-          }
-      },
-      error: function(xhr, status, error) {
-          console.error('Error updating Purchase:', error);
-      }
-  });
+                    // Close the modal and reload the page
+                    setTimeout(function () {
+                        $('#editPurchaseModal').modal('hide'); // Hide modal
+                        $('#editPurchaseForm')[0].reset();    // Reset the form
+                        $('#successMessage2').addClass('d-none'); // Hide success message
+                        location.reload(); // Reload page
+                    }, 2000);
+                } else {
+                    // Show validation errors
+                    $('#successMessage2').addClass('d-none'); // Hide success message
+                    $('#errorMessage2').removeClass('d-none'); // Show error messages
+
+                    let errorHtml = '';
+                    for (let field in response.errors) {
+                        errorHtml += `<li>${response.errors[field]}</li>`; // Build error list
+                    }
+                    $('#errorList2').html(errorHtml); // Display errors
+                }
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error updating purchase:', error);
+            console.log(xhr.responseText); // Log response for debugging
+        },
+    });
 });
+
 
 // Purchase delegation for dynamically loaded buttons (Archive)
 
@@ -189,20 +196,40 @@ $(document).on('click', '#confirmArchiveBtn', function() {
         data: { purchase_id: purchaseId },
         dataType: 'json',
         success: function(response) {
-            if (response && response.success) {
-                console.log("Purchase archived successfully!");
-                location.reload();
-            } else {
-                // Show error message if archiving fails
-                console.error("Error archiving purchase:", response.message || "Unknown error.");
-                alert("Error archiving purchase: " + (response.message || "Unknown error."));
+            try { 
+                if (response.success) {
+                  // Show success message (optional)
+                  console.log(response.message);
+                    // Hide any existing error messages
+                    $('#errorMessage3').addClass('d-none');
+
+                    // Show success message
+                    $('#successMessage3').removeClass('d-none');
+
+                    // Close the modal after a short delay
+                    setTimeout(function() {
+                        $('#archiveModal').modal('hide'); 
+                        $('#successMessage3').addClass('d-none');
+                        location.reload(); 
+                    }, 2000);
+              } else {
+                  // Show validation errors
+                  $('#editsuccessMessage3').addClass('d-none');
+
+                  $('#errorMessage3').removeClass('d-none');
+                    let errorHtml = '';
+                    for (let field in response.errors) {
+                        errorHtml += `<li>${response.errors[field]}</li>`;
+                    }
+                    $('#errorList3').html(errorHtml);
+                }
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
             }
-            // Close the modal after archiving
-            $('#archiveModal').modal('hide');
-        },
-        error: function(xhr, status, error) {
-            console.error("AJAX Error:", error, xhr.responseText);
-            alert("AJAX request failed: " + error);
-        }
-    });
+          },
+          error: function(xhr, status, error) {
+            console.error('Error archiving event:', error);
+            console.log(xhr.responseText);
+          }
+      });
 });

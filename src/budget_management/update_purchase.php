@@ -1,63 +1,47 @@
 <?php
-// Include database connection
+// Include necessary files
 include('connection.php');
-include '../session_check.php'; 
+include('../session_check.php'); 
 
-// Set content type to JSON
-header('Content-Type: application/json');
-
-// Initialize an array to hold validation errors and response data
 $errors = [];
-$data = [];
+$response = ['success' => false];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate title
-    if (empty($_POST['title'])) {
+    // Validate form inputs
+    $title = mysqli_real_escape_string($conn, trim($_POST['title']));
+    $purchase_id = mysqli_real_escape_string($conn, $_POST['edit_purchase_id']);
+    
+    if (empty($title)) {
         $errors['title'] = 'Purchase title is required.';
     } else {
-        $title = mysqli_real_escape_string($conn, $_POST['title']); // Correctly set $title here
-        $purchase_id = mysqli_real_escape_string($conn, $_POST['purchase_id']); // Set $purchase_id for use
-
-        // Check for duplicate purchase title
-        $query = "SELECT * FROM purchases WHERE title = '$title' AND purchase_id != '$purchase_id'";
-        $result = mysqli_query($conn, $query);
-
+        // Check for duplicate titles
+        $check_query = "SELECT * FROM purchases WHERE title = '$title' AND purchase_id != '$purchase_id'";
+        $result = mysqli_query($conn, $check_query);
         if (mysqli_num_rows($result) > 0) {
             $errors['title'] = 'A purchase with this title already exists.';
         }
     }
 
-    // Validate completion_status if necessary (assuming it’s required)
-    if (!isset($_POST['completion_status'])) {
-        $errors['completion_status'] = 'Completion status is required.';
-    } else {
-        $completion_status = (int)$_POST['completion_status'];
-    }
-
-    // If there are validation errors, return them
-    if (!empty($errors)) {
-        $data['success'] = false;
-        $data['errors'] = $errors;
-    } else {
-        // Prepare organization_id from session
-        $organization_id = $_SESSION['organization_id'];
-
-        // Prepare and execute the update query
-        $query = "UPDATE purchases SET 
-                    title = '$title',
-                    completion_status = '$completion_status'
-                  WHERE purchase_id = '$purchase_id'";
-
-        if (mysqli_query($conn, $query)) {
-            $data['success'] = true;
-            $data['message'] = 'Purchase updated successfully!';
+    // Proceed if no errors
+    if (empty($errors)) {
+        $update_query = "UPDATE purchases SET 
+                            title = '$title'
+                         WHERE purchase_id = '$purchase_id'";
+        if (mysqli_query($conn, $update_query)) {
+            $response['success'] = true;
+            $response['message'] = 'Purchase updated successfully!';
         } else {
-            $data['success'] = false;
-            $data['errors'] = ['database' => 'Failed to update purchase in the database.'];
+            $response['success'] = false;
+            $errors['database'] = 'Failed to update the purchase in the database.';
         }
+    } else {
+        $response['errors'] = $errors;
     }
+} else {
+    $response['errors'] = ['general' => 'Invalid request method.'];
 }
 
-// Return JSON response
-echo json_encode($data);
+$response['errors'] = $errors ?? [];
+echo json_encode($response);
+
 ?>
