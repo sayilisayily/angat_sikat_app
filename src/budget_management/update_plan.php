@@ -1,123 +1,81 @@
 <?php
 // Include database connection
 include('connection.php');
-include '../session_check.php';
-// Initialize an array to hold validation errors
+
+// Initialize an array for validation errors and response data
 $errors = [];
 $data = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate and sanitize fields
-    if (empty($_POST['edit_title'])) {
+    // Validate and sanitize input fields
+    $plan_id = isset($_POST['edit_plan_id']) ? mysqli_real_escape_string($conn, $_POST['edit_plan_id']) : '';
+    $title = isset($_POST['edit_title']) ? mysqli_real_escape_string($conn, $_POST['edit_title']) : '';
+    $amount = isset($_POST['edit_amount']) ? mysqli_real_escape_string($conn, $_POST['edit_amount']) : '';
+    $type = isset($_POST['edit_type']) ? mysqli_real_escape_string($conn, $_POST['edit_type']) : '';
+    $category = isset($_POST['edit_category']) ? mysqli_real_escape_string($conn, $_POST['edit_category']) : '';
+    $date = isset($_POST['edit_date']) ? mysqli_real_escape_string($conn, $_POST['edit_date']) : '';
+
+    // Title validation
+    if (empty($title)) {
         $errors[] = 'Plan title is required.';
     } else {
-        $title = mysqli_real_escape_string($conn, $_POST['edit_title']);
-        $plan_id = mysqli_real_escape_string($conn, $_POST['edit_plan_id']); // Plan ID for update
-
-        // Check for duplicate plan title (excluding the current record)
+        // Check for duplicate titles (excluding current plan)
         $query = "SELECT * FROM financial_plan WHERE title = '$title' AND plan_id != '$plan_id'";
         $result = mysqli_query($conn, $query);
 
-        // Check if query was successful
         if (!$result) {
-            $errors[] = 'Database error: ' . mysqli_error($conn); // Show MySQL error
-        } else {
-            if (mysqli_num_rows($result) > 0) {
-                $errors[] = 'A plan with this title already exists.';
-            }
+            $errors[] = 'Database error: ' . mysqli_error($conn);
+        } elseif (mysqli_num_rows($result) > 0) {
+            $errors[] = 'A plan with this title already exists.';
         }
     }
 
-    if (empty($_POST['edit_amount'])) {
+    // Amount validation
+    if (empty($amount)) {
         $errors[] = 'Amount is required.';
-    } else if (!is_numeric($_POST['edit_amount']) || $_POST['edit_amount'] < 0) {
-        $errors[] = 'Amount must be a valid positive number.';
-    } else {
-        $amount = mysqli_real_escape_string($conn, $_POST['edit_amount']);
+    } elseif (!is_numeric($amount) || $amount < 0) {
+        $errors[] = 'Amount must be a positive number.';
     }
 
-    if (empty($_POST['edit_type'])) {
+    // Type validation
+    if (empty($type)) {
         $errors[] = 'Plan type is required.';
-    } else {
-        $type = mysqli_real_escape_string($conn, $_POST['edit_type']);
     }
 
-    // Validate category for expense plans
-    if ($_POST['edit_type'] === 'Expense') {
-        if (empty($_POST['edit_category'])) {
-            $errors['category'] = 'Category is required for expense plans.';
-        } else {
-            $category = mysqli_real_escape_string($conn, $_POST['edit_category']);
-        }
-    } else {
-        $category = ''; // Default empty for non-expense plans
+    // Category validation for Expense type
+    if ($type === 'Expense' && empty($category)) {
+        $errors[] = 'Category is required for expense plans.';
     }
 
-    // Validate date (required for Activities or Income plans)
-    if (isset($_POST['edit_date']) && ($_POST['edit_type'] === 'Income' || ($_POST['edit_type'] === 'Expense' && $category === 'Activities'))) {
-        if (empty($_POST['date'])) {
-            $errors['date'] = 'Plan date is required for Income plans or Activities category.';
-        } else {
-            $date = mysqli_real_escape_string($conn, $_POST['edit_date']);
-        }
-    } else {
-        $date = ''; // Default to empty if not applicable
+    // Date validation for specific types or categories
+    if (($type === 'Income' || ($type === 'Expense' && $category === 'Activities')) && empty($date)) {
+        $errors[] = 'Plan date is required for Income plans or Activities category.';
     }
 
-    // Validate if total plans in the category exceed allocated budget
-    if ($_POST['edit_type'] === 'Expense' && !empty($category)) {
-        // Fetch the total amount of plans in the same category
-        $sum_query = "SELECT SUM(amount) as total_plans_in_category 
-                      FROM financial_plan 
-                      WHERE category = '$category' AND organization_id = $organization_id";
-        $sum_result = mysqli_query($conn, $sum_query);
-        $sum_row = mysqli_fetch_assoc($sum_result);
-        $total_plans_in_category = $sum_row['total_plans_in_category'] ?? 0;
-
-        // Fetch the allocated budget for the category
-        $allocation_query = "SELECT allocated_budget 
-                             FROM budget_allocation 
-                             WHERE category = '$category' AND organization_id = $organization_id";
-        $allocation_result = mysqli_query($conn, $allocation_query);
-        $allocation_row = mysqli_fetch_assoc($allocation_result);
-        $allocated_budget = $allocation_row['allocated_budget'] ?? 0;
-
-        // Debugging logs
-        error_log("Total plans in category: $total_plans_in_category");
-        error_log("Allocated budget: $allocated_budget");
-        error_log("Proposed plan amount: $amount");
-
-        // Check if the total plans plus the new plan amount exceeds the allocated budget
-        if (($total_plans_in_category + $amount) > $allocated_budget) {
-            $errors['budget'] = 'Total amount for plans in this category exceeds the allocated budget.';
-        }
-    }
-
-    // If there are validation errors, return them
+    // Return errors if validation fails
     if (!empty($errors)) {
         $data['success'] = false;
         $data['errors'] = $errors;
     } else {
-        // Prepare the update query
+        // Update query
         $query = "UPDATE financial_plan SET 
-                    title = '$title', 
-                    date = '$date', 
-                    amount = '$amount', 
-                    type = '$type', 
-                    category =  '$category'
+                    title = '$title',
+                    date = '$date',
+                    amount = '$amount',
+                    type = '$type',
+                    category = '$category'
                   WHERE plan_id = '$plan_id'";
 
-        // Execute the update query
         if (mysqli_query($conn, $query)) {
             $data['success'] = true;
             $data['message'] = 'Plan updated successfully!';
         } else {
             $data['success'] = false;
-            $data['errors'] = ['database' => 'Failed to update plan in the database. ' . mysqli_error($conn)];
+            $data['errors'] = ['database' => 'Failed to update the plan. ' . mysqli_error($conn)];
         }
     }
 }
 
-// Return the response as JSON
+// Return response as JSON
 echo json_encode($data);
 ?>

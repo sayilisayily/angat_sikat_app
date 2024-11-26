@@ -117,90 +117,80 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
 
 
                 <div class="tab-content mt-4 mx-3">
-                    <!-- Financial Plan Tab -->
-                    <div class="tab-pane fade show active" id="financial-plan" role="tabpanel" aria-labelledby="financial-plan-tab">
+                <!-- Financial Plan Tab -->
+                <div class="tab-pane fade show active" id="financial-plan" role="tabpanel" aria-labelledby="financial-plan-tab">
 
-                        <!-- Event Information -->
-                        <h4>Title:
-                            <?php echo $event['title']; ?>
-                        </h4>
-                        <p>Venue:
-                            <?php echo $event['event_venue']; ?>
-                        </p>
-                        <p>Start Date:
-                            <?php echo $event['event_start_date']; ?>
-                        </p>
-                        <p>End Date:
-                            <?php echo $event['event_end_date']; ?>
-                        </p>
+                    <!-- Event Information -->
+                    <h4>Title:
+                        <?php echo $event['title']; ?>
+                    </h4>
+                    <p>Venue:
+                        <?php echo $event['event_venue']; ?>
+                    </p>
+                    <p>Start Date:
+                        <?php echo $event['event_start_date']; ?>
+                    </p>
+                    <p>End Date:
+                        <?php echo $event['event_end_date']; ?>
+                    </p>
 
-                        <h4>Items<?php if ($event['accomplishment_status'] === 0): ?>
+                    <h4>Items<?php if ($event['accomplishment_status'] === 0): ?>
                         <button class="btn btn-sm btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addItemModal"><i class="fa-solid fa-plus"></i> Add Item</button>
-                        <?php endif; ?></h4>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Description</th>
-                                    <th>Quantity</th>
-                                    <th>Unit</th>
-                                    <th>Amount</th>
-                                    <?php
-                                    if ($event['event_type'] === 'Income') {
-                                        echo "<th> Markup </th>";
-                                    }
-                                    ?>
-                                    <th>Total Amount</th>
-                                    <?php
+                    <?php endif; ?></h4>
+                    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                                <th>Amount</th>
+                                <?php if ($event['event_type'] === 'Income'): ?>
+                                    <th>Markup</th>
+                                <?php endif; ?>
+                                <th>Total Amount</th>
+                                <?php if ($event['accomplishment_status'] === 0): ?>
+                                    <th>Actions</th>
+                                <?php endif; ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $grand_total = 0; // Initialize the total amount for all items
+                            if (!empty($items)) {
+                                foreach ($items as $item) {
+                                    $total_amount = $item['quantity'] * $item['amount'];
+                                    $grand_total += $total_amount; // Add to the grand total
+                                    echo "<tr>
+                                            <td>{$item['description']}</td>
+                                            <td>{$item['quantity']}</td>
+                                            <td>{$item['unit']}</td>
+                                            <td>{$item['amount']}</td>
+                                            <td>{$total_amount}</td>";
                                     if ($event['accomplishment_status'] === 0) {
-                                        echo "<th>Actions</th>";
+                                        echo "<td>
+                                                <button class='btn edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#editItemModal' data-id='{$item['item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
+                                                <button class='btn delete-btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteItemModal' data-id='{$item['item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
+                                            </td>";
                                     }
-                                    ?>
-                                    
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                if (!empty($items)) {
-                                    foreach ($items as $item) {
-                                        $total_amount = $item['quantity'] * $item['amount'];
-                                        echo "<tr>
-                                                <td>{$item['description']}</td>
-                                                <td>{$item['quantity']}</td>
-                                                <td>{$item['unit']}</td>
-                                                <td>{$item['amount']}</td>
-                                                <td>{$total_amount}</td>
-                                                <td>";
-                                        if ($event['accomplishment_status'] === 0) {
-                                            echo "<button class='btn edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#editItemModal' data-id='{$item['item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
-                                                <button class='btn delete-btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteItemModal' data-id='{$item['item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>";
-                                        }
-                                        echo "</td>
-                                            </tr>";
-                                    }
-                                } else {
-                                    echo "<tr><td colspan='6' class='text-center'>No items found</td></tr>";
+                                    echo "</tr>";
                                 }
-                                ?>
-                            </tbody>
-                            
-                        </table>
-                        <?php
-                                // Query to calculate the total amount for the event
-                                //$total_query = "SELECT SUM(total_amount) AS total FROM event_items WHERE event_id = ?";
-                                //$stmt = $conn->prepare($total_query);
-//
-                                //if ($stmt) {
-                                //    $stmt->bind_param("i", $event_id);
-                                //    $stmt->execute();
-                                //    $stmt->bind_result($event_total);
-                                //    $stmt->fetch();
-                                //    $stmt->close();
-                                //} else {
-                                //    $event_total = 0; // Default value in case of a query failure
-                                //}
+                            } else {
+                                echo "<tr><td colspan='6' class='text-center'>No items found</td></tr>";
+                            }
                             ?>
-                                <h6 class="flex-end">Total Amount: <?= number_format($event_total, 2); ?></h6>    
+                        </tbody>
+                    </table>
+
+                    <!-- Display the grand total -->
+                    <div class="mt-3">
+                        <h6 class="text-end">Total Amount: <span>
+                            <?php echo number_format($grand_total, 2); ?>
+                        </span></h6>
                     </div>
+                </div>
+            </div>
+
 
                     <!-- Financial Summary Tab -->
                     <div class="tab-pane fade" id="financial-summary" role="tabpanel" aria-labelledby="financial-summary-tab">
@@ -270,10 +260,10 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                 
 
 
-                <!-- Plan Add Item Modal -->
+                <!-- Add Item Modal -->
                 <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel"
                     aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <form id="addItemForm">
                                 <div class="modal-header">
@@ -591,7 +581,6 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
     <script src="../assets/js/app.min.js"></script>
     <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
     <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 

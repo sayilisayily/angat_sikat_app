@@ -197,7 +197,7 @@ $('#editPlanForm').on('submit', function(event) {
         success: function(response) {
             try {
                 // Parse the JSON response (ensure it's valid JSON)
-                response = JSON.stringify(response);
+                response = JSON.parse(response);
                 console.log(response);
 
                 if (response.success) {

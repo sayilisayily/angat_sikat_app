@@ -94,14 +94,17 @@ $('#confirmationModal .btn-secondary').on('click', function() {
             // Extract data from the selected option
             const startDate = selectedOption.getAttribute("data-date") || "";
             const type = selectedOption.getAttribute("data-type") || "";
+            const amount = selectedOption.getAttribute("data-amount") || "";
     
             // Populate the modal fields
             document.getElementById("start_date").value = startDate;
             document.getElementById("type").value = type;
+            document.getElementById("amount").value = amount;
         } else {
             // Clear the fields if no title is selected
             document.getElementById("start_date").value = "";
             document.getElementById("type").value = "";
+            document.getElementById("amount").value = "";
         }
     });
     

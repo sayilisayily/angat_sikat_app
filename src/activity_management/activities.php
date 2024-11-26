@@ -39,7 +39,6 @@ $result = $conn->query($sql);
     <script src="../assets/js/app.min.js"></script>
     <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
     <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
     <!--Bootstrap JS-->
@@ -189,12 +188,12 @@ $result = $conn->query($sql);
                                     <option value="">Select Event Title</option>
                                     <?php
                                     // Query to fetch titles with category 'Activities'
-                                    $title_query = "SELECT title, date, type FROM financial_plan WHERE category = 'Activities' OR type = 'Income' AND organization_id = $organization_id";
+                                    $title_query = "SELECT title, date, type, amount FROM financial_plan WHERE category = 'Activities' OR type = 'Income' AND organization_id = $organization_id";
                                     $result = mysqli_query($conn, $title_query);
 
                                     if ($result && mysqli_num_rows($result) > 0) {
                                         while ($row = mysqli_fetch_assoc($result)) {
-                                            echo '<option value="' . htmlspecialchars($row['title']) . '" data-date="' . htmlspecialchars($row['date']) . '" data-type="' . htmlspecialchars($row['type']) . '">' . htmlspecialchars($row['title']) . '</option>';
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" data-date="' . htmlspecialchars($row['date']) . '" data-amount="' . htmlspecialchars($row['amount']) . '" data-type="' . htmlspecialchars($row['type']) . '">' . htmlspecialchars($row['title']) . '</option>';
                                         }
                                     } else {
                                         echo '<option value="">No titles available</option>';
@@ -222,6 +221,10 @@ $result = $conn->query($sql);
                             <div class="col">
                                 <label for="type">Event Type</label>
                                 <input type="text" class="form-control" id="type" name="type" readonly>                                 
+                            </div>
+                            <div class="col">
+                                <label for="type">Event Total Amount</label>
+                                <input type="text" class="form-control" id="amount" name="amount" readonly>                                 
                             </div>
                         </div>
 
