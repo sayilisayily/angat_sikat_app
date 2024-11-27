@@ -332,7 +332,7 @@ include '../user_query.php';
                                 </div>
                                 <!-- Success Message Alert -->
                                 <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
-                                    Rewuest added successfully!
+                                    Reuest added successfully!
                                 </div>
                                 <!-- Error Message Alert -->
                                 <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
