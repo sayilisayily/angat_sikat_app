@@ -48,8 +48,25 @@ if (isset($_GET['purchase_id']) && !empty($_GET['purchase_id'])) {
     }
 
     // Close the statements
-    $stmt->close();
     $itemStmt->close();
+
+    // Fetch items for Financial Summary if the purchase is accomplished
+    $summaryItems = [];
+    if ($purchase['completion_status'] == 1) { // Check accomplishment status
+        $summaryStmt = $conn->prepare("SELECT * FROM purchase_summary_items WHERE purchase_id = ?");
+        if ($summaryStmt === false) {
+            die('Prepare for summary items failed: ' . $conn->error);
+        }
+        $summaryStmt->bind_param("i", $purchase_id);
+        $summaryStmt->execute();
+        $summaryResult = $summaryStmt->get_result();
+        if ($summaryResult->num_rows > 0) {
+            while ($row = $summaryResult->fetch_assoc()) {
+                $summaryItems[] = $row;
+            }
+        }
+        $summaryStmt->close(); 
+    }
 } else {
     echo "No purchase ID provided.";
     exit;
@@ -219,7 +236,7 @@ if (isset($_GET['purchase_id']) && !empty($_GET['purchase_id'])) {
                             </tbody>
                         </table>
                         <?php else: ?>
-                        <p>This purchase has not been accomplished yet. The financial summary will be available once the purchase is marked as accomplished.</p>
+                        <p>This purchase has not been completed yet. The financial summary will be available once the purchase is marked as completed.</p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -550,7 +567,7 @@ if (isset($_GET['purchase_id']) && !empty($_GET['purchase_id'])) {
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 
-    <script src="js/event_details.js"></script>
+    <script src="js/purchase_details.js"></script>
 </body>
 
 </html>

@@ -73,7 +73,7 @@ $result = $conn->query($sql);
             <thead>
                 <tr>
                     <th>Title</th>
-                    <th>Total Budget</th>
+                    <th>Total Amount</th>
                     <th>Status</th>
                     <th>Completed</th>
                     <th>Actions</th>
@@ -87,7 +87,7 @@ $result = $conn->query($sql);
                         $disabled = ($row['purchase_status'] !== 'Approved') ? 'disabled' : '';
                         echo "<tr>
                                 <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='purchase_details.php?purchase_id={$row['purchase_id']}'>{$row['title']}</a></td>
-                                <td>{$row['total_budget']}</td>
+                                <td>{$row['total_amount']}</td>
                                 <td>";
                         
                         // Display purchase status with appropriate badge
