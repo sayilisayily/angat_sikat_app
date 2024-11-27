@@ -101,7 +101,7 @@ $result = $conn->query($sql);
 
                         echo "</td>
                             <td>
-                                <input type='checkbox' class='form-check-input' onclick='toggleCompletion({$row['purchase_id']}, this.checked)' $checked $disabled>
+                                <input type='checkbox' class='form-check-input' onclick='showConfirmationModal({$row['purchase_id']}, this.checked)' $checked $disabled>
                             </td>
                             <td>
                                 <button class='btn btn-primary btn-sm edit-btn mb-3' data-bs-toggle='modal' data-bs-target='#editPurchaseModal' data-id='{$row['purchase_id']}'>
@@ -124,11 +124,11 @@ $result = $conn->query($sql);
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Accomplishment Status Change</h5>
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Completion Status Change</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to change the accomplishment status of this event?
+                    Are you sure you want to change the completion status of this purchase?
                     <!-- Success Message Alert -->
                     <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
                         Status updated successfully!
