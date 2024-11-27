@@ -13,7 +13,7 @@ if (empty($_POST['title'])) {
     $title = mysqli_real_escape_string($conn, $_POST['title']);
     
     // Check if the event with the same title already exists
-    $query = "SELECT * FROM budget_approvals WHERE title = '$title'";
+    $query = "SELECT * FROM budget_approvals WHERE title = '$title' AND archived = 0 AND organization_id=$organization_id";
     $result = mysqli_query($conn, $query);
     
     if (mysqli_num_rows($result) > 0) {
