@@ -86,23 +86,6 @@ $('#confirmationModal .btn-secondary').on('click', function() {
     }, 500);
 });
 
-//function toggleCompletion(purchaseId, isChecked) {
-//    $.ajax({
-//        url: 'update_completion.php',
-//        type: 'POST',
-//        data: {
-//            purchase_id: purchaseId,
-//            completion_status: isChecked ? 1 : 0
-//        },
-//        success: function(response) {
-//            console.log('Completion status updated successfully:', response);
-//        },
-//        error: function(xhr, status, error) {
-//            console.error('Error updating completion status:', error);
-//        }
-//    });
-//}
-
 
   // Handle Add purchase Form Submission
   $('#addPurchaseForm').on('submit', function(event) {
@@ -290,7 +273,7 @@ $(document).on('click', '#confirmArchiveBtn', function() {
                     }, 2000);
               } else {
                   // Show validation errors
-                  $('#editsuccessMessage3').addClass('d-none');
+                  $('#successMessage3').addClass('d-none');
 
                   $('#errorMessage3').removeClass('d-none');
                     let errorHtml = '';
