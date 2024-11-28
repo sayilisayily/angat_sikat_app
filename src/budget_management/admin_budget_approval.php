@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $purchase_stmt->execute();
                     $purchase_stmt->close();
                 } elseif ($category === 'Maintenance') {
-                    $update_maintenance_query = "UPDATE moe SET moe_status = ? WHERE title = ?";
+                    $update_maintenance_query = "UPDATE maintenance SET maintenance_status = ? WHERE title = ?";
                     $maintenance_stmt = $conn->prepare($update_maintenance_query);
                     $maintenance_stmt->bind_param('ss', $new_status, $title);
                     $maintenance_stmt->execute();
