@@ -63,11 +63,18 @@ $result = $conn->query($sql);
 
     
     <div class="container mt-5 p-5">
-        <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Purchases
-            <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addPurchaseModal"
-             style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                <i class="fa-solid fa-plus"></i> Add Purchase
-            </button>
+        <h2 class="mb-4 d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-warning fw-bold me-2">|</span> Purchases
+                <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addPurchaseModal"
+                style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                    <i class="fa-solid fa-plus"></i> Add Purchase
+                </button>
+            </div>
+            <a href="purchases_archive.php" class="text-gray text-decoration-none fw-bold" 
+            style="font-size: 14px;">
+                View Archive
+            </a>
         </h2>
             <table id="purchasesTable" class="table">
             <thead>
