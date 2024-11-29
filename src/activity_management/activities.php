@@ -64,11 +64,18 @@ $result = $conn->query($sql);
 
     
     <div class="container mt-5 p-5">
-        <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Activities
-            <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addEventModal"
-             style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                <i class="fa-solid fa-plus"></i> Add Activity
-            </button>
+        <h2 class="mb-4 d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-warning fw-bold me-2">|</span> Activities
+                <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addEventModal"
+                    style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                    <i class="fa-solid fa-plus"></i> Add Activity
+                </button>
+            </div>
+            <a href="activities_archive.php" class="text-gray text-decoration-none fw-bold" 
+            style="font-size: 14px;">
+                View Archive
+            </a>
         </h2>
         <table id="eventsTable" class="table">
             <thead>
@@ -89,7 +96,7 @@ $result = $conn->query($sql);
             <tbody>
                 <?php
                 if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
+                    while ($row = $result->fetch_assoc()) {
                         $checked = $row['accomplishment_status'] ? 'checked' : '';
                         $disabled = ($row['event_status'] !== 'Approved') ? 'disabled' : '';
                         echo "<tr>
@@ -99,38 +106,37 @@ $result = $conn->query($sql);
                                 <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
                                 <td>{$row['event_type']}</td>
                                 <td>";
-                                  if ($row['event_status'] == 'Pending') {
-                                    echo " <span class='badge rounded-pill pending'> ";
-                                  } else if ($row['event_status'] == 'Approved') {
-                                    echo " <span class='badge rounded-pill approved'> ";
-                                  } else if ($row['event_status'] == 'Disapproved') {
-                                    echo " <span class='badge rounded-pill disapproved'> ";
-                                  }
-                                  echo "
-                                  {$row['event_status']}
-                                  </span>
-                                </td>
-                                <td>
-                                    <input type='checkbox' 
-                                    class='form-check-input' 
-                                    onclick='showConfirmationModal({$row['event_id']}, this.checked)' 
-                                    $checked 
-                                    $disabled>
-
-                                </td>
-                                <td>
-                                    <button class='btn btn-primary btn-sm edit-btn mb-3' 
-                                            data-bs-toggle='modal' 
-                                            data-bs-target='#editEventModal' 
-                                            data-id='{$row['event_id']}'>
-                                        <i class='fa-solid fa-pen'></i> Edit
-                                    </button>
-                                    <button class='btn btn-danger btn-sm archive-btn mb-3' 
-                                            data-id='{$row['event_id']}'>
-                                        <i class='fa-solid fa-box-archive'></i> Archive
-                                    </button>
-                                </td>
-                            </tr>";
+                        if ($row['event_status'] == 'Pending') {
+                            echo " <span class='badge rounded-pill pending'> ";
+                        } elseif ($row['event_status'] == 'Approved') {
+                            echo " <span class='badge rounded-pill approved'> ";
+                        } elseif ($row['event_status'] == 'Disapproved') {
+                            echo " <span class='badge rounded-pill disapproved'> ";
+                        }
+                        echo "
+                            {$row['event_status']}
+                            </span>
+                            </td>
+                            <td>
+                                <input type='checkbox' 
+                                class='form-check-input' 
+                                onclick='showConfirmationModal({$row['event_id']}, this.checked)' 
+                                $checked 
+                                $disabled>
+                            </td>
+                            <td>
+                                <button class='btn btn-primary btn-sm edit-btn mb-3' 
+                                        data-bs-toggle='modal' 
+                                        data-bs-target='#editEventModal' 
+                                        data-id='{$row['event_id']}'>
+                                    <i class='fa-solid fa-pen'></i> Edit
+                                </button>
+                                <button class='btn btn-danger btn-sm archive-btn mb-3' 
+                                        data-id='{$row['event_id']}'>
+                                    <i class='fa-solid fa-box-archive'></i> Archive
+                                </button>
+                            </td>
+                        </tr>";
                     }
                 } else {
                     echo "<tr><td colspan='9' class='text-center'>No events found</td></tr>";
@@ -139,6 +145,7 @@ $result = $conn->query($sql);
             </tbody>
         </table>
     </div>
+
 
     <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
