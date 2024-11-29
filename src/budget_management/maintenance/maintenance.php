@@ -5,7 +5,7 @@ include '../user_query.php';
 
 // Check if user is logged in and has officer role
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'officer') {
-    header("Location: ../user/login.html");
+    header("Location: ../../user/login.html");
     exit();
 }
 

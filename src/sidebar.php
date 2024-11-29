@@ -32,7 +32,7 @@
                             <a href="../budget_management/budget_overview.php">› Overview </a>
                             <a href="../budget_management/financial_plan.php">› Plan </a>
                             <a href="../budget_management/purchases.php">› Purchases</a>
-                            <a href="../budget_management/moe.php">› MOE</a>
+                            <a href="../budget_management/maintenance/maintenance.php">› MOE</a>
                             <a href="../budget_management/budget_approval_table.php">› Approval</a>
                         </div>
                         </li>
