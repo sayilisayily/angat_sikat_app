@@ -102,10 +102,10 @@ $('#confirmationModal .btn-secondary').on('click', function() {
 
                 if (response.success) {
                     // Hide any existing error messages
-                    $('#errorMessage').addClass('d-none');
+                    $('#addErrorMessage').addClass('d-none');
 
                     // Show success message
-                    $('#successMessage').removeClass('d-none');
+                    $('#addSuccessMessage').removeClass('d-none');
 
                     // Close the modal after a short delay
                     setTimeout(function() {
@@ -113,7 +113,7 @@ $('#confirmationModal .btn-secondary').on('click', function() {
 
                         // Reset the form and hide the success message
                         $('#addPurchaseForm')[0].reset();
-                        $('#successMessage').addClass('d-none');
+                        $('#addSuccessMessage').addClass('d-none');
 
                         // Reload the page to reflect the new purchase
                         location.reload();
@@ -121,15 +121,15 @@ $('#confirmationModal .btn-secondary').on('click', function() {
 
                 } else {
                     // Hide any existing success messages
-                    $('#successMessage').addClass('d-none');
+                    $('#addSuccessMessage').addClass('d-none');
 
                     // Show error messages
-                    $('#errorMessage').removeClass('d-none');
+                    $('#addErrorMessage').removeClass('d-none');
                     let errorHtml = '';
                     for (let field in response.errors) {
                         errorHtml += `<li>${response.errors[field]}</li>`;
                     }
-                    $('#errorList').html(errorHtml);
+                    $('#addErrorList').html(errorHtml);
                 }
             } catch (error) {
                 console.error('Error parsing JSON:', error);
@@ -260,27 +260,27 @@ $(document).on('click', '#confirmArchiveBtn', function() {
                   // Show success message (optional)
                   console.log(response.message);
                     // Hide any existing error messages
-                    $('#errorMessage3').addClass('d-none');
+                    $('#archiveErrorMessage').addClass('d-none');
 
                     // Show success message
-                    $('#successMessage3').removeClass('d-none');
+                    $('#archiveSuccessMessage').removeClass('d-none');
 
                     // Close the modal after a short delay
                     setTimeout(function() {
                         $('#archiveModal').modal('hide'); 
-                        $('#successMessage3').addClass('d-none');
+                        $('#archiveSuccessMessage').addClass('d-none');
                         location.reload(); 
                     }, 2000);
               } else {
                   // Show validation errors
-                  $('#successMessage3').addClass('d-none');
+                  $('#archiveSuccessMessage').addClass('d-none');
 
-                  $('#errorMessage3').removeClass('d-none');
+                  $('#archiveErrorMessage').removeClass('d-none');
                     let errorHtml = '';
                     for (let field in response.errors) {
                         errorHtml += `<li>${response.errors[field]}</li>`;
                     }
-                    $('#errorList3').html(errorHtml);
+                    $('#archiveErrorList').html(errorHtml);
                 }
             } catch (error) {
                 console.error('Error parsing JSON:', error);

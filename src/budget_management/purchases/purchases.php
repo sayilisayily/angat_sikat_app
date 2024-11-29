@@ -183,16 +183,17 @@ $result = $conn->query($sql);
                         ?>
                     </select>
                 </div>
+                <!-- Success Message Alert -->
+                <div id="addSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                        Purchase added successfully!
+                </div>  
+                <!-- Error Message Alert -->
+                <div id="addErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                    <ul id="addErrorList"></ul>
+                </div>
             </div>
 
-            <!-- Success Message Alert -->
-            <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
-                    Purchase added successfully!
-            </div>  
-            <!-- Error Message Alert -->
-            <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                <ul id="errorList"></ul>
-            </div>
+            
             </div>
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -248,19 +249,20 @@ $result = $conn->query($sql);
                 <div class="modal-body">
                     Are you sure you want to archive this Purchase?
                     <input type="hidden" id="archivePurchaseId">
+                    <!-- Success Message Alert -->
+                    <div id="archiveSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                            Purchase archived successfully!
+                    </div>  
+                    <!-- Error Message Alert -->
+                    <div id="archiveErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                        <ul id="archiveErrorList"></ul>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" id="confirmArchiveBtn" class="btn btn-danger">Archive</button>
                 </div>
-                <!-- Success Message Alert -->
-                <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
-                        Purchase archived successfully!
-                </div>  
-                <!-- Error Message Alert -->
-                <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                    <ul id="errorList"></ul>
-                </div>
+                
             </div>
         </div>
     </div>
