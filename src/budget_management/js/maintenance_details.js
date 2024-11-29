@@ -4,7 +4,7 @@ $(document).ready(function () {
             event.preventDefault(); // Prevent the form from submitting in the traditional way
 
             $.ajax({
-                url: 'm_add_item.php', // The PHP file that processes adding the item
+                url: 'add_item.php', // The PHP file that processes adding the item
                 type: 'POST',
                 data: $(this).serialize(), // Serialize the form data
                 success: function(response) {
@@ -75,14 +75,19 @@ $(document).ready(function () {
         });
 
 
-    //Submit Add Item Form
+    // Submit Add Item Form
     $('#summaryAddItemForm').on('submit', function(event) {
         event.preventDefault(); // Prevent the form from submitting in the traditional way
+
+        // Create a FormData object to include file inputs
+        const formData = new FormData(this);
 
         $.ajax({
             url: 'add_summary_item.php', // The PHP file that processes adding the item
             type: 'POST',
-            data: $(this).serialize(), // Serialize the form data
+            data: formData, // Use FormData for the request
+            processData: false, // Prevent jQuery from automatically processing data
+            contentType: false, // Prevent jQuery from overriding the Content-Type header
             success: function(response) {
                 try {
                     // Parse the JSON response
@@ -125,7 +130,7 @@ $(document).ready(function () {
             },
             error: function(xhr, status, error) {
                 console.error('Error adding item:', error);
-                console.log(response);
+                console.log(xhr.responseText);
             }
         });
     });
@@ -136,7 +141,7 @@ $(document).ready(function () {
         console.log("Selected Item ID:", itemId); // Log the item ID for debugging
 
         $.ajax({
-            url: 'm_get_item_details.php', // Your PHP script for fetching the item details
+            url: 'get_item_details.php', // Your PHP script for fetching the item details
             type: 'POST',
             data: {item_id: itemId},
             dataType: 'json',
@@ -165,47 +170,50 @@ $(document).ready(function () {
         });
     });
 
-    // Fetch and populate Edit Item Modal
-    $('.summary-edit-btn').on('click', function() {
-        var itemId = $(this).data('id'); // Corrected to retrieve item_id from the button
-        console.log("Selected Item ID:", itemId); // Log the item ID for debugging
+// Fetch and populate Edit Item Modal
+$('.summary-edit-btn').on('click', function() {
+    var itemId = $(this).data('id'); // Corrected to retrieve item_id from the button
+    console.log("Selected Item ID:", itemId); // Log the item ID for debugging
 
-        $.ajax({
-            url: 'm_get_summary_item_details.php', // Your PHP script for fetching the item details
-            type: 'POST',
-            data: {item_id: itemId},
-            dataType: 'json',
-            success: function (response) {
-                console.log(response);
-                if (response.success) {
-                    // Populate the modal fields with the item data
-                    $('#summary_edit_item_id').val(response.data.summary_item_id);
-                    $('#summary_edit_description').val(response.data.description);
-                    $('#summary_edit_quantity').val(response.data.quantity);
-                    $('#summary_edit_unit').val(response.data.unit);
-                    $('#summary_edit_amount').val(response.data.amount);
+    $.ajax({
+        url: 'get_summary_item_details.php', // Your PHP script for fetching the item details
+        type: 'POST',
+        data: {item_id: itemId},
+        dataType: 'json',
+        success: function (response) {
+            console.log(response);
+            if (response.success) {
+                // Populate the modal fields with the item data
+                $('#summary_edit_item_id').val(response.data.summary_item_id);
+                $('#summary_edit_description').val(response.data.description);
+                $('#summary_edit_quantity').val(response.data.quantity);
+                $('#summary_edit_unit').val(response.data.unit);
+                $('#summary_edit_amount').val(response.data.amount);
 
-                    // Show the modal
-                    $('#sumarryEditItemModal').modal('show');
-                } else {
-                    // Display an error message if fetching failed
-                    console.log("Error fetching data: ", response.message);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error: ", error);
-                console.log("Status:", status);
-                console.log("Response Text:", xhr.responseText); // Log full response for debugging
+                // Handle reference file display (optional if reference details are required)
+                $('#currentAttachment').html('<strong>Current Attachment:</strong> ' + response.data.reference);
+
+                // Show the modal
+                $('#sumarryEditItemModal').modal('show');
+            } else {
+                // Display an error message if fetching failed
+                console.log("Error fetching data: ", response.message);
             }
-        });
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX Error: ", error);
+            console.log("Status:", status);
+            console.log("Response Text:", xhr.responseText); // Log full response for debugging
+        }
     });
+});
 
 
 // Handle form submission for updating the item
 $('#editItemForm').on('submit', function(e) {
     e.preventDefault()
     $.ajax({
-        url: 'm_update_item.php', // URL of your PHP script for updating the item
+        url: 'update_item.php', // URL of your PHP script for updating the item
         type: 'POST',
         data: $(this).serialize(),
         success: function(response) {
@@ -245,41 +253,48 @@ $('#editItemForm').on('submit', function(e) {
 
 // Handle form submission for updating the item
 $('#summaryEditItemForm').on('submit', function(e) {
-    e.preventDefault()
+    e.preventDefault();
+
+    var formData = new FormData(this); // Use FormData to handle file uploads
+
     $.ajax({
         url: 'update_summary_item.php', // URL of your PHP script for updating the item
         type: 'POST',
-        data: $(this).serialize(),
+        data: formData,
+        processData: false, // Required for FormData
+        contentType: false, // Required for FormData
         success: function(response) {
             // Parse the JSON response
             var result = JSON.parse(response);
             console.log(response);
             if (result.success) {
                 // Hide any existing error messages
-                $('#errorMessage5').addClass('d-none')
+                $('#errorMessage5').addClass('d-none');
                 // Show success message
                 $('#successMessage5').removeClass('d-none');
-                
+
                 setTimeout(function() {
-                    $('#summaryEditItemModal').modal('hide')
+                    $('#summaryEditItemModal').modal('hide');
                     // Reset the form and hide the success message
                     $('#summaryEditItemForm')[0].reset();
                     $('#successMessage5').addClass('d-none');
                     location.reload();
-                }, 2000); 
+                }, 2000);
             } else {
                 // Show validation errors
-                $('#successMessage5').addClass('d-none')
+                $('#successMessage5').addClass('d-none');
                 $('#errorMessage5').removeClass('d-none');
                 let errorHtml = '';
-                for (let field in response.errors) {
-                    errorHtml += `<li>${response.errors[field]}</li>`;
+                for (let field in result.errors) {
+                    errorHtml += `<li>${result.errors[field]}</li>`;
                 }
-                $('#errorList5').html(errorHtml);
+                $('#editErrorList5').html(errorHtml);
             }
         },
-        error: function() {
-            console.error('Error updating event:', error);
+        error: function(xhr, status, error) {
+            console.error('Error updating item:', error);
+            console.log("Status:", status);
+            console.log("Response Text:", xhr.responseText);
         }
     });
 });
@@ -303,7 +318,7 @@ $('#confirmDeleteBtn').on('click', function() {
     
     // Send an AJAX request to delete the item
     $.ajax({
-        url: 'm_delete_item.php', // PHP file to handle deletion
+        url: 'delete_item.php', // PHP file to handle deletion
         type: 'POST',
         data: { item_id: itemId },
         dataType: 'json',

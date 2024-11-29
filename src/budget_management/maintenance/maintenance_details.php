@@ -404,7 +404,7 @@ if (isset($_GET['maintenance_id']) && !empty($_GET['maintenance_id'])) {
                     aria-labelledby="summaryAddItemModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form id="summaryAddItemForm">
+                            <form id="summaryAddItemForm" enctype="multipart/form-data">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="summaryAddItemModalLabel">Add Item</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -476,7 +476,7 @@ if (isset($_GET['maintenance_id']) && !empty($_GET['maintenance_id'])) {
                     aria-labelledby="summaryEditItemModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form id="summaryEditItemForm">
+                            <form id="summaryEditItemForm" enctype="multipart/form-data">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="summaryEditItemModalLabel">Edit Item</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -509,6 +509,11 @@ if (isset($_GET['maintenance_id']) && !empty($_GET['maintenance_id'])) {
                                             <input type="number" step="0.01" class="form-control"
                                                 id="summary_edit_amount" name="amount" required>
                                         </div>
+                                    </div>
+                                    <div class="form-group">
+                                            <label for="reference">Reference</label>
+                                            <input type="file" class="form-control" id="edit_reference" name="reference">
+                                            <div id="currentAttachment" class="mt-2"></div>
                                     </div>
                                     <div id="successMessage5" class="alert alert-success d-none mt-3"
                                         role="alert">Item updated successfully!</div>

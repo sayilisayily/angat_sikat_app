@@ -185,6 +185,9 @@ $(document).ready(function () {
                     $('#summary_edit_unit').val(response.data.unit);
                     $('#summary_edit_amount').val(response.data.amount);
 
+                    // Handle reference file display (optional if reference details are required)
+                    $('#currentAttachment').html('<strong>Current Attachment:</strong> ' + response.data.reference);
+
                     // Show the modal
                     $('#sumarryEditItemModal').modal('show');
                 } else {
@@ -245,41 +248,48 @@ $('#editItemForm').on('submit', function(e) {
 
 // Handle form submission for updating the item
 $('#summaryEditItemForm').on('submit', function(e) {
-    e.preventDefault()
+    e.preventDefault();
+
+    var formData = new FormData(this); // Use FormData to handle file uploads
+
     $.ajax({
         url: 'update_summary_item.php', // URL of your PHP script for updating the item
         type: 'POST',
-        data: $(this).serialize(),
+        data: formData,
+        processData: false, // Required for FormData
+        contentType: false, // Required for FormData
         success: function(response) {
             // Parse the JSON response
             var result = JSON.parse(response);
             console.log(response);
             if (result.success) {
                 // Hide any existing error messages
-                $('#errorMessage5').addClass('d-none')
+                $('#errorMessage5').addClass('d-none');
                 // Show success message
                 $('#successMessage5').removeClass('d-none');
-                
+
                 setTimeout(function() {
-                    $('#summaryEditItemModal').modal('hide')
+                    $('#summaryEditItemModal').modal('hide');
                     // Reset the form and hide the success message
                     $('#summaryEditItemForm')[0].reset();
                     $('#successMessage5').addClass('d-none');
                     location.reload();
-                }, 2000); 
+                }, 2000);
             } else {
                 // Show validation errors
-                $('#successMessage5').addClass('d-none')
+                $('#successMessage5').addClass('d-none');
                 $('#errorMessage5').removeClass('d-none');
                 let errorHtml = '';
-                for (let field in response.errors) {
-                    errorHtml += `<li>${response.errors[field]}</li>`;
+                for (let field in result.errors) {
+                    errorHtml += `<li>${result.errors[field]}</li>`;
                 }
-                $('#errorList5').html(errorHtml);
+                $('#editErrorList5').html(errorHtml);
             }
         },
-        error: function() {
-            console.error('Error updating event:', error);
+        error: function(xhr, status, error) {
+            console.error('Error updating item:', error);
+            console.log("Status:", status);
+            console.log("Response Text:", xhr.responseText);
         }
     });
 });
