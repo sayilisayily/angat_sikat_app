@@ -53,7 +53,7 @@ if (isset($_GET['maintenance_id']) && !empty($_GET['maintenance_id'])) {
     // Fetch items for Financial Summary if the maintenance is accomplished
     $summaryItems = [];
     if ($maintenance['completion_status'] == 1) { // Check accomplishment status
-        $summaryStmt = $conn->prepare("SELECT * FROM purchase_summary_items WHERE maintenance_id = ?");
+        $summaryStmt = $conn->prepare("SELECT * FROM maintenance_summary_items WHERE maintenance_id = ?");
         if ($summaryStmt === false) {
             die('Prepare for summary items failed: ' . $conn->error);
         }

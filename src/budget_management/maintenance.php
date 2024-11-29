@@ -100,7 +100,7 @@ $result = $conn->query($sql);
                         }
 
                         echo "{$row['maintenance_status']}</span></td>
-                            <td><input type='checkbox' class='form-check-input' onclick='toggleCompletion({$row['maintenance_id']}, this.checked)' $checked $disabled></td>
+                            <td><input type='checkbox' class='form-check-input' onclick='showConfirmationModal({$row['maintenance_id']}, this.checked)' $checked $disabled></td>
                             <td>
                                 <button class='btn btn-primary btn-sm edit-btn mb-3' data-bs-toggle='modal' data-bs-target='#editMaintenanceModal' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-pen'></i> Edit</button>
                                 <button class='btn btn-danger btn-sm archive-btn mb-3' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-box-archive'></i> Archive</button>
