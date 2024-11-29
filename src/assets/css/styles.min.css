@@ -15,7 +15,7 @@
   --bs-pink: #d63384;
   --bs-red: #ff6692;
   --bs-orange: #fd7e14;
-  --bs-yellow: #ffae1f;
+  --bs-yellow: #ffb000;
   --bs-green: #13deb9;
   --bs-teal: #20c997;
   --bs-cyan: #539bff;
@@ -32,7 +32,7 @@
   --bs-gray-700: #495057;
   --bs-gray-800: #343a40;
   --bs-gray-900: #212529;
-  --bs-primary: #00a1ff;
+  --bs-primary: #ffb000;
   --bs-secondary: #8965e5;
   --bs-success: #00ceb6;
   --bs-info: #46caeb;
@@ -51,7 +51,7 @@
   --bs-light-indigo: #ebf3fe;
   --bs-dark-light: #111c2d;
   --bs-light-gray: #f6f9fc;
-  --bs-primary-rgb: 0, 161, 255;
+  --bs-primary-rgb: 255, 176, 0;
   --bs-secondary-rgb: 137, 101, 229;
   --bs-success-rgb: 0, 206, 182;
   --bs-info-rgb: 70, 202, 235;
