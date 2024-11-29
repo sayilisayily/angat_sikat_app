@@ -64,11 +64,18 @@ $result = $conn->query($sql);
 
     
     <div class="container mt-5 p-5">
-        <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Maintenance and Other Expenses
-            <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addModal"
-             style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                <i class="fa-solid fa-plus"></i> Add MOE
-            </button>
+        <h2 class="mb-4 d-flex align-items-center justify-content-between">
+            <div>    
+                <span class="text-warning fw-bold me-2">|</span> Maintenance and Other Expenses
+                <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addModal"
+                style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                    <i class="fa-solid fa-plus"></i> Add MOE
+                </button>
+            </div>
+            <a href="maintenance_archive.php" class="text-gray text-decoration-none fw-bold" 
+            style="font-size: 14px;">
+                View Archive
+            </a>
         </h2>
             <table id="maintenanceTable" class="table">
             <thead>
@@ -108,7 +115,7 @@ $result = $conn->query($sql);
                             </tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='5' class='text-center'>No maintenance or other expense records found</td></tr>";
+                    echo "<tr><td colspan='5' class='text-center'>No maintenance or other expenses found</td></tr>";
                 }
                 ?>
             </tbody>
