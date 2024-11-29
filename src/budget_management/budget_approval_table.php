@@ -300,7 +300,7 @@ include '../user_query.php';
                                         <!-- Fetch titles from events, purchases, and maintenance -->
                                         <?php
                                         // Fetch events
-                                        $event_query = "SELECT title FROM events where archived=0 and organization_id = $organization_id";
+                                        $event_query = "SELECT title FROM events where archived = 0 and organization_id = $organization_id";
                                         $event_result = mysqli_query($conn, $event_query);
                                         echo "<optgroup label='Events'>";
                                         while ($row = mysqli_fetch_assoc($event_result)) {
@@ -309,7 +309,7 @@ include '../user_query.php';
                                         echo "</optgroup>";
         
                                         // Fetch purchases
-                                        $purchase_query = "SELECT title FROM purchases";
+                                        $purchase_query = "SELECT title FROM purchases where archived = 0 and organization_id = $organization_id";
                                         $purchase_result = mysqli_query($conn, $purchase_query);
                                         echo "<optgroup label='Purchases'>";
                                         while ($row = mysqli_fetch_assoc($purchase_result)) {
@@ -318,11 +318,13 @@ include '../user_query.php';
                                         echo "</optgroup>";
         
                                         // Fetch maintenance
-                                        $maintenance_query = "SELECT title FROM maintenance";
+                                        $maintenance_query = "SELECT title FROM maintenance where archived = 0 and organization_id = $organization_id";
                                         $maintenance_result = mysqli_query($conn, $maintenance_query);
+                                        echo "<optgroup label='Mainteance and Other Expenses'>";
                                         while ($row = mysqli_fetch_assoc($maintenance_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . " (Maintenance)</option>";
+                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . " </option>";
                                         }
+                                        echo "</optgroup>";
                                         ?>
                                     </select>
                                 </div>
@@ -332,7 +334,7 @@ include '../user_query.php';
                                 </div>
                                 <!-- Success Message Alert -->
                                 <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
-                                    Reuest added successfully!
+                                    Request added successfully!
                                 </div>
                                 <!-- Error Message Alert -->
                                 <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
