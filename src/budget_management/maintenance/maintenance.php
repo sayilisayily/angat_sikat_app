@@ -259,7 +259,7 @@ $result = $conn->query($sql);
     </div>
 
     <!-- BackEnd -->
-    <script src="js/maintenance.js"></script>
+    <script src="../js/maintenance.js"></script>
 </body>
 
 </html>

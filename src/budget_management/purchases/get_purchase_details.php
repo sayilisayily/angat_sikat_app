@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../connection.php';
 
 if (isset($_POST['purchase_id'])) {
     $purchase_id = $_POST['purchase_id']; // Correct variable name

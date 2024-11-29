@@ -1,7 +1,7 @@
 <?php
 
-include 'connection.php';
-include '../session_check.php';  // Ensure the organization ID is in the session
+include '../connection.php';
+include '../../session_check.php';  // Ensure the organization ID is in the session
 
 $errors = [];
 $data = [];

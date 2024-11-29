@@ -1,8 +1,8 @@
 <?php
 // Database connection
-require 'connection.php';
-include '../session_check.php';
-include '../user_query.php';
+include '../../connection.php';
+include '../../session_check.php'; 
+include '../../user_query.php';
 
 // Check if 'maintenance_id' is passed in the URL
 if (isset($_GET['maintenance_id']) && !empty($_GET['maintenance_id'])) {
@@ -76,8 +76,8 @@ if (isset($_GET['maintenance_id']) && !empty($_GET['maintenance_id'])) {
 <!DOCTYPE html>
 <html lang="en">
 
-<head><head>
-    <title>Purchases Table</title>
+<head>
+    <title>Maintenance Details</title>
     <link rel="shortcut icon" type="image/png" href="../../assets/images/logos/favicon.png" />
     <link rel="stylesheet" href="../../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
@@ -573,7 +573,7 @@ if (isset($_GET['maintenance_id']) && !empty($_GET['maintenance_id'])) {
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 
-    <script src="js/maintenance_details.js"></script>
+    <script src="../js/maintenance_details.js"></script>
 </body>
 
 </html>

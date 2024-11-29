@@ -1,11 +1,11 @@
 <?php
-include 'connection.php';
-include '../session_check.php'; 
-include '../user_query.php';
+include '../../connection.php';
+include '../../session_check.php'; 
+include '../../user_query.php';
 
 // Check if user is logged in and has officer role
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'officer') {
-    header("Location: ../user/login.html");
+    header("Location: ../../user/login.html");
     exit();
 }
 
@@ -19,12 +19,12 @@ $result = $conn->query($sql);
 
 <head>
     <title>Purchases Table</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
-    <link rel="stylesheet" href="../assets/css/styles.min.css" />
+    <link rel="shortcut icon" type="image/png" href="../../assets/images/logos/favicon.png" />
+    <link rel="stylesheet" href="../../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
-    <link rel="stylesheet" href="../html/sidebar.css" />
+    <link rel="stylesheet" href="../../html/sidebar.css" />
     <!--Custom CSS for Activities-->
-    <link rel="stylesheet" href="../activity_management/css/activities.css" />
+    <link rel="stylesheet" href="../../activity_management/css/activities.css" />
     <!--Boxicon-->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <!--Font Awesome-->
@@ -32,12 +32,12 @@ $result = $conn->query($sql);
     <!-- Lordicon (for animated icons) -->
     <script src="https://cdn.lordicon.com/lordicon.js"></script>
     <!--Bootstrap Script-->
-    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/sidebarmenu.js"></script>
-    <script src="../assets/js/app.min.js"></script>
-    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+    <script src="../../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/sidebarmenu.js"></script>
+    <script src="../../assets/js/app.min.js"></script>
+    <script src="../../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="../../assets/libs/simplebar/dist/simplebar.js"></script>
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
     <!--Bootstrap JS-->
@@ -55,9 +55,9 @@ $result = $conn->query($sql);
     <!-- Overall Body Wrapper -->
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
         data-sidebar-position="fixed" data-header-position="fixed">
-        <?php include '../sidebar.php'; ?>
+        <?php include '../../sidebar.php'; ?>
 
-        <?php include '../navbar.php';?>
+        <?php include '../../navbar.php';?>
     </div>
     <!-- End of Overall Body Wrapper -->
 
@@ -259,7 +259,7 @@ $result = $conn->query($sql);
     </div>
 
     <!-- BackEnd -->
-    <script src="js/purchases.js"></script>
+    <script src="../js/purchases.js"></script>
 </body>
 
 </html>

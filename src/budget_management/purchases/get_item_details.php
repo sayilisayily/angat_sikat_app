@@ -1,5 +1,5 @@
 <?php
-include 'connection.php'; // Database connection
+include '../connection.php'; // Database connection
 
 if (isset($_POST['item_id'])) {
     $item_id = $_POST['item_id'];
