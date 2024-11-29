@@ -1,5 +1,5 @@
 <?php
-require 'connection.php';
+require '../connection.php';
 
 // Initialize an empty response array
 $response = array('success' => false, 'errors' => array());

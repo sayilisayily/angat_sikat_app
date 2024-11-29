@@ -1,7 +1,7 @@
 <?php
 // Include necessary files
-include('connection.php');
-include('../session_check.php'); 
+include('../connection.php');
+include('../../session_check.php'); 
 
 $errors = [];
 $response = ['success' => false];
