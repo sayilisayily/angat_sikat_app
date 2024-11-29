@@ -1,3 +1,4 @@
+
 $(document).ready(function () {
     //Submit Add Item Form
     $('#addItemForm').on('submit', function(event) {
@@ -75,14 +76,19 @@ $(document).ready(function () {
         });
 
 
-    //Submit Add Item Form
+    // Submit Add Item Form
     $('#summaryAddItemForm').on('submit', function(event) {
         event.preventDefault(); // Prevent the form from submitting in the traditional way
+
+        // Create a FormData object to include file inputs
+        const formData = new FormData(this);
 
         $.ajax({
             url: 'add_summary_item.php', // The PHP file that processes adding the item
             type: 'POST',
-            data: $(this).serialize(), // Serialize the form data
+            data: formData, // Use FormData for the request
+            processData: false, // Prevent jQuery from automatically processing data
+            contentType: false, // Prevent jQuery from overriding the Content-Type header
             success: function(response) {
                 try {
                     // Parse the JSON response
@@ -125,10 +131,11 @@ $(document).ready(function () {
             },
             error: function(xhr, status, error) {
                 console.error('Error adding item:', error);
-                console.log(response);
+                console.log(xhr.responseText);
             }
         });
     });
+
 
     // Fetch and populate Edit Item Modal
     $('.edit-btn').on('click', function() {
@@ -167,15 +174,15 @@ $(document).ready(function () {
 
     // Fetch and populate Edit Item Modal
     $('.summary-edit-btn').on('click', function() {
-        var itemId = $(this).data('id'); // Corrected to retrieve item_id from the button
+        var itemId = $(this).data('id'); // Retrieve item_id from the button
         console.log("Selected Item ID:", itemId); // Log the item ID for debugging
 
         $.ajax({
             url: 'get_summary_item_details.php', // Your PHP script for fetching the item details
             type: 'POST',
-            data: {item_id: itemId},
+            data: { item_id: itemId },
             dataType: 'json',
-            success: function (response) {
+            success: function(response) {
                 console.log(response);
                 if (response.success) {
                     // Populate the modal fields with the item data
@@ -185,14 +192,17 @@ $(document).ready(function () {
                     $('#summary_edit_unit').val(response.data.unit);
                     $('#summary_edit_amount').val(response.data.amount);
 
+                    // Handle reference file display (optional if reference details are required)
+                    $('#currentAttachment').html('<strong>Current Attachment:</strong> ' + response.data.reference);
+
                     // Show the modal
-                    $('#sumarryEditItemModal').modal('show');
+                    $('#summaryEditItemModal').modal('show');
                 } else {
                     // Display an error message if fetching failed
-                    console.log("Error fetching data: ", response.message);
+                    console.error("Error fetching data: ", response.message);
                 }
             },
-            error: function (xhr, status, error) {
+            error: function(xhr, status, error) {
                 console.error("AJAX Error: ", error);
                 console.log("Status:", status);
                 console.log("Response Text:", xhr.responseText); // Log full response for debugging
@@ -201,43 +211,51 @@ $(document).ready(function () {
     });
 
 
+
 // Handle form submission for updating the item
-$('#editItemForm').on('submit', function(e) {
-    e.preventDefault()
+$('#summaryEditItemForm').on('submit', function(e) {
+    e.preventDefault();
+
+    var formData = new FormData(this); // Use FormData to handle file uploads
+
     $.ajax({
-        url: 'update_item.php', // URL of your PHP script for updating the item
+        url: 'update_summary_item.php', // URL of your PHP script for updating the item
         type: 'POST',
-        data: $(this).serialize(),
+        data: formData,
+        processData: false, // Required for FormData
+        contentType: false, // Required for FormData
         success: function(response) {
             // Parse the JSON response
             var result = JSON.parse(response);
             console.log(response);
             if (result.success) {
                 // Hide any existing error messages
-                $('#errorMessage2').addClass('d-none')
+                $('#errorMessage5').addClass('d-none');
                 // Show success message
-                $('#successMessage2').removeClass('d-none');
-                
+                $('#successMessage5').removeClass('d-none');
+
                 setTimeout(function() {
-                    $('#editItemModal').modal('hide')
+                    $('#summaryEditItemModal').modal('hide');
                     // Reset the form and hide the success message
-                    $('#editItemForm')[0].reset();
-                    $('#successMessage2').addClass('d-none');
+                    $('#summaryEditItemForm')[0].reset();
+                    $('#successMessage5').addClass('d-none');
                     location.reload();
-                }, 2000); 
+                }, 2000);
             } else {
                 // Show validation errors
-                $('#successMessage2').addClass('d-none')
-                $('#errorMessage2').removeClass('d-none');
+                $('#successMessage5').addClass('d-none');
+                $('#errorMessage5').removeClass('d-none');
                 let errorHtml = '';
-                for (let field in response.errors) {
-                    errorHtml += `<li>${response.errors[field]}</li>`;
+                for (let field in result.errors) {
+                    errorHtml += `<li>${result.errors[field]}</li>`;
                 }
-                $('#errorList2').html(errorHtml);
+                $('#editErrorList5').html(errorHtml);
             }
         },
-        error: function() {
-            console.error('Error updating event:', error);
+        error: function(xhr, status, error) {
+            console.error('Error updating item:', error);
+            console.log("Status:", status);
+            console.log("Response Text:", xhr.responseText);
         }
     });
 });

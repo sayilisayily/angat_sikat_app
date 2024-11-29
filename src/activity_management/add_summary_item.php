@@ -1,97 +1,127 @@
 <?php
-require 'connection.php';
 
-// Initialize an empty response array
-$response = array('success' => false, 'errors' => array());
+include 'connection.php';
 
-// Check if the required fields are set
-if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST['unit'], $_POST['amount']) && isset($_FILES['reference'])) {
-    // Retrieve and sanitize input data
-    $event_id = intval($_POST['event_id']);
-    $description = trim($_POST['description']);
-    $quantity = intval($_POST['quantity']);
-    $unit = trim($_POST['unit']);
-    $amount = floatval($_POST['amount']);
+$errors = [];
+$data = [];
 
-    // Validation errors
-    if (empty($description)) {
-        $response['errors']['description'] = 'Description is required';
-    }
-    if ($quantity <= 0) {
-        $response['errors']['quantity'] = 'Quantity must be greater than zero';
-    }
-    if (empty($unit)) {
-        $response['errors']['unit'] = 'Unit is required';
-    }
-    if ($amount <= 0) {
-        $response['errors']['amount'] = 'Amount must be greater than zero';
-    }
-
-    // Handle file upload
-    $reference_path = null;
-    if ($_FILES['reference']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = 'uploads/references/';
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true); // Create the directory if it doesn't exist
-        }
-
-        $file_name = basename($_FILES['reference']['name']);
-        $file_tmp = $_FILES['reference']['tmp_name'];
-        $reference_path = $upload_dir . uniqid() . '_' . $file_name;
-
-        if (!move_uploaded_file($file_tmp, $reference_path)) {
-            $response['errors']['reference'] = 'Failed to upload reference file.';
-        }
-    } else {
-        $response['errors']['reference'] = 'Reference file is required.';
-    }
-
-    // Check for duplicate descriptions
-    if (empty($response['errors'])) {
-        $checkStmt = $conn->prepare("SELECT COUNT(*) FROM event_summary_items WHERE event_id = ? AND description = ?");
-        if ($checkStmt === false) {
-            $response['errors']['database'] = 'Failed to prepare duplicate check statement: ' . $conn->error;
-        } else {
-            $checkStmt->bind_param("is", $event_id, $description);
-            $checkStmt->execute();
-            $checkStmt->bind_result($count);
-            $checkStmt->fetch();
-            $checkStmt->close();
-
-            if ($count > 0) {
-                $response['errors']['duplicate'] = 'Description already exists for this event.';
-            }
-        }
-    }
-
-    // Proceed only if no errors
-    if (empty($response['errors'])) {
-        // Prepare the SQL statement
-        $stmt = $conn->prepare("INSERT INTO event_summary_items (event_id, description, quantity, unit, amount, reference) VALUES (?, ?, ?, ?, ?, ?)");
-        
-        // Check if preparation was successful
-        if ($stmt === false) {
-            $response['errors']['prepare'] = 'Prepare failed: ' . $conn->error;
-        } else {
-            // Bind the parameters
-            if (!$stmt->bind_param("isids", $event_id, $description, $quantity, $unit, $amount, $reference_path)) {
-                $response['errors']['bind'] = 'Bind failed: ' . $stmt->error;
-            } else {
-                // Execute the query
-                if ($stmt->execute()) {
-                    $response['success'] = true;
-                } else {
-                    $response['errors']['execute'] = 'Failed to add summary item: ' . $stmt->error;
-                }
-            }
-            // Close the statement
-            $stmt->close();
-        }
-    }
+// Validate required fields
+if (empty($_POST['event_id'])) {
+    $errors['event_id'] = 'Event ID is required.';
 } else {
-    $response['errors']['form'] = 'Required fields are missing';
+    $event_id = intval($_POST['event_id']);
 }
 
-// Return the response in JSON format
-echo json_encode($response);
+if (empty($_POST['description'])) {
+    $errors['description'] = 'Description is required.';
+} else {
+    $description = mysqli_real_escape_string($conn, trim($_POST['description']));
+}
+
+if (empty($_POST['quantity']) || intval($_POST['quantity']) <= 0) {
+    $errors['quantity'] = 'Quantity must be greater than zero.';
+} else {
+    $quantity = intval($_POST['quantity']);
+}
+
+if (empty($_POST['unit'])) {
+    $errors['unit'] = 'Unit is required.';
+} else {
+    $unit = mysqli_real_escape_string($conn, trim($_POST['unit']));
+}
+
+if (empty($_POST['amount']) || floatval($_POST['amount']) <= 0) {
+    $errors['amount'] = 'Amount must be greater than zero.';
+} else {
+    $amount = floatval($_POST['amount']);
+}
+
+// Debugging: Log the $_FILES array
+file_put_contents('upload_debug.log', print_r($_FILES, true), FILE_APPEND);
+
+// Handle file upload if no errors yet
+if (empty($errors)) {
+    if (isset($_FILES['reference']) && $_FILES['reference']['error'] !== UPLOAD_ERR_NO_FILE) {
+        // Debugging: Check the error code
+        if ($_FILES['reference']['error'] !== UPLOAD_ERR_OK) {
+            $errors['reference'] = 'File upload error code: ' . $_FILES['reference']['error'];
+        } else {
+            $file_tmp = $_FILES['reference']['tmp_name'];
+            $file_name = $_FILES['reference']['name'];
+
+            if (!empty($file_name)) {
+                $upload_dir = 'uploads/references/';
+
+                // Ensure uploads directory exists
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+
+                // Move uploaded file to the directory
+                $file_path = $upload_dir . basename($file_name);
+                if (move_uploaded_file($file_tmp, $file_path)) {
+                    $reference = $file_name; // File uploaded successfully
+                } else {
+                    $errors['reference'] = 'Error moving the uploaded file.';
+                }
+            } else {
+                $errors['reference'] = 'Uploaded file name is empty.';
+            }
+        }
+    } else {
+        $errors['reference'] = 'Reference file is required.';
+    }
+}
+
+// Check for duplicates in the database
+if (empty($errors)) {
+    $check_query = "SELECT COUNT(*) FROM event_summary_items WHERE event_id = ? AND description = ?";
+    $stmt = $conn->prepare($check_query);
+
+    if ($stmt) {
+        $stmt->bind_param("is", $event_id, $description);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->close();
+
+        if ($count > 0) {
+            $errors['description'] = 'A summary item with this description already exists for the event.';
+        }
+    } else {
+        $errors['database'] = 'Failed to prepare duplicate check query: ' . $conn->error;
+    }
+}
+
+// Insert into the database if no errors
+if (empty($errors)) {
+    $insert_query = "INSERT INTO event_summary_items (event_id, description, quantity, unit, amount, reference) 
+                     VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($insert_query);
+
+    if ($stmt) {
+        $stmt->bind_param("isidss", $event_id, $description, $quantity, $unit, $amount, $reference);
+
+        if ($stmt->execute()) {
+            $data['success'] = true;
+            $data['message'] = 'Summary item added successfully!';
+        } else {
+            $errors['database'] = 'Failed to insert summary item: ' . $stmt->error;
+        }
+
+        $stmt->close();
+    } else {
+        $errors['database'] = 'Failed to prepare insert query: ' . $conn->error;
+    }
+}
+
+// Return errors or success response
+if (!empty($errors)) {
+    $data['success'] = false;
+    $data['errors'] = $errors;
+}
+
+echo json_encode($data);
+
 ?>
+
