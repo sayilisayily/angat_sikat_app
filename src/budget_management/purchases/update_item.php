@@ -42,23 +42,23 @@ if (isset($_POST['item_id'], $_POST['description'], $_POST['quantity'], $_POST['
             $stmt->fetch();
             $stmt->close();
 
-            // Retrieve the purchase title based on the purchase_id
-            $stmt = $conn->prepare("SELECT title FROM purchases WHERE purchase_id = ?");
+            // Retrieve the purchase plan_id based on the purchase_id
+            $stmt = $conn->prepare("SELECT plan_id FROM purchases WHERE purchase_id = ?");
             $stmt->bind_param("i", $purchase_id);
             if (!$stmt->execute()) {
-                throw new Exception('Failed to fetch purchase title: ' . $stmt->error);
+                throw new Exception('Failed to fetch purchase plan_id: ' . $stmt->error);
             }
             $stmt->bind_result($event_title);
             $stmt->fetch();
             $stmt->close();
 
-            // If no purchase title is found, return an error
+            // If no purchase plan_id is found, return an error
             if (empty($event_title)) {
-                throw new Exception('Purchase title not found for this purchase_id');
+                throw new Exception('Purchase plan_id not found for this purchase_id');
             }
 
-            // Retrieve the allocated budget for the purchase based on its title
-            $stmt = $conn->prepare("SELECT amount FROM financial_plan WHERE title = ?");
+            // Retrieve the allocated budget for the purchase based on its plan_id
+            $stmt = $conn->prepare("SELECT amount FROM financial_plan WHERE plan_id = ?");
             $stmt->bind_param("s", $event_title);
             if (!$stmt->execute()) {
                 throw new Exception('Failed to fetch allocated budget: ' . $stmt->error);

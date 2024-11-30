@@ -48,23 +48,23 @@ if (isset($_POST['maintenance_id'], $_POST['description'], $_POST['quantity'], $
             $conn->begin_transaction();
             
             try {
-                // Retrieve the maintenance title based on the maintenance_id to get the corresponding title in the financial plan
-                $stmt = $conn->prepare("SELECT title FROM maintenance WHERE maintenance_id = ?");
+                // Retrieve the maintenance plan_id based on the maintenance_id to get the corresponding plan_id in the financial plan
+                $stmt = $conn->prepare("SELECT plan_id FROM maintenance WHERE maintenance_id = ?");
                 $stmt->bind_param("i", $maintenance_id);
                 if (!$stmt->execute()) {
-                    throw new Exception('Failed to fetch maintenance title: ' . $stmt->error);
+                    throw new Exception('Failed to fetch maintenance plan_id: ' . $stmt->error);
                 }
                 $stmt->bind_result($purchase_title);
                 $stmt->fetch();
                 $stmt->close();
 
-                // If no Maintenance title is found, return an error
+                // If no Maintenance plan_id is found, return an error
                 if (empty($purchase_title)) {
-                    throw new Exception('Maintenance title not found for this maintenance_id');
+                    throw new Exception('Maintenance plan_id not found for this maintenance_id');
                 }
 
-                // Retrieve the allocated budget for the Maintenance based on its title in the financial plan table
-                $stmt = $conn->prepare("SELECT amount FROM financial_plan WHERE title = ?");
+                // Retrieve the allocated budget for the Maintenance based on its plan_id in the financial plan table
+                $stmt = $conn->prepare("SELECT amount FROM financial_plan WHERE plan_id = ?");
                 $stmt->bind_param("s", $purchase_title);
                 if (!$stmt->execute()) {
                     throw new Exception('Failed to fetch allocated budget: ' . $stmt->error);

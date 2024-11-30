@@ -23,6 +23,13 @@ if (empty($_POST['title'])) {
     }
 }
 
+// Validate that plan_id is provided and not empty
+if (empty($_POST['plan_id'])) {
+    $errors['plan_id'] = 'Plan ID is required.';
+} else {
+    $plan_id = mysqli_real_escape_string($conn, $_POST['plan_id']);
+}
+
 // If there are errors, return them in the response
 if (!empty($errors)) {
     $data['success'] = false;
@@ -32,8 +39,8 @@ if (!empty($errors)) {
     $organization_id = $_SESSION['organization_id'];
     
     // Insert the purchase if no validation errors
-    $query = "INSERT INTO purchases (title, purchase_status, completion_status, organization_id) 
-              VALUES ('$title', 'Pending', 0, '$organization_id')";
+    $query = "INSERT INTO purchases (title, purchase_status, completion_status, organization_id, plan_id) 
+              VALUES ('$title', 'Pending', 0, '$organization_id', '$plan_id')";
     
     if (mysqli_query($conn, $query)) {
         $data['success'] = true;

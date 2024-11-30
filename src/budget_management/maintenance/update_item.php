@@ -42,23 +42,23 @@ if (isset($_POST['item_id'], $_POST['description'], $_POST['quantity'], $_POST['
             $stmt->fetch();
             $stmt->close();
 
-            // Retrieve the maintenance or other expense title based on the maintenance_id
-            $stmt = $conn->prepare("SELECT title FROM maintenance WHERE maintenance_id = ?");
+            // Retrieve the maintenance or other expense plan_id based on the maintenance_id
+            $stmt = $conn->prepare("SELECT plan_id FROM maintenance WHERE maintenance_id = ?");
             $stmt->bind_param("i", $maintenance_id);
             if (!$stmt->execute()) {
-                throw new Exception('Failed to fetch maintenance or other expense title: ' . $stmt->error);
+                throw new Exception('Failed to fetch maintenance or other expense plan_id: ' . $stmt->error);
             }
             $stmt->bind_result($event_title);
             $stmt->fetch();
             $stmt->close();
 
-            // If no maintenance or other expense title is found, return an error
+            // If no maintenance or other expense plan_id is found, return an error
             if (empty($event_title)) {
-                throw new Exception('maintenance or other expense title not found for this maintenance_id');
+                throw new Exception('maintenance or other expense plan_id not found for this maintenance_id');
             }
 
-            // Retrieve the allocated budget for the maintenance or other expense based on its title
-            $stmt = $conn->prepare("SELECT amount FROM financial_plan WHERE title = ?");
+            // Retrieve the allocated budget for the maintenance or other expense based on its plan_id
+            $stmt = $conn->prepare("SELECT amount FROM financial_plan WHERE plan_id = ?");
             $stmt->bind_param("s", $event_title);
             if (!$stmt->execute()) {
                 throw new Exception('Failed to fetch allocated budget: ' . $stmt->error);

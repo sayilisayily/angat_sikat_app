@@ -162,6 +162,8 @@ $result = $conn->query($sql);
             <div class="modal-body">
             <!-- Form fields -->
             <div class="form-group row mb-2">
+            <!-- Plan ID -->
+            <input type="hidden" id="plan_id" name="plan_id">
             <div class="col">
                     <label for="title">Maintenance or Other Expense Title</label>
                     <!-- Purchase title dropdown -->
@@ -169,11 +171,14 @@ $result = $conn->query($sql);
                         <option value="">Select MOE Title</option>
                         <?php
                         // Query to fetch titles with category 'Purchases'
-                        $title_query = "SELECT title, amount FROM financial_plan WHERE category = 'Maintenance and Other Expenses' AND organization_id = $organization_id";
+                        $title_query = "SELECT title, amount, plan_id FROM financial_plan WHERE category = 'Maintenance and Other Expenses' AND organization_id = $organization_id";
                         $title_result = mysqli_query($conn, $title_query);
                         if ($title_result && mysqli_num_rows($title_result) > 0) {
                             while ($row = mysqli_fetch_assoc($title_result)) {
-                                echo '<option value="' . htmlspecialchars($row['title']) . '" data-amount="' . htmlspecialchars($row['amount']) . '">' . htmlspecialchars($row['title']) . '</option>';
+                                echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                      data-plan-id="' . htmlspecialchars($row['plan_id']) . '" 
+                                      data-amount="' . htmlspecialchars($row['amount']) . '">' . 
+                                      htmlspecialchars($row['title']) . '</option>';
                             }
                         }
                         

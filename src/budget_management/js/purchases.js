@@ -86,7 +86,24 @@ $('#confirmationModal .btn-secondary').on('click', function() {
     }, 500);
 });
 
+    // Add an event listener to the title selector dropdown
+    document.getElementById("title").addEventListener("change", function () {
+        const selectedOption = this.options[this.selectedIndex];
 
+        if (selectedOption && selectedOption.value) {
+            // Extract data from the selected option
+            const planId = selectedOption.getAttribute("data-plan-id") || "";
+            const amount = selectedOption.getAttribute("data-amount") || "";
+
+            // Populate the modal fields
+            document.getElementById("plan_id").value = planId;
+            document.getElementById("amount").value = amount;
+        } else {
+            // Clear the fields if no title is selected
+            document.getElementById("plan_id").value = "";
+            document.getElementById("amount").value = "";
+        }
+    });
   // Handle Add purchase Form Submission
   $('#addPurchaseForm').on('submit', function(event) {
     event.preventDefault(); // Prevent the form from submitting the default way
