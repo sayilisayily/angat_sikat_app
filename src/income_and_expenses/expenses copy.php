@@ -237,7 +237,7 @@ $result = $conn->query($sql);
                             <th>Title</th>
                             <th>Amount</th>
                             <th>Reference</th>
-                            
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -250,6 +250,19 @@ $result = $conn->query($sql);
                             <td>{$row['title']}</td>
                             <td>{$row['amount']}</td>
                             <td>{$row['reference']}</td>
+                            
+                            <td>
+                                <button class='btn btn-primary btn-sm edit-btn' 
+                                        data-bs-toggle='modal' 
+                                        data-bs-target='#editExpenseModal' 
+                                        data-id='{$row['expense_id']}'>
+                                    <i class='fa-solid fa-pen'></i> Edit
+                                </button>
+                                <button class='btn btn-danger btn-sm archive-btn' 
+                                        data-id='{$row['expense_id']}'>
+                                    <i class='fa-solid fa-box-archive'></i> Archive
+                                </button>
+                            </td>
                         </tr>";
                 }
             } else {
@@ -272,43 +285,35 @@ $result = $conn->query($sql);
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                
+                                <!-- Category Field -->
+                                <div class="form-group">
+                                    <label for="category">Category</label>
+                                    <select class="form-control" id="category" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="activities">Activities</option>
+                                        <option value="purchases">Purchases</option>
+                                        <option value="maintenance">Maintenance</option>
+                                    </select>
+                                </div>
 
                                 <!-- Title Field -->
-                                <div class="form-group">
+                                <div class="form-group mt-3">
                                     <label for="title">Title</label>
-                                    <select name="title" class="form-control" required>
-                                        <option value="">Select Title</option>
-                                        <!-- Fetch titles from events, purchases, and maintenance -->
-                                        <?php
-                                        // Fetch events
-                                        $event_query = "SELECT title FROM events WHERE archived = 0 AND accomplishment_status = 1 AND organization_id = $organization_id";
-                                        $event_result = mysqli_query($conn, $event_query);
-                                        echo "<optgroup label='Events'>";
-                                        while ($row = mysqli_fetch_assoc($event_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . "</option>";
-                                        }
-                                        echo "</optgroup>";
-        
-                                        // Fetch purchases
-                                        $purchase_query = "SELECT title FROM purchases WHERE archived = 0 AND completion_status = 1 AND organization_id = $organization_id";
-                                        $purchase_result = mysqli_query($conn, $purchase_query);
-                                        echo "<optgroup label='Purchases'>";
-                                        while ($row = mysqli_fetch_assoc($purchase_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . " </option>";
-                                        }
-                                        echo "</optgroup>";
-        
-                                        // Fetch maintenance
-                                        $maintenance_query = "SELECT title FROM maintenance WHERE archived = 0 AND completion_status = 1 AND organization_id = $organization_id";
-                                        $maintenance_result = mysqli_query($conn, $maintenance_query);
-                                        echo "<optgroup label='Mainteance and Other Expenses'>";
-                                        while ($row = mysqli_fetch_assoc($maintenance_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . " </option>";
-                                        }
-                                        echo "</optgroup>";
-                                        ?>
-                                    </select>
+                                    <input type="text" class="form-control" id="title" name="title" required>
+                                </div>
+
+                                <!-- Amount Field -->
+                                <div class="form-group mt-3">
+                                    <label for="amount">Amount</label>
+                                    <input type="number" class="form-control" id="amount" name="amount" step="0.01"
+                                        required>
+                                </div>
+
+                                <!-- Reference (File Upload) Field -->
+                                <div class="form-group mt-3">
+                                    <label for="reference">Reference (File Upload)</label>
+                                    <input type="file" class="form-control" id="reference" name="reference"
+                                        accept=".pdf,.jpg,.png,.doc,.docx" required>
                                 </div>
 
                                 <!-- Success Message Alert -->
@@ -415,7 +420,17 @@ $result = $conn->query($sql);
     <!-- End of Overall Body Wrapper -->
 
     <!-- BackEnd -->
-    <script src="js/expenses.js"></script>
+    <script src="js/expenses.js">
+    </script>
+    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/sidebarmenu.js"></script>
+    <script src="../assets/js/app.min.js"></script>
+    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+    <script src="../assets/js/dashboard.js"></script>
+    <!-- solar icons -->
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 </body>
 
 </html>
