@@ -13,3 +13,15 @@ Array
         )
 
 )
+Array
+(
+    [reference] => Array
+        (
+            [name] => info assurance and security.rtf
+            [type] => application/rtf
+            [tmp_name] => C:\xampp\tmp\phpC437.tmp
+            [error] => 0
+            [size] => 4686
+        )
+
+)

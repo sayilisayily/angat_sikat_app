@@ -156,6 +156,7 @@ $(document).ready(function () {
                     $('#edit_quantity').val(response.data.quantity);
                     $('#edit_unit').val(response.data.unit);
                     $('#edit_amount').val(response.data.amount);
+                    $('#edit_profit').val(response.data.profit);
 
                     // Show the modal
                     $('#editItemModal').modal('show');
@@ -262,10 +263,10 @@ $('#summaryEditItemForm').on('submit', function(e) {
 
 
 // Handle form submission for updating the item
-$('#summaryEditItemForm').on('submit', function(e) {
+$('#editItemForm').on('submit', function(e) {
     e.preventDefault()
     $.ajax({
-        url: 'update_summary_item.php', // URL of your PHP script for updating the item
+        url: 'update_item.php', // URL of your PHP script for updating the item
         type: 'POST',
         data: $(this).serialize(),
         success: function(response) {
@@ -274,26 +275,26 @@ $('#summaryEditItemForm').on('submit', function(e) {
             console.log(response);
             if (result.success) {
                 // Hide any existing error messages
-                $('#errorMessage5').addClass('d-none')
+                $('#errorMessage2').addClass('d-none')
                 // Show success message
-                $('#successMessage5').removeClass('d-none');
+                $('#successMessage2').removeClass('d-none');
                 
                 setTimeout(function() {
-                    $('#summaryEditItemModal').modal('hide')
+                    $('#editItemModal').modal('hide')
                     // Reset the form and hide the success message
-                    $('#summaryEditItemForm')[0].reset();
-                    $('#successMessage5').addClass('d-none');
+                    $('#editItemForm')[0].reset();
+                    $('#successMessage2').addClass('d-none');
                     location.reload();
                 }, 2000); 
             } else {
                 // Show validation errors
-                $('#successMessage5').addClass('d-none')
-                $('#errorMessage5').removeClass('d-none');
+                $('#successMessage2').addClass('d-none')
+                $('#errorMessage2').removeClass('d-none');
                 let errorHtml = '';
                 for (let field in response.errors) {
                     errorHtml += `<li>${response.errors[field]}</li>`;
                 }
-                $('#errorList5').html(errorHtml);
+                $('#errorList2').html(errorHtml);
             }
         },
         error: function() {

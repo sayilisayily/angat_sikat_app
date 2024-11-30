@@ -176,8 +176,7 @@ $result = $conn->query($sql);
     </div>
 
     <!-- Add Event Modal -->
-    <div class="modal fade" id="addEventModal" tabindex="-1" role="dialog" aria-labelledby="addEventLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="addEventModal" tabindex="-1" role="dialog" aria-labelledby="addEventLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <form id="addEventForm">
@@ -190,24 +189,30 @@ $result = $conn->query($sql);
                         <div class="form-group row mb-2">
                             <div class="col">
                                 <label for="title">Event Title</label>
+                                <!-- Plan ID -->
+                                <input type="hidden" id="plan_id" name="plan_id">
                                 <!-- Event title dropdown -->
                                 <select class="form-control" id="title" name="title">
                                     <option value="">Select Event Title</option>
                                     <?php
                                     // Query to fetch titles with category 'Activities'
-                                    $title_query = "SELECT title, date, type, amount FROM financial_plan WHERE category = 'Activities' OR type = 'Income' AND organization_id = $organization_id";
+                                    $title_query = "SELECT plan_id, title, date, type, amount FROM financial_plan WHERE category = 'Activities' OR type = 'Income' AND organization_id = $organization_id";
                                     $result = mysqli_query($conn, $title_query);
 
                                     if ($result && mysqli_num_rows($result) > 0) {
                                         while ($row = mysqli_fetch_assoc($result)) {
-                                            echo '<option value="' . htmlspecialchars($row['title']) . '" data-date="' . htmlspecialchars($row['date']) . '" data-amount="' . htmlspecialchars($row['amount']) . '" data-type="' . htmlspecialchars($row['type']) . '">' . htmlspecialchars($row['title']) . '</option>';
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-plan-id="' . htmlspecialchars($row['plan_id']) . '"
+                                                    data-date="' . htmlspecialchars($row['date']) . '" 
+                                                    data-amount="' . htmlspecialchars($row['amount']) . '" 
+                                                    data-type="' . htmlspecialchars($row['type']) . '">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
                                         }
                                     } else {
                                         echo '<option value="">No titles available</option>';
                                     }
                                     ?>
                                 </select>
-
                             </div>
                             <div class="col">
                                 <label for="venue">Venue</label>
@@ -230,7 +235,7 @@ $result = $conn->query($sql);
                                 <input type="text" class="form-control" id="type" name="type" readonly>                                 
                             </div>
                             <div class="col">
-                                <label for="type">Event Total Amount</label>
+                                <label for="amount">Event Total Amount</label>
                                 <input type="text" class="form-control" id="amount" name="amount" readonly>                                 
                             </div>
                         </div>

@@ -146,9 +146,12 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                 <th>Unit</th>
                                 <th>Amount</th>
                                 <?php if ($event['event_type'] === 'Income'): ?>
-                                    <th>Markup</th>
+                                    <th>Profit</th>
                                 <?php endif; ?>
                                 <th>Total Amount</th>
+                                <?php if ($event['event_type'] === 'Income'): ?>
+                                    <th>Total Profit</th>
+                                <?php endif; ?>
                                 <?php if ($event['accomplishment_status'] === 0): ?>
                                     <th>Actions</th>
                                 <?php endif; ?>
@@ -159,14 +162,20 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                             $grand_total = 0; // Initialize the total amount for all items
                             if (!empty($items)) {
                                 foreach ($items as $item) {
-                                    $total_amount = $item['quantity'] * $item['amount'];
-                                    $grand_total += $total_amount; // Add to the grand total
+                                    
+                                    $grand_total += $item['total_amount']; // Add to the grand total
                                     echo "<tr>
                                             <td>{$item['description']}</td>
                                             <td>{$item['quantity']}</td>
                                             <td>{$item['unit']}</td>
-                                            <td>{$item['amount']}</td>
-                                            <td>{$total_amount}</td>";
+                                            <td>{$item['amount']}</td>";
+                                    if ($event['event_type'] === 'Income'){ 
+                                        echo " <td>{$item['profit']}</td>}";
+                                    }
+                                        echo "<td>{$item['total_amount']}</td>";
+                                    if ($event['event_type'] === 'Income'){ 
+                                        echo " <td>{$item['total_profit']}</td>}";
+                                    }
                                     if ($event['accomplishment_status'] === 0) {
                                         echo "<td>
                                                 <button class='btn edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#editItemModal' data-id='{$item['item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
@@ -220,7 +229,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     <th>Amount</th>
                                     <?php
                                     if ($event['event_type'] === 'Income') {
-                                        echo "<th> Markup </th>";
+                                        echo "<th> Profit </th>";
                                     }
                                     ?>
                                     <th>Total Amount</th>
@@ -299,7 +308,18 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                                 name="amount" required>
                                         </div>
                                     </div>
-
+                                    <?php if ($event['event_type'] === 'Income') {
+                                        echo "<div class='form-group row mb-2'>
+                                                <div class='col'>
+                                                    <label for='profit'>Profit</label>
+                                                    <input type='number' step='0.01' class='form-control' id='profit' name='profit' required>
+                                                </div>
+                                                <div class='col'>
+                                                </div>
+                                            </div>";
+                                    }
+                                    
+                                    ?>
                                     <!-- Success Message Alert -->
                                     <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
                                         Item added successfully!
@@ -356,7 +376,18 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                                 name="amount" required>
                                         </div>
                                     </div>
-
+                                    <?php if ($event['event_type'] === 'Income') {
+                                        echo "<div class='form-group row mb-2'>
+                                                <div class='col'>
+                                                    <label for='profit'>Profit</label>
+                                                    <input type='number' step='0.01' class='form-control' id='edit_profit' name='profit' required>
+                                                </div>
+                                                <div class='col'>
+                                                </div>
+                                            </div>";
+                                    }
+                                    
+                                    ?>
                                     <!-- Success Message Alert -->
                                     <div id="successMessage2" class="alert alert-success d-none mt-3" role="alert">
                                         Item updated successfully!
