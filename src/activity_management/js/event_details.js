@@ -66,12 +66,14 @@ $(document).ready(function () {
                 document.getElementById("summary_quantity").value = itemData.quantity || "";
                 document.getElementById("summary_unit").value = itemData.unit || "";
                 document.getElementById("summary_amount").value = itemData.amount || "";
+                document.getElementById("summary_profit").value = itemData.profit || "";
             } else {
                 // Clear the fields if no item is selected
                 document.getElementById("summary_description").value = "";
                 document.getElementById("summary_quantity").value = "";
                 document.getElementById("summary_unit").value = "";
                 document.getElementById("summary_amount").value = "";
+                document.getElementById("summary_profit").value = "";
             }
         });
 
@@ -192,6 +194,7 @@ $(document).ready(function () {
                     $('#summary_edit_quantity').val(response.data.quantity);
                     $('#summary_edit_unit').val(response.data.unit);
                     $('#summary_edit_amount').val(response.data.amount);
+                    $('#summary_edit_profit').val(response.data.profit);
 
                     // Handle reference file display (optional if reference details are required)
                     $('#currentAttachment').html('<strong>Current Attachment:</strong> ' + response.data.reference);

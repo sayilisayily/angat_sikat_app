@@ -20,28 +20,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['errors'] = $errors;
         echo json_encode($data);
         exit;
-    } else {
-        // Prepare the SQL query using a prepared statement
-        $query = "DELETE FROM event_summary_items WHERE summary_item_id = ?";
-        $stmt = $conn->prepare($query);
+    }
 
-        if ($stmt) {
-            // Bind parameters and execute the query
-            $stmt->bind_param('i', $item_id);
+    // Check if the item exists and fetch its reference
+    $reference = null;
+    $check_query = "SELECT reference FROM event_summary_items WHERE summary_item_id = ?";
+    $stmt_check = $conn->prepare($check_query);
 
-            if ($stmt->execute()) {
-                $data['success'] = true;
-                $data['message'] = 'Item deleted successfully!';
-            } else {
+    if ($stmt_check) {
+        $stmt_check->bind_param('i', $item_id);
+        $stmt_check->execute();
+        $stmt_check->bind_result($reference);
+        $stmt_check->fetch();
+        $stmt_check->close();
+    }
+
+    // If a reference exists, delete the file from the server
+    if ($reference) {
+        $file_path = "uploads/references/" . $reference;
+
+        // Check if the file exists before attempting to delete
+        if (file_exists($file_path)) {
+            if (!unlink($file_path)) {
                 $data['success'] = false;
-                $data['errors'] = ['database' => 'Failed to delete item from the database.'];
+                $data['errors'] = ['file' => 'Failed to delete associated reference file.'];
+                echo json_encode($data);
+                exit;
             }
+        }
+    }
 
-            $stmt->close();
+    // Proceed to delete the database record
+    $query = "DELETE FROM event_summary_items WHERE summary_item_id = ?";
+    $stmt = $conn->prepare($query);
+
+    if ($stmt) {
+        $stmt->bind_param('i', $item_id);
+
+        if ($stmt->execute()) {
+            $data['success'] = true;
+            $data['message'] = 'Item deleted successfully!';
         } else {
             $data['success'] = false;
-            $data['errors'] = ['database' => 'Failed to prepare the delete statement.'];
+            $data['errors'] = ['database' => 'Failed to delete item from the database.'];
         }
+
+        $stmt->close();
+    } else {
+        $data['success'] = false;
+        $data['errors'] = ['database' => 'Failed to prepare the delete statement.'];
     }
 }
 
