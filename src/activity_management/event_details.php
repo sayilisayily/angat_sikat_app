@@ -179,7 +179,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     if ($event['accomplishment_status'] === 0) {
                                         echo "<td>
                                                 <button class='btn edit-btn btn-primary btn-sm mb-3' data-bs-toggle='modal' data-bs-target='#editItemModal' data-id='{$item['item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
-                                                <button class='btn delete-btn btn-danger btn-sm mb03' data-bs-toggle='modal' data-bs-target='#deleteItemModal' data-id='{$item['item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
+                                                <button class='btn delete-btn btn-danger btn-sm mb-3' data-bs-toggle='modal' data-bs-target='#deleteItemModal' data-id='{$item['item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
                                             </td>";
                                     }
                                     echo "</tr>";

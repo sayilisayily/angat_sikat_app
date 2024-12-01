@@ -105,43 +105,72 @@ if (empty($errors)) {
     }
 }
 
-// Update database if no errors
+// Update summary item and event totals if no errors
 if (empty($errors)) {
-    if ($event_type === 'Income') {
-        $total_profit = $quantity * $profit;
-        $total_amount = $quantity * ($amount + $profit);
-        $query = "UPDATE event_summary_items 
-                  SET description = ?, quantity = ?, unit = ?, amount = ?, profit = ?, total_profit = ?, total_amount = ?, reference = ?
-                  WHERE summary_item_id = ?";
-        $stmt = $conn->prepare($query);
+    $conn->begin_transaction(); // Start transaction
 
-        if ($stmt) {
-            $stmt->bind_param("siddddssi", $description, $quantity, $unit, $amount, $profit, $total_profit, $total_amount, $reference, $summary_item_id);
-            if ($stmt->execute()) {
-                $data['success'] = true;
-                $data['message'] = 'Income summary item updated successfully!';
-            } else {
-                $errors['database'] = 'Failed to update income summary item: ' . $stmt->error;
-            }
-            $stmt->close();
-        }
-    } else if ($event_type === 'Expense') {
-        $total_amount = $quantity * $amount;
-        $query = "UPDATE event_summary_items 
-                  SET description = ?, quantity = ?, unit = ?, amount = ?, total_amount = ?, reference = ?
-                  WHERE summary_item_id = ?";
-        $stmt = $conn->prepare($query);
+    try {
+        // Calculate totals based on event type
+        if ($event_type === 'Income') {
+            $total_profit = $quantity * $profit;
+            $total_amount = $quantity * ($amount + $profit);
 
-        if ($stmt) {
-            $stmt->bind_param("sidddsi", $description, $quantity, $unit, $amount, $total_amount, $reference, $summary_item_id);
-            if ($stmt->execute()) {
-                $data['success'] = true;
-                $data['message'] = 'Expense summary item updated successfully!';
-            } else {
-                $errors['database'] = 'Failed to update expense summary item: ' . $stmt->error;
+            // Update event_summary_items table
+            $query = "UPDATE event_summary_items 
+                      SET description = ?, quantity = ?, unit = ?, amount = ?, profit = ?, total_profit = ?, total_amount = ?, reference = ? 
+                      WHERE summary_item_id = ?";
+            $stmt = $conn->prepare($query);
+
+            if ($stmt) {
+                $stmt->bind_param("siddddssi", $description, $quantity, $unit, $amount, $profit, $total_profit, $total_amount, $reference, $summary_item_id);
+                if (!$stmt->execute()) {
+                    throw new Exception('Failed to update income summary item.');
+                }
+                $stmt->close();
             }
-            $stmt->close();
+
+        } else if ($event_type === 'Expense') {
+            $total_amount = $quantity * $amount;
+
+            // Update event_summary_items table
+            $query = "UPDATE event_summary_items 
+                      SET description = ?, quantity = ?, unit = ?, amount = ?, total_amount = ?, reference = ? 
+                      WHERE summary_item_id = ?";
+            $stmt = $conn->prepare($query);
+
+            if ($stmt) {
+                $stmt->bind_param("sidddsi", $description, $quantity, $unit, $amount, $total_amount, $reference, $summary_item_id);
+                if (!$stmt->execute()) {
+                    throw new Exception('Failed to update expense summary item.');
+                }
+                $stmt->close();
+            }
         }
+
+        // Update the event totals (total_amount and total_profit) in the events table
+        $stmt = $conn->prepare("SELECT COALESCE(SUM(total_amount), 0), COALESCE(SUM(total_profit), 0) FROM event_summary_items WHERE event_id = ?");
+        $stmt->bind_param("i", $event_id);
+        $stmt->execute();
+        $stmt->bind_result($new_total_amount, $new_total_profit);
+        $stmt->fetch();
+        $stmt->close();
+
+        // Update the event totals in the events table
+        $stmt = $conn->prepare("UPDATE events_summary SET total_amount = ?, total_profit = ? WHERE event_id = ?");
+        $stmt->bind_param("ddi", $new_total_amount, $new_total_profit, $event_id);
+        if (!$stmt->execute()) {
+            throw new Exception('Failed to update event totals.');
+        }
+        $stmt->close();
+
+        $conn->commit(); // Commit transaction
+        $data['success'] = true;
+        $data['message'] = 'Summary item updated successfully!';
+
+    } catch (Exception $e) {
+        $conn->rollback(); // Rollback transaction on failure
+        $data['success'] = false;
+        $data['errors'] = ['database' => $e->getMessage()];
     }
 }
 
