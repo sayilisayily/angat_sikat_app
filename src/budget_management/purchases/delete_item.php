@@ -1,5 +1,5 @@
 <?php
-include('../connection.php');
+include '../connection.php';
 
 // Initialize an array to hold validation errors
 $errors = [];
@@ -21,26 +21,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($data);
         exit;
     } else {
-        // Prepare the SQL query using a prepared statement
-        $query = "DELETE FROM purchase_items WHERE item_id = ?";
+        // Retrieve the item total_amount and purchase_id for adjustment
+        $query = "SELECT total_amount, purchase_id FROM purchase_items WHERE item_id = ?";
         $stmt = $conn->prepare($query);
 
         if ($stmt) {
-            // Bind parameters and execute the query
             $stmt->bind_param('i', $item_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $item = $result->fetch_assoc();
+            $stmt->close();
 
-            if ($stmt->execute()) {
-                $data['success'] = true;
-                $data['message'] = 'Item deleted successfully!';
+            if ($item) {
+                $total_amount = $item['total_amount'];
+                $purchase_id = $item['purchase_id'];
+
+                // Update the total_amount in the purchases table
+                $update_query = "UPDATE purchases SET total_amount = total_amount - ? WHERE purchase_id = ?";
+                $update_stmt = $conn->prepare($update_query);
+
+                if ($update_stmt) {
+                    $update_stmt->bind_param('di', $total_amount, $purchase_id);
+
+                    if ($update_stmt->execute()) {
+                        // Proceed to delete the item
+                        $delete_query = "DELETE FROM purchase_items WHERE item_id = ?";
+                        $delete_stmt = $conn->prepare($delete_query);
+
+                        if ($delete_stmt) {
+                            $delete_stmt->bind_param('i', $item_id);
+
+                            if ($delete_stmt->execute()) {
+                                $data['success'] = true;
+                                $data['message'] = 'Item deleted successfully!';
+                            } else {
+                                $data['success'] = false;
+                                $data['errors'] = ['database' => 'Failed to delete item.'];
+                            }
+
+                            $delete_stmt->close();
+                        }
+                    } else {
+                        $data['success'] = false;
+                        $data['errors'] = ['database' => 'Failed to update total amount.'];
+                    }
+
+                    $update_stmt->close();
+                }
             } else {
                 $data['success'] = false;
-                $data['errors'] = ['database' => 'Failed to delete item from the database.'];
+                $data['errors'] = ['database' => 'Item not found.'];
             }
-
-            $stmt->close();
         } else {
             $data['success'] = false;
-            $data['errors'] = ['database' => 'Failed to prepare the delete statement.'];
+            $data['errors'] = ['database' => 'Failed to retrieve item details.'];
         }
     }
 }
