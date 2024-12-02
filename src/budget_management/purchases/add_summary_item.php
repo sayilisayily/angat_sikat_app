@@ -1,127 +1,103 @@
 <?php
-
 include '../connection.php';
 
-$errors = [];
-$data = [];
+$response = ['success' => false, 'errors' => []];
 
-// Validate required fields
-if (empty($_POST['purchase_id'])) {
-    $errors['purchase_id'] = 'Maintenance ID is required.';
-} else {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['purchase_id'], $_POST['description'], $_POST['quantity'], $_POST['unit'], $_POST['amount'])) {
     $purchase_id = intval($_POST['purchase_id']);
-}
-
-if (empty($_POST['description'])) {
-    $errors['description'] = 'Description is required.';
-} else {
-    $description = mysqli_real_escape_string($conn, trim($_POST['description']));
-}
-
-if (empty($_POST['quantity']) || intval($_POST['quantity']) <= 0) {
-    $errors['quantity'] = 'Quantity must be greater than zero.';
-} else {
+    $description = trim($_POST['description']);
     $quantity = intval($_POST['quantity']);
-}
-
-if (empty($_POST['unit'])) {
-    $errors['unit'] = 'Unit is required.';
-} else {
-    $unit = mysqli_real_escape_string($conn, trim($_POST['unit']));
-}
-
-if (empty($_POST['amount']) || floatval($_POST['amount']) <= 0) {
-    $errors['amount'] = 'Amount must be greater than zero.';
-} else {
+    $unit = trim($_POST['unit']);
     $amount = floatval($_POST['amount']);
-}
 
-// Debugging: Log the $_FILES array
-file_put_contents('upload_debug.log', print_r($_FILES, true), FILE_APPEND);
+    // Validation checks
+    if (empty($description)) {
+        $response['errors']['description'] = 'Description is required.';
+    }
+    if ($quantity <= 0) {
+        $response['errors']['quantity'] = 'Quantity must be greater than zero.';
+    }
+    if (empty($unit)) {
+        $response['errors']['unit'] = 'Unit is required.';
+    }
+    if ($amount <= 0) {
+        $response['errors']['amount'] = 'Amount must be greater than zero.';
+    }
 
-// Handle file upload if no errors yet
-if (empty($errors)) {
-    if (isset($_FILES['reference']) && $_FILES['reference']['error'] !== UPLOAD_ERR_NO_FILE) {
-        // Debugging: Check the error code
-        if ($_FILES['reference']['error'] !== UPLOAD_ERR_OK) {
-            $errors['reference'] = 'File upload error code: ' . $_FILES['reference']['error'];
-        } else {
-            $file_tmp = $_FILES['reference']['tmp_name'];
-            $file_name = $_FILES['reference']['name'];
+    if (empty($response['errors'])) {
+        $conn->begin_transaction();
 
-            if (!empty($file_name)) {
-                $upload_dir = 'uploads/references/';
+        try {
+            // Calculate the total amount
+            $total_amount = $quantity * $amount;
 
-                // Ensure uploads directory exists
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0777, true);
-                }
+            // Handle file upload if provided
+            $reference = null;
+            if (isset($_FILES['reference']) && $_FILES['reference']['error'] !== UPLOAD_ERR_NO_FILE) {
+                if ($_FILES['reference']['error'] === UPLOAD_ERR_OK) {
+                    $file_tmp = $_FILES['reference']['tmp_name'];
+                    $file_name = $_FILES['reference']['name'];
+                    $file_extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                    $allowed_extensions = ['doc', 'docx', 'xls', 'xlsx', 'pdf'];
 
-                // Move uploaded file to the directory
-                $file_path = $upload_dir . basename($file_name);
-                if (move_uploaded_file($file_tmp, $file_path)) {
-                    $reference = $file_name; // File uploaded successfully
+                    if (!in_array($file_extension, $allowed_extensions)) {
+                        throw new Exception('Invalid file type.');
+                    }
+
+                    $upload_dir = 'uploads/references/';
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0777, true);
+                    }
+                    $file_path = $upload_dir . basename($file_name);
+
+                    if (!move_uploaded_file($file_tmp, $file_path)) {
+                        throw new Exception('Error moving the uploaded file.');
+                    }
+
+                    $reference = $file_name;
                 } else {
-                    $errors['reference'] = 'Error moving the uploaded file.';
+                    throw new Exception('File upload error.');
                 }
-            } else {
-                $errors['reference'] = 'Uploaded file name is empty.';
             }
+
+            // Insert new purchase summary item
+            $stmt = $conn->prepare("INSERT INTO purchase_summary_items 
+                (purchase_id, description, quantity, unit, amount, total_amount, reference) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("isiddds", $purchase_id, $description, $quantity, $unit, $amount, $total_amount, $reference);
+
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to insert the summary item.');
+            }
+            $stmt->close();
+
+            // Update total amount in purchases_summary
+            $stmt = $conn->prepare("SELECT COALESCE(SUM(total_amount), 0) FROM purchase_summary_items WHERE purchase_id = ?");
+            $stmt->bind_param("i", $purchase_id);
+            $stmt->execute();
+            $stmt->bind_result($new_total_amount);
+            $stmt->fetch();
+            $stmt->close();
+
+            $stmt = $conn->prepare("UPDATE purchases_summary SET total_amount = ? WHERE purchase_id = ?");
+            $stmt->bind_param("di", $new_total_amount, $purchase_id);
+
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to update purchases totals.');
+            }
+            $stmt->close();
+
+            $conn->commit();
+            $response['success'] = true;
+            $response['message'] = 'Item added successfully!';
+        } catch (Exception $e) {
+            $conn->rollback();
+            $response['errors']['database'] = $e->getMessage();
         }
-    } else {
-        $errors['reference'] = 'Reference file is required.';
     }
+} else {
+    $response['errors']['form'] = 'Required fields are missing.';
 }
 
-// Check for duplicates in the database
-if (empty($errors)) {
-    $check_query = "SELECT COUNT(*) FROM purchase_summary_items WHERE purchase_id = ? AND description = ?";
-    $stmt = $conn->prepare($check_query);
-
-    if ($stmt) {
-        $stmt->bind_param("is", $purchase_id, $description);
-        $stmt->execute();
-        $stmt->bind_result($count);
-        $stmt->fetch();
-        $stmt->close();
-
-        if ($count > 0) {
-            $errors['description'] = 'A summary item with this description already exists for the maintenance or other expense.';
-        }
-    } else {
-        $errors['database'] = 'Failed to prepare duplicate check query: ' . $conn->error;
-    }
-}
-
-// Insert into the database if no errors
-if (empty($errors)) {
-    $insert_query = "INSERT INTO purchase_summary_items (purchase_id, description, quantity, unit, amount, reference) 
-                     VALUES (?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($insert_query);
-
-    if ($stmt) {
-        $stmt->bind_param("isidss", $purchase_id, $description, $quantity, $unit, $amount, $reference);
-
-        if ($stmt->execute()) {
-            $data['success'] = true;
-            $data['message'] = 'Summary item added successfully!';
-        } else {
-            $errors['database'] = 'Failed to insert summary item: ' . $stmt->error;
-        }
-
-        $stmt->close();
-    } else {
-        $errors['database'] = 'Failed to prepare insert query: ' . $conn->error;
-    }
-}
-
-// Return errors or success response
-if (!empty($errors)) {
-    $data['success'] = false;
-    $data['errors'] = $errors;
-}
-
-echo json_encode($data);
-
+echo json_encode($response);
 ?>
-
