@@ -26,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             // Get the purchase_id associated with the summary_item_id
-            $maintenance_id_query = "SELECT purchase_id FROM purchase_summary_items WHERE summary_item_id = ?";
-            $stmt = $conn->prepare($maintenance_id_query);
+            $purchase_id_query = "SELECT purchase_id FROM purchase_summary_items WHERE summary_item_id = ?";
+            $stmt = $conn->prepare($purchase_id_query);
             if (!$stmt) {
                 throw new Exception('Failed to prepare purchase_id query.');
             }

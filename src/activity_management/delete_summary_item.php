@@ -8,15 +8,10 @@ $data = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve the item_id from POST
     $item_id = $_POST['item_id'];
-    $event_id = $_POST['event_id']; // Assuming the event_id is also passed in POST
 
     // Validate input
     if (empty($item_id)) {
         $errors[] = 'Item ID is required.';
-    }
-
-    if (empty($event_id)) {
-        $errors[] = 'Event ID is required.';
     }
 
     // Check for validation errors before proceeding
@@ -29,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Check if the item exists and fetch its details
     $reference = null;
+    $event_id = null; // Declare event_id variable
     $description = null;
     $quantity = 0;
     $amount = 0;
@@ -36,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $total_profit = 0;
     $total_amount = 0;
 
-    $check_query = "SELECT reference, description, quantity, amount, profit, total_profit, total_amount 
+    $check_query = "SELECT event_id, reference, description, quantity, amount, profit, total_profit, total_amount 
                     FROM event_summary_items 
                     WHERE summary_item_id = ?";
     $stmt_check = $conn->prepare($check_query);
@@ -44,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt_check) {
         $stmt_check->bind_param('i', $item_id);
         $stmt_check->execute();
-        $stmt_check->bind_result($reference, $description, $quantity, $amount, $profit, $total_profit, $total_amount);
+        $stmt_check->bind_result($event_id, $reference, $description, $quantity, $amount, $profit, $total_profit, $total_amount);
         $stmt_check->fetch();
         $stmt_check->close();
     }
@@ -102,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($stmt_update_event->execute()) {
                     $data['success'] = true;
-                    $data['message'] = 'Item deleted and event totals updated successfully!';
+                    $data['message'] = 'Item deleted successfully!';
                 } else {
                     $data['success'] = false;
                     $data['errors'] = ['database' => 'Failed to update event totals.'];
