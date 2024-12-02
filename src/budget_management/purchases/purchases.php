@@ -58,73 +58,72 @@ $result = $conn->query($sql);
         <?php include '../../sidebar.php'; ?>
 
         <?php include '../../navbar.php';?>
+            <div class="container mt-5 p-5">
+                <h2 class="mb-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-warning fw-bold me-2">|</span> Purchases
+                        <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addPurchaseModal"
+                        style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                            <i class="fa-solid fa-plus"></i> Add Purchase
+                        </button>
+                    </div>
+                    <a href="purchases_archive.php" class="text-gray text-decoration-none fw-bold" 
+                    style="font-size: 14px;">
+                        View Archive
+                    </a>
+                </h2>
+                    <table id="purchasesTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Completed</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if ($result->num_rows > 0) {
+                            while($row = $result->fetch_assoc()) {
+                                $checked = $row['completion_status'] ? 'checked' : '';
+                                $disabled = ($row['purchase_status'] !== 'Approved') ? 'disabled' : '';
+                                echo "<tr>
+                                        <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='purchase_details.php?purchase_id={$row['purchase_id']}'>{$row['title']}</a></td>
+                                        <td>{$row['total_amount']}</td>
+                                        <td>";
+                                
+                                // Display purchase status with appropriate badge
+                                if ($row['purchase_status'] == 'Pending') {
+                                    echo "<span class='badge rounded-pill pending'>Pending</span>";
+                                } elseif ($row['purchase_status'] == 'Approved') {
+                                    echo "<span class='badge rounded-pill approved'>Approved</span>";
+                                } elseif ($row['purchase_status'] == 'Disapproved') {
+                                    echo "<span class='badge rounded-pill disapproved'>Disapproved</span>";
+                                }
+
+                                echo "</td>
+                                    <td>
+                                        <input type='checkbox' class='form-check-input' onclick='showConfirmationModal({$row['purchase_id']}, this.checked)' $checked $disabled>
+                                    </td>
+                                    <td>
+                                        <button class='btn btn-primary btn-sm edit-btn mb-3' data-bs-toggle='modal' data-bs-target='#editPurchaseModal' data-id='{$row['purchase_id']}'>
+                                            <i class='fa-solid fa-pen'></i> Edit
+                                        </button>
+                                        <button class='btn btn-danger btn-sm archive-btn mb-3' data-id='{$row['purchase_id']}'><i class='fa-solid fa-box-archive'></i> Archive</button>
+                                    </td>
+                                    </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5' class='text-center'>No purchases found</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <!-- End of Overall Body Wrapper -->
-
-    
-    <div class="container mt-5 p-5">
-        <h2 class="mb-4 d-flex align-items-center justify-content-between">
-            <div>
-                <span class="text-warning fw-bold me-2">|</span> Purchases
-                <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addPurchaseModal"
-                style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                    <i class="fa-solid fa-plus"></i> Add Purchase
-                </button>
-            </div>
-            <a href="purchases_archive.php" class="text-gray text-decoration-none fw-bold" 
-            style="font-size: 14px;">
-                View Archive
-            </a>
-        </h2>
-            <table id="purchasesTable" class="table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Total Amount</th>
-                    <th>Status</th>
-                    <th>Completed</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        $checked = $row['completion_status'] ? 'checked' : '';
-                        $disabled = ($row['purchase_status'] !== 'Approved') ? 'disabled' : '';
-                        echo "<tr>
-                                <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='purchase_details.php?purchase_id={$row['purchase_id']}'>{$row['title']}</a></td>
-                                <td>{$row['total_amount']}</td>
-                                <td>";
-                        
-                        // Display purchase status with appropriate badge
-                        if ($row['purchase_status'] == 'Pending') {
-                            echo "<span class='badge rounded-pill pending'>Pending</span>";
-                        } elseif ($row['purchase_status'] == 'Approved') {
-                            echo "<span class='badge rounded-pill approved'>Approved</span>";
-                        } elseif ($row['purchase_status'] == 'Disapproved') {
-                            echo "<span class='badge rounded-pill disapproved'>Disapproved</span>";
-                        }
-
-                        echo "</td>
-                            <td>
-                                <input type='checkbox' class='form-check-input' onclick='showConfirmationModal({$row['purchase_id']}, this.checked)' $checked $disabled>
-                            </td>
-                            <td>
-                                <button class='btn btn-primary btn-sm edit-btn mb-3' data-bs-toggle='modal' data-bs-target='#editPurchaseModal' data-id='{$row['purchase_id']}'>
-                                    <i class='fa-solid fa-pen'></i> Edit
-                                </button>
-                                <button class='btn btn-danger btn-sm archive-btn mb-3' data-id='{$row['purchase_id']}'><i class='fa-solid fa-box-archive'></i> Archive</button>
-                            </td>
-                            </tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='5' class='text-center'>No purchases found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
 
     <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">

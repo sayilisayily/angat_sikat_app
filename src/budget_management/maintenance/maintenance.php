@@ -59,68 +59,70 @@ $result = $conn->query($sql);
         <?php include '../../sidebar.php'; ?>
 
         <?php include '../../navbar.php';?>
+            <div class="container mt-5 p-5">
+                <h2 class="mb-4 d-flex align-items-center justify-content-between">
+                    <div>    
+                        <span class="text-warning fw-bold me-2">|</span> Maintenance and Other Expenses
+                        <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addModal"
+                        style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                            <i class="fa-solid fa-plus"></i> Add MOE
+                        </button>
+                    </div>
+                    <a href="maintenance_archive.php" class="text-gray text-decoration-none fw-bold" 
+                    style="font-size: 14px;">
+                        View Archive
+                    </a>
+                </h2>
+                    <table id="maintenanceTable" class="table">
+                    <thead>
+                        <tr> 
+                            <th>Title</th>
+                            <th>Total Budget</th>
+                            <th>Status</th>
+                            <th>Completed</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if ($result->num_rows > 0) {
+                            while($row = $result->fetch_assoc()) {
+                                $checked = $row['completion_status'] ? 'checked' : '';
+                                $disabled = ($row['maintenance_status'] !== 'Approved') ? 'disabled' : '';
+                                echo "<tr>
+                                        <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='maintenance_details.php?maintenance_id={$row['maintenance_id']}'>{$row['title']}</a></td>
+                                        <td>{$row['total_amount']}</td>
+                                        <td>";
+                                
+                                if ($row['maintenance_status'] == 'Pending') {
+                                    echo "<span class='badge rounded-pill pending'> ";
+                                } else if ($row['maintenance_status'] == 'Approved') {
+                                    echo "<span class='badge rounded-pill approved'> ";
+                                } else if ($row['maintenance_status'] == 'Disapproved') {
+                                    echo "<span class='badge rounded-pill disapproved'> ";
+                                }
+
+                                echo "{$row['maintenance_status']}</span></td>
+                                    <td><input type='checkbox' class='form-check-input' onclick='showConfirmationModal({$row['maintenance_id']}, this.checked)' $checked $disabled></td>
+                                    <td>
+                                        <button class='btn btn-primary btn-sm edit-btn mb-3' data-bs-toggle='modal' data-bs-target='#editMaintenanceModal' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-pen'></i> Edit</button>
+                                        <button class='btn btn-danger btn-sm archive-btn mb-3' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-box-archive'></i> Archive</button>
+                                    </td>
+                                    </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5' class='text-center'>No maintenance or other expenses found</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <!-- End of Overall Body Wrapper -->
 
     
-    <div class="container mt-5 p-5">
-        <h2 class="mb-4 d-flex align-items-center justify-content-between">
-            <div>    
-                <span class="text-warning fw-bold me-2">|</span> Maintenance and Other Expenses
-                <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addModal"
-                style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                    <i class="fa-solid fa-plus"></i> Add MOE
-                </button>
-            </div>
-            <a href="maintenance_archive.php" class="text-gray text-decoration-none fw-bold" 
-            style="font-size: 14px;">
-                View Archive
-            </a>
-        </h2>
-            <table id="maintenanceTable" class="table">
-            <thead>
-                <tr> 
-                    <th>Title</th>
-                    <th>Total Budget</th>
-                    <th>Status</th>
-                    <th>Completed</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        $checked = $row['completion_status'] ? 'checked' : '';
-                        $disabled = ($row['maintenance_status'] !== 'Approved') ? 'disabled' : '';
-                        echo "<tr>
-                                <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='maintenance_details.php?maintenance_id={$row['maintenance_id']}'>{$row['title']}</a></td>
-                                <td>{$row['total_amount']}</td>
-                                <td>";
-                        
-                        if ($row['maintenance_status'] == 'Pending') {
-                            echo "<span class='badge rounded-pill pending'> ";
-                        } else if ($row['maintenance_status'] == 'Approved') {
-                            echo "<span class='badge rounded-pill approved'> ";
-                        } else if ($row['maintenance_status'] == 'Disapproved') {
-                            echo "<span class='badge rounded-pill disapproved'> ";
-                        }
-
-                        echo "{$row['maintenance_status']}</span></td>
-                            <td><input type='checkbox' class='form-check-input' onclick='showConfirmationModal({$row['maintenance_id']}, this.checked)' $checked $disabled></td>
-                            <td>
-                                <button class='btn btn-primary btn-sm edit-btn mb-3' data-bs-toggle='modal' data-bs-target='#editMaintenanceModal' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-pen'></i> Edit</button>
-                                <button class='btn btn-danger btn-sm archive-btn mb-3' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-box-archive'></i> Archive</button>
-                            </td>
-                            </tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='5' class='text-center'>No maintenance or other expenses found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
+    
 
     <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">

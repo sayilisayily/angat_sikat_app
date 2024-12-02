@@ -64,5 +64,5 @@
             </header>
             <!-- Header End -->
 
-        </div>
+        
         <!-- End of 2nd Body Wrapper -->
