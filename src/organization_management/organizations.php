@@ -22,6 +22,8 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
+    <!--Custom CSS for Activities-->
+    <link rel="stylesheet" href="../activity_management/css/activities.css" />
     <!--Boxicon-->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <!--Font Awesome-->
@@ -229,46 +231,59 @@ $result = $conn->query($sql);
             </button>
         </h2>
         <table id="organizationsTable" class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Logo</th>
-                    <th>Members</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    $organization_logo = $row['organization_logo']; // Assuming the logo is stored as the file name
-                    $logo_path = !empty($organization_logo) ? 'uploads/' . $organization_logo : 'uploads/default_logo.png';
-                    echo "<tr>
-                            <td>{$row['organization_name']}</td>
-                            <td><img src='$logo_path' alt='Logo' style='width: 50px; height: 50px;'></td>
-                            <td>{$row['organization_members']}</td>
-                            <td>{$row['organization_status']}</td>
-                            <td>
-                                <button class='btn btn-primary btn-sm edit-btn mb-3' 
-                                        data-bs-toggle='modal' 
-                                        data-bs-target='#editOrganizationModal' 
-                                        data-id='{$row['organization_id']}'>
-                                    <i class='fa-solid fa-pen'></i> Edit
-                                </button>
-                                <button class='btn btn-danger btn-sm archive-btn mb-3' 
-                                        data-id='{$row['organization_id']}'>
-                                    <i class='fa-solid fa-box-archive'></i> Archive
-                                </button>
-                            </td>
-                        </tr>";
-                }
-            } else {
-                echo "<tr><td colspan='4' class='text-center'>No organizations found</td></tr>";
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Logo</th>
+                <th>Members</th>
+                <th>Status</th>
+                <th>Color</th> <!-- Added column for organization color -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $organization_logo = $row['organization_logo']; // Assuming the logo is stored as the file name
+                // Check if logo exists and construct the path
+                $logo_path = !empty($organization_logo) && file_exists('uploads/' . $organization_logo) 
+                            ? 'uploads/' . $organization_logo 
+                            : 'uploads/default_logo.png';
+
+                // Get the organization color
+                $organization_color = !empty($row['organization_color']) ? $row['organization_color'] : '#FFFFFF'; // Default to white if no color is set
+                
+                // Display the organization data in the table
+                echo "<tr>
+                        <td>{$row['organization_name']}</td>
+                        <td><img src='$logo_path' alt='Logo' style='width: 50px; height: 50px; object-fit: cover;'></td>
+                        <td>{$row['organization_members']}</td>
+                        <td>{$row['organization_status']}</td>
+                        <td style='background-color: {$organization_color}; color: white; text-align: center;'> <!-- Display color -->
+                            {$organization_color}
+                        </td>
+                        <td>
+                            <button class='btn btn-primary btn-sm edit-btn mb-3' 
+                                    data-bs-toggle='modal' 
+                                    data-bs-target='#editOrganizationModal' 
+                                    data-id='{$row['organization_id']}'>
+                                <i class='fa-solid fa-pen'></i> Edit
+                            </button>
+                            <button class='btn btn-danger btn-sm archive-btn mb-3' 
+                                    data-id='{$row['organization_id']}'>
+                                <i class='fa-solid fa-box-archive'></i> Archive
+                            </button>
+                        </td>
+                    </tr>";
             }
-            ?>
-            </tbody>
-        </table>
+        } else {
+            echo "<tr><td colspan='6' class='text-center'>No organizations found</td></tr>"; // Updated colspan to 6
+        }
+        ?>
+        </tbody>
+    </table>
+
     </div>
 
     <!-- Add Organization Modal -->
@@ -305,6 +320,15 @@ $result = $conn->query($sql);
                                 <option value="Active">Level I</option>
                                 <option value="Inactive">Level II</option>
                             </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="col-sm-3">
+                                <label for="organization_color">Color</label>
+                                <input type="color" class="form-control" id="organization_color"
+                                    name="organization_color" required>
+                            </div>
+                            <div class="col-sm-3">
+                            </div>
                         </div>
 
                         <!-- Success Message Alert -->
@@ -363,7 +387,15 @@ $result = $conn->query($sql);
                                 <option value="Inactive">Level II</option>
                             </select>
                         </div>
-
+                        <div class="form-group mb-3">
+                            <div class="col-sm-3">
+                                <label for="organization_color">Color</label>
+                                <input type="color" class="form-control" id="editOrganizationColor"
+                                    name="organization_color" required>
+                            </div>
+                            <div class="col-sm-3">
+                            </div>
+                        </div>
                         <!-- Success Message Alert -->
                         <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
                             Organization updated successfully!

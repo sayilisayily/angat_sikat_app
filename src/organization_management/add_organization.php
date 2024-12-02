@@ -1,11 +1,9 @@
 <?php
-
 include '../connection.php';
 include '../session_check.php';
 
 $errors = [];
 $data = [];
-print_r($_FILES);
 
 // Validate organization name
 if (empty($_POST['organization_name'])) {
@@ -24,35 +22,39 @@ if (empty($_POST['organization_name'])) {
 
 // Validate and upload organization logo
 if (isset($_FILES['organization_logo']) && $_FILES['organization_logo']['error'] == 0) {
-    $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-    $max_size = 2 * 1024 * 1024; // 2 MB
-
-    $file_type = $_FILES['organization_logo']['type'];
-    $file_size = $_FILES['organization_logo']['size'];
     $file_tmp = $_FILES['organization_logo']['tmp_name'];
-    $file_name = basename($_FILES['organization_logo']['name']);
-    $upload_dir = 'uploads/';
-    $upload_file = $upload_dir . uniqid() . '_' . $file_name;
+    $file_name = $_FILES['organization_logo']['name'];
+    
+    if (!empty($file_name)) {
+        $upload_dir = 'uploads/';
+        
+        // Ensure uploads directory exists
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        
+        // Check the file type (e.g., JPEG, PNG, GIF)
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        $file_type = mime_content_type($file_tmp);
 
-    // Check file type
-    if (!in_array($file_type, $allowed_types)) {
-        $errors['organization_logo'] = 'Only JPEG, PNG, and GIF files are allowed.';
-    }
-
-    // Check file size
-    if ($file_size > $max_size) {
-        $errors['organization_logo'] = 'Logo file size must be under 2MB.';
-    }
-
-    // Move file to uploads directory if no errors
-    if (empty($errors['organization_logo']) && move_uploaded_file($file_tmp, $upload_file)) {
-        $organization_logo = mysqli_real_escape_string($conn, $upload_file);
+        if (!in_array($file_type, $allowed_types)) {
+            $errors['organization_logo'] = 'Invalid file type.';
+        } else {
+            // Move uploaded file to the directory
+            $file_path = $upload_dir . basename($file_name);
+            if (move_uploaded_file($file_tmp, $file_path)) {
+                $organization_logo = $file_name; // File uploaded successfully
+            } else {
+                $errors['organization_logo'] = 'Error moving the uploaded file.';
+            }
+        }
     } else {
-        $errors['organization_logo'] = 'Failed to upload logo.';
+        $errors['organization_logo'] = 'Uploaded file name is empty.';
     }
 } else {
     $errors['organization_logo'] = 'Organization logo is required.';
 }
+
 
 // Validate organization members
 if (empty($_POST['organization_members']) || !is_numeric($_POST['organization_members'])) {
@@ -68,25 +70,39 @@ if (empty($_POST['organization_status'])) {
     $organization_status = mysqli_real_escape_string($conn, $_POST['organization_status']);
 }
 
+// Validate organization color (if provided)
+$organization_color = isset($_POST['organization_color']) ? $_POST['organization_color'] : null;
+if (!empty($organization_color) && !preg_match('/^#[a-fA-F0-9]{6}$/', $organization_color)) {
+    $errors['organization_color'] = 'Invalid color format. Please use a valid hex color code.';
+}
+
 // If there are errors, return them
 if (!empty($errors)) {
     $data['success'] = false;
     $data['errors'] = $errors;
 } else {
-    // Insert organization into the database
-    $query = "INSERT INTO organizations (organization_name, organization_logo, organization_members, organization_status) 
-              VALUES ('$organization_name', '$organization_logo', $organization_members, '$organization_status')";
+    // Use prepared statement to insert organization into the database
+    $query = "INSERT INTO organizations (organization_name, organization_logo, organization_members, organization_status, organization_color) 
+              VALUES (?, ?, ?, ?, ?)";
     
-    if (mysqli_query($conn, $query)) {
-        $data['success'] = true;
-        $data['message'] = 'Organization added successfully!';
+    if ($stmt = $conn->prepare($query)) {
+        $stmt->bind_param('ssiss', $organization_name, $organization_logo, $organization_members, $organization_status, $organization_color);
+
+        if ($stmt->execute()) {
+            $data['success'] = true;
+            $data['message'] = 'Organization added successfully!';
+        } else {
+            $data['success'] = false;
+            $data['errors'] = ['database' => 'Failed to add organization to the database.'];
+        }
+
+        $stmt->close();
     } else {
         $data['success'] = false;
-        $data['errors'] = ['database' => 'Failed to add organization to the database.'];
+        $data['errors'] = ['database' => 'Failed to prepare insert statement.'];
     }
 }
 
 // Output response as JSON
 echo json_encode($data);
-
 ?>

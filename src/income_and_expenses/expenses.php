@@ -263,7 +263,7 @@ $result = $conn->query($sql);
             <!-- Add Expense Modal -->
             <div class="modal fade" id="addExpenseModal" tabindex="-1" role="dialog" aria-labelledby="addExpenseLabel"
                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
+                <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <form id="addExpenseForm" enctype="multipart/form-data">
                             <div class="modal-header">
@@ -273,42 +273,58 @@ $result = $conn->query($sql);
                             </div>
                             <div class="modal-body">
                                 
+                                <input type="hidden" id="id" name="id">
 
                                 <!-- Title Field -->
                                 <div class="form-group">
                                     <label for="title">Title</label>
-                                    <select name="title" class="form-control" required>
+                                    <select name="title" id="title" class="form-control" required>
                                         <option value="">Select Title</option>
                                         <!-- Fetch titles from events, purchases, and maintenance -->
                                         <?php
                                         // Fetch events
-                                        $event_query = "SELECT title FROM events WHERE archived = 0 AND accomplishment_status = 1 AND organization_id = $organization_id";
+                                        $event_query = "SELECT event_id, title, total_amount FROM events_summary WHERE type = 'Expense' AND archived = 0 AND organization_id = $organization_id";
                                         $event_result = mysqli_query($conn, $event_query);
                                         echo "<optgroup label='Events'>";
                                         while ($row = mysqli_fetch_assoc($event_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . "</option>";
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['event_id']) . '"
+                                                    data-amount="' . htmlspecialchars($row['total_amount']) . '">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
                                         }
                                         echo "</optgroup>";
         
                                         // Fetch purchases
-                                        $purchase_query = "SELECT title FROM purchases WHERE archived = 0 AND completion_status = 1 AND organization_id = $organization_id";
+                                        $purchase_query = "SELECT purchase_id, title, total_amount FROM purchases_summary WHERE archived = 0 AND organization_id = $organization_id";
                                         $purchase_result = mysqli_query($conn, $purchase_query);
                                         echo "<optgroup label='Purchases'>";
                                         while ($row = mysqli_fetch_assoc($purchase_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . " </option>";
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['purchase_id']) . '"
+                                                    data-amount="' . htmlspecialchars($row['total_amount']) . '">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
                                         }
                                         echo "</optgroup>";
         
                                         // Fetch maintenance
-                                        $maintenance_query = "SELECT title FROM maintenance WHERE archived = 0 AND completion_status = 1 AND organization_id = $organization_id";
+                                        $maintenance_query = "SELECT maintenance_id, title, total_amount FROM maintenance_summary WHERE archived = 0 AND organization_id = $organization_id";
                                         $maintenance_result = mysqli_query($conn, $maintenance_query);
                                         echo "<optgroup label='Mainteance and Other Expenses'>";
                                         while ($row = mysqli_fetch_assoc($maintenance_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . " </option>";
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['maintenance_id']) . '"
+                                                    data-amount="' . htmlspecialchars($row['total_amount']) . '">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
                                         }
                                         echo "</optgroup>";
                                         ?>
                                     </select>
+                                </div>
+                                <div class="form-group row mb-2">
+                                    <div class="col">
+                                        <label for="amount">Amount</label>
+                                        <input type="number" class="form-control" id="amount" name="amount" readonly>
+                                    </div>
                                 </div>
 
                                 <!-- Success Message Alert -->
