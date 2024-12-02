@@ -11,6 +11,12 @@ if (empty($_POST['summary_item_id'])) {
     $summary_item_id = intval($_POST['summary_item_id']);
 }
 
+if (empty($_POST['maintenance_id'])) {
+    $errors['maintenance_id'] = 'Maintenance ID is required.';
+} else {
+    $maintenance_id = intval($_POST['maintenance_id']);
+}
+
 if (empty($_POST['description'])) {
     $errors['description'] = 'Description is required.';
 } else {
@@ -74,7 +80,7 @@ if (isset($_FILES['reference']) && $_FILES['reference']['error'] !== UPLOAD_ERR_
     $stmt->close();
 }
 
-// Update summary item if no errors
+// Update summary item and totals if no errors
 if (empty($errors)) {
     $conn->begin_transaction(); // Start transaction
 
@@ -95,9 +101,27 @@ if (empty($errors)) {
             $stmt->close();
         }
 
+        // Recalculate the total for the maintenance summary table
+        $stmt = $conn->prepare("SELECT COALESCE(SUM(total_amount), 0) FROM maintenance_summary_items WHERE maintenance_id = ?");
+        $stmt->bind_param("i", $maintenance_id);
+        $stmt->execute();
+        $stmt->bind_result($new_total_amount);
+        $stmt->fetch();
+        $stmt->close();
+
+        // Update the total amount in the maintenance table
+        $stmt = $conn->prepare("UPDATE maintenance_summary SET total_amount = ? WHERE maintenance_id = ?");
+        if ($stmt) {
+            $stmt->bind_param("di", $new_total_amount, $maintenance_id);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to update maintenance summary totals.');
+            }
+            $stmt->close();
+        }
+
         $conn->commit(); // Commit transaction
         $data['success'] = true;
-        $data['message'] = 'Summary item updated successfully!';
+        $data['message'] = 'Summary item and totals updated successfully!';
     } catch (Exception $e) {
         $conn->rollback(); // Rollback transaction on failure
         $data['success'] = false;

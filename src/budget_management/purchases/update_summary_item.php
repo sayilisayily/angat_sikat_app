@@ -11,6 +11,12 @@ if (empty($_POST['summary_item_id'])) {
     $summary_item_id = intval($_POST['summary_item_id']);
 }
 
+if (empty($_POST['purchase_id'])) {
+    $errors['purchase_id'] = 'Maintenance ID is required.';
+} else {
+    $purchase_id = intval($_POST['purchase_id']);
+}
+
 if (empty($_POST['description'])) {
     $errors['description'] = 'Description is required.';
 } else {
@@ -74,7 +80,7 @@ if (isset($_FILES['reference']) && $_FILES['reference']['error'] !== UPLOAD_ERR_
     $stmt->close();
 }
 
-// Update summary item if no errors
+// Update summary item and totals if no errors
 if (empty($errors)) {
     $conn->begin_transaction(); // Start transaction
 
@@ -95,9 +101,27 @@ if (empty($errors)) {
             $stmt->close();
         }
 
+        // Recalculate the total for the purchase summary table
+        $stmt = $conn->prepare("SELECT COALESCE(SUM(total_amount), 0) FROM purchase_summary_items WHERE purchase_id = ?");
+        $stmt->bind_param("i", $purchase_id);
+        $stmt->execute();
+        $stmt->bind_result($new_total_amount);
+        $stmt->fetch();
+        $stmt->close();
+
+        // Update the total amount in the purchase table
+        $stmt = $conn->prepare("UPDATE purchases_summary SET total_amount = ? WHERE purchase_id = ?");
+        if ($stmt) {
+            $stmt->bind_param("di", $new_total_amount, $purchase_id);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to update purchase summary totals.');
+            }
+            $stmt->close();
+        }
+
         $conn->commit(); // Commit transaction
         $data['success'] = true;
-        $data['message'] = 'Summary item updated successfully!';
+        $data['message'] = 'Summary item and totals updated successfully!';
     } catch (Exception $e) {
         $conn->rollback(); // Rollback transaction on failure
         $data['success'] = false;
