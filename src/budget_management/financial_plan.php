@@ -39,7 +39,6 @@ $result = $conn->query($sql);
     <script src="../assets/js/app.min.js"></script>
     <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
     <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
     <!--Bootstrap JS-->
@@ -60,129 +59,127 @@ $result = $conn->query($sql);
         <?php include '../sidebar.php'; ?>
 
         <?php include '../navbar.php';?>
+            <div class="container mt-5 p-5">
+                <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Financial Plan
+                    <button class="btn add-btn btn-primary ms-3" id="add-btn" data-bs-toggle="modal" data-bs-target="#addPlanModal"
+                    style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                        <i class="fa-solid fa-plus"></i> Add Plan
+                    </button>
+                </h2>
+                <table id="financialPlanTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Projected Income</th>
+                            <th style="text-align: center;">Proposed Date</th>
+                            <th style="text-align: center;">Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $has_income = false;
+                        $has_expenses = false;
+
+                        if ($result->num_rows > 0) {
+                            // Loop through income records
+                            while ($row = $result->fetch_assoc()) {
+                                if ($row['type'] === 'Income') {
+                                    $has_income = true;
+                                    echo "<tr>
+                                            <td>{$row['title']}</td>
+                                            <td style='text-align: center;'>" . date('F j, Y', strtotime($row['date'])) . "</td>
+                                            <td style='text-align: center;'>{$row['amount']}</td>
+                                            <td>
+                                                <button class='btn btn-primary btn-sm edit-btn mb-3' 
+                                                        data-bs-toggle='modal' 
+                                                        data-bs-target='#editPlanModal' 
+                                                        data-id='{$row['plan_id']}'>
+                                                    <i class='fa-solid fa-pen'></i> Edit
+                                                </button>
+                                                <button class='btn btn-danger btn-sm delete-btn mb-3' 
+                                                        data-id='{$row['plan_id']}'>
+                                                    <i class='fa-solid fa-trash'></i> Delete
+                                                </button>
+                                            </td>
+                                        </tr>";
+                                }
+                            }
+
+                            if (!$has_income) {
+                                echo "<tr><td colspan='4' class='text-center'>No projected income found</td></tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='4' class='text-center'>No records found</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+
+                    <thead>
+                        <tr>
+                            <th colspan="4">Projected Expenses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Reset result pointer for expense segregation
+                        $result->data_seek(0); // Move back to the beginning of the result set
+
+                        $categories = ['Activities', 'Purchases', 'Maintenance and Other Expenses'];
+                        foreach ($categories as $category) {
+                            echo "<tr><th colspan='4'>$category</th></tr>";
+
+                            // Loop through expense records by category
+                            $has_expenses_for_category = false;
+                            while ($row = $result->fetch_assoc()) {
+                                if ($row['type'] === 'Expense' && $row['category'] === $category) {
+                                    $has_expenses = true;
+                                    $has_expenses_for_category = true;
+                                    echo "<tr>
+                                            <td>{$row['title']}</td>";
+                                
+                                    if ($category === 'Activities') {
+                                        echo "<td style='text-align: center;'>" . date('F j, Y', strtotime($row['date'])) . "</td>";
+                                    } else {
+                                        echo "<td></td>";
+                                    }
+                                            
+                                            echo "
+                                            <td style='text-align: center;'>{$row['amount']}</td>
+                                            <td>
+                                                <button class='btn btn-primary btn-sm edit-btn mb-3' 
+                                                        data-bs-toggle='modal' 
+                                                        data-bs-target='#editPlanModal' 
+                                                        data-id='{$row['plan_id']}'>
+                                                    <i class='fa-solid fa-pen'></i> Edit
+                                                </button>
+                                                <button class='btn btn-danger btn-sm delete-btn mb-3' 
+                                                        data-id='{$row['plan_id']}'>
+                                                    <i class='fa-solid fa-trash'></i> Delete
+                                                </button>
+                                            </td>
+                                        </tr>";
+                                }
+                            }
+
+                            if (!$has_expenses_for_category) {
+                                echo "<tr><td colspan='4' class='text-center'>No expenses for $category</td></tr>";
+                            }
+
+                            // Reset pointer for the next category
+                            $result->data_seek(0);
+                        }
+
+                        if (!$has_expenses) {
+                            echo "<tr><td colspan='4' class='text-center'>No projected expenses found</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
     </div>
     <!-- End of Overall Body Wrapper -->
-
-    
-    <div class="container mt-5 p-5">
-        <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Financial Plan
-            <button class="btn add-btn btn-primary ms-3" id="add-btn" data-bs-toggle="modal" data-bs-target="#addPlanModal"
-             style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                <i class="fa-solid fa-plus"></i> Add Plan
-            </button>
-        </h2>
-        <table id="financialPlanTable" class="table">
-            <thead>
-                <tr>
-                    <th>Projected Income</th>
-                    <th style="text-align: center;">Proposed Date</th>
-                    <th style="text-align: center;">Amount</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $has_income = false;
-                $has_expenses = false;
-
-                if ($result->num_rows > 0) {
-                    // Loop through income records
-                    while ($row = $result->fetch_assoc()) {
-                        if ($row['type'] === 'Income') {
-                            $has_income = true;
-                            echo "<tr>
-                                    <td>{$row['title']}</td>
-                                    <td style='text-align: center;'>" . date('F j, Y', strtotime($row['date'])) . "</td>
-                                    <td style='text-align: center;'>{$row['amount']}</td>
-                                    <td>
-                                        <button class='btn btn-primary btn-sm edit-btn mb-3' 
-                                                data-bs-toggle='modal' 
-                                                data-bs-target='#editPlanModal' 
-                                                data-id='{$row['plan_id']}'>
-                                            <i class='fa-solid fa-pen'></i> Edit
-                                        </button>
-                                        <button class='btn btn-danger btn-sm delete-btn mb-3' 
-                                                data-id='{$row['plan_id']}'>
-                                            <i class='fa-solid fa-trash'></i> Delete
-                                        </button>
-                                    </td>
-                                </tr>";
-                        }
-                    }
-
-                    if (!$has_income) {
-                        echo "<tr><td colspan='4' class='text-center'>No projected income found</td></tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='4' class='text-center'>No records found</td></tr>";
-                }
-                ?>
-            </tbody>
-
-            <thead>
-                <tr>
-                    <th colspan="4">Projected Expenses</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Reset result pointer for expense segregation
-                $result->data_seek(0); // Move back to the beginning of the result set
-
-                $categories = ['Activities', 'Purchases', 'Maintenance and Other Expenses'];
-                foreach ($categories as $category) {
-                    echo "<tr><th colspan='4'>$category</th></tr>";
-
-                    // Loop through expense records by category
-                    $has_expenses_for_category = false;
-                    while ($row = $result->fetch_assoc()) {
-                        if ($row['type'] === 'Expense' && $row['category'] === $category) {
-                            $has_expenses = true;
-                            $has_expenses_for_category = true;
-                            echo "<tr>
-                                    <td>{$row['title']}</td>";
-                        
-                            if ($category === 'Activities') {
-                                echo "<td style='text-align: center;'>" . date('F j, Y', strtotime($row['date'])) . "</td>";
-                            } else {
-                                echo "<td></td>";
-                            }
-                                    
-                                    echo "
-                                    <td style='text-align: center;'>{$row['amount']}</td>
-                                    <td>
-                                        <button class='btn btn-primary btn-sm edit-btn mb-3' 
-                                                data-bs-toggle='modal' 
-                                                data-bs-target='#editPlanModal' 
-                                                data-id='{$row['plan_id']}'>
-                                            <i class='fa-solid fa-pen'></i> Edit
-                                        </button>
-                                        <button class='btn btn-danger btn-sm delete-btn mb-3' 
-                                                data-id='{$row['plan_id']}'>
-                                            <i class='fa-solid fa-trash'></i> Delete
-                                        </button>
-                                    </td>
-                                </tr>";
-                        }
-                    }
-
-                    if (!$has_expenses_for_category) {
-                        echo "<tr><td colspan='4' class='text-center'>No expenses for $category</td></tr>";
-                    }
-
-                    // Reset pointer for the next category
-                    $result->data_seek(0);
-                }
-
-                if (!$has_expenses) {
-                    echo "<tr><td colspan='4' class='text-center'>No projected expenses found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-
-    </div>
-
 
     <!-- Add Plan Modal -->
     <div class="modal fade" id="addPlanModal" tabindex="-1" role="dialog" aria-labelledby="addPlanLabel" aria-hidden="true">

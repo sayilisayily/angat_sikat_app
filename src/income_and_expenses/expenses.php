@@ -16,25 +16,32 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
-    <!--Custom CSS for Budget Overview-->
-    <link rel="stylesheet" href="../budget_management/budget.css" />
+    <!--Custom CSS for Activities-->
+    <link rel="stylesheet" href="../activity_management/css/activities.css" />
     <!--Boxicon-->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <!--Font Awesome-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <!-- Lordicon (for animated icons) -->
     <script src="https://cdn.lordicon.com/lordicon.js"></script>
-    <!-- Selectize -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css"
-        integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
-    <!-- jQuery -->
+    <!--Bootstrap Script-->
+    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/sidebarmenu.js"></script>
+    <script src="../assets/js/app.min.js"></script>
+    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+    <!-- solar icons -->
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+    <!--Bootstrap JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Bootstrap JavaScript for responsive components and modals -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JavaScript for table interactions and pagination -->
+    <script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.1.7/js/dataTables.bootstrap5.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.bootstrap.min.css" />
 </head>
 
 
@@ -230,7 +237,7 @@ $result = $conn->query($sql);
                             <th>Title</th>
                             <th>Amount</th>
                             <th>Reference</th>
-                            <th>Actions</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -243,19 +250,6 @@ $result = $conn->query($sql);
                             <td>{$row['title']}</td>
                             <td>{$row['amount']}</td>
                             <td>{$row['reference']}</td>
-                            
-                            <td>
-                                <button class='btn btn-primary btn-sm edit-btn' 
-                                        data-bs-toggle='modal' 
-                                        data-bs-target='#editExpenseModal' 
-                                        data-id='{$row['expense_id']}'>
-                                    <i class='fa-solid fa-pen'></i> Edit
-                                </button>
-                                <button class='btn btn-danger btn-sm archive-btn' 
-                                        data-id='{$row['expense_id']}'>
-                                    <i class='fa-solid fa-box-archive'></i> Archive
-                                </button>
-                            </td>
                         </tr>";
                 }
             } else {
@@ -269,7 +263,7 @@ $result = $conn->query($sql);
             <!-- Add Expense Modal -->
             <div class="modal fade" id="addExpenseModal" tabindex="-1" role="dialog" aria-labelledby="addExpenseLabel"
                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
+                <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <form id="addExpenseForm" enctype="multipart/form-data">
                             <div class="modal-header">
@@ -278,35 +272,59 @@ $result = $conn->query($sql);
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <!-- Category Field -->
-                                <div class="form-group">
-                                    <label for="category">Category</label>
-                                    <select class="form-control" id="category" name="category" required>
-                                        <option value="">Select Category</option>
-                                        <option value="activities">Activities</option>
-                                        <option value="purchases">Purchases</option>
-                                        <option value="maintenance">Maintenance</option>
-                                    </select>
-                                </div>
+                                
+                                <input type="hidden" id="id" name="id">
 
                                 <!-- Title Field -->
-                                <div class="form-group mt-3">
+                                <div class="form-group">
                                     <label for="title">Title</label>
-                                    <input type="text" class="form-control" id="title" name="title" required>
+                                    <select name="title" id="title" class="form-control" required>
+                                        <option value="">Select Title</option>
+                                        <!-- Fetch titles from events, purchases, and maintenance -->
+                                        <?php
+                                        // Fetch events
+                                        $event_query = "SELECT event_id, title, total_amount FROM events_summary WHERE type = 'Expense' AND archived = 0 AND organization_id = $organization_id";
+                                        $event_result = mysqli_query($conn, $event_query);
+                                        echo "<optgroup label='Events'>";
+                                        while ($row = mysqli_fetch_assoc($event_result)) {
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['event_id']) . '"
+                                                    data-amount="' . htmlspecialchars($row['total_amount']) . '">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
+                                        }
+                                        echo "</optgroup>";
+        
+                                        // Fetch purchases
+                                        $purchase_query = "SELECT purchase_id, title, total_amount FROM purchases_summary WHERE archived = 0 AND organization_id = $organization_id";
+                                        $purchase_result = mysqli_query($conn, $purchase_query);
+                                        echo "<optgroup label='Purchases'>";
+                                        while ($row = mysqli_fetch_assoc($purchase_result)) {
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['purchase_id']) . '"
+                                                    data-amount="' . htmlspecialchars($row['total_amount']) . '">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
+                                        }
+                                        echo "</optgroup>";
+        
+                                        // Fetch maintenance
+                                        $maintenance_query = "SELECT maintenance_id, title, total_amount FROM maintenance_summary WHERE archived = 0 AND organization_id = $organization_id";
+                                        $maintenance_result = mysqli_query($conn, $maintenance_query);
+                                        echo "<optgroup label='Mainteance and Other Expenses'>";
+                                        while ($row = mysqli_fetch_assoc($maintenance_result)) {
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['maintenance_id']) . '"
+                                                    data-amount="' . htmlspecialchars($row['total_amount']) . '">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
+                                        }
+                                        echo "</optgroup>";
+                                        ?>
+                                    </select>
                                 </div>
-
-                                <!-- Amount Field -->
-                                <div class="form-group mt-3">
-                                    <label for="amount">Amount</label>
-                                    <input type="number" class="form-control" id="amount" name="amount" step="0.01"
-                                        required>
-                                </div>
-
-                                <!-- Reference (File Upload) Field -->
-                                <div class="form-group mt-3">
-                                    <label for="reference">Reference (File Upload)</label>
-                                    <input type="file" class="form-control" id="reference" name="reference"
-                                        accept=".pdf,.jpg,.png,.doc,.docx" required>
+                                <div class="form-group row mb-2">
+                                    <div class="col">
+                                        <label for="amount">Amount</label>
+                                        <input type="number" class="form-control" id="amount" name="amount" readonly>
+                                    </div>
                                 </div>
 
                                 <!-- Success Message Alert -->
@@ -413,17 +431,7 @@ $result = $conn->query($sql);
     <!-- End of Overall Body Wrapper -->
 
     <!-- BackEnd -->
-    <script src="js/expenses.js">
-    </script>
-    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/sidebarmenu.js"></script>
-    <script src="../assets/js/app.min.js"></script>
-    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
-    <!-- solar icons -->
-    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+    <script src="js/expenses.js"></script>
 </body>
 
 </html>

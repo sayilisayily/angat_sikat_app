@@ -59,52 +59,48 @@ $result = $conn->query($sql);
         data-sidebar-position="fixed" data-header-position="fixed">
       <?php include '../sidebar.php'; ?>
 
-        <!--  2nd Body wrapper -->
-        <div class="body-wrapper">
-            <div class="container mt-5 p-5">
-                <h2 class="mb-4 d-flex align-items-center justify-content-between">
-                    <div>
-                        <span class="text-warning fw-bold me-2">|</span> Activities
-                        <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addEventModal"
-                            style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                            <i class="fa-solid fa-plus"></i> Add Activity
-                        </button>
-                    </div>
-                    <a href="activities_archive.php" class="text-gray text-decoration-none fw-bold" 
-                    style="font-size: 14px;">
-                        View Archive
-                    </a>
-                </h2>
-                <table id="eventsTable" class="table">
-                    <thead>
-                        <tr>
-                            <th rowspan=2>Title</th>
-                            <th rowspan=2>Venue</th>
-                            <th colspan=2 style="text-align: center;"> Date </th>
-                            <th rowspan=2>Type</th>
-                            <th rowspan=2>Status</th>
-                            <th rowspan=2>Accomplished</th>
-                            <th rowspan=2>Actions</th>
-                        </tr>
-                        <tr>
-                            <th>Start</th>
-                            <th>End</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                $checked = $row['accomplishment_status'] ? 'checked' : '';
-                                $disabled = ($row['event_status'] !== 'Approved') ? 'disabled' : '';
-                                echo "<tr>
-                                        <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
-                                        <td>{$row['event_venue']}</td>
-                                        <td>" . date('F j, Y', strtotime($row['event_start_date'])) . "</td>
-                                        <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
-                                        <td>{$row['event_type']}</td>
-                                        <td>";
-                                if ($row['event_status'] == 'Pending') {
+        <?php include '../navbar.php';?>
+    </div>
+    <!-- End of Overall Body Wrapper -->
+
+    
+    <div class="container mt-5 p-5">
+        <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Activities
+            <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addEventModal"
+             style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                <i class="fa-solid fa-plus"></i> Add Activity
+            </button>
+        </h2>
+        <table id="eventsTable" class="table">
+            <thead>
+                <tr>
+                    <th rowspan=2>Title</th>
+                    <th rowspan=2>Venue</th>
+                    <th colspan=2 style="text-align: center;"> Date </th>
+                    <th rowspan=2>Type</th>
+                    <th rowspan=2>Status</th>
+                    <th rowspan=2>Accomplished</th>
+                    <th rowspan=2>Actions</th>
+                </tr>
+                <tr>
+                    <th>Start</th>
+                    <th>End</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($result->num_rows > 0) {
+                    while($row = $result->fetch_assoc()) {
+                        $checked = $row['accomplishment_status'] ? 'checked' : '';
+                        $disabled = ($row['event_status'] !== 'Approved') ? 'disabled' : '';
+                        echo "<tr>
+                                <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
+                                <td>{$row['event_venue']}</td>
+                                <td>" . date('F j, Y', strtotime($row['event_start_date'])) . "</td>
+                                <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
+                                <td>{$row['event_type']}</td>
+                                <td>";
+                                  if ($row['event_status'] == 'Pending') {
                                     echo " <span class='badge rounded-pill pending'> ";
                                 } elseif ($row['event_status'] == 'Approved') {
                                     echo " <span class='badge rounded-pill approved'> ";

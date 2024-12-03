@@ -1,0 +1,42 @@
+Array
+(
+)
+Array
+(
+)
+Array
+(
+    [reference] => Array
+        (
+            [name] => lesson-1.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpAF36.tmp
+            [error] => 0
+            [size] => 152929
+        )
+
+)
+Array
+(
+    [reference] => Array
+        (
+            [name] => lesson-1.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpE85C.tmp
+            [error] => 0
+            [size] => 152929
+        )
+
+)
+Array
+(
+    [reference] => Array
+        (
+            [name] => Script-Methodology-Presentation-in-ITEC-116.txt
+            [type] => text/plain
+            [tmp_name] => C:\xampp\tmp\php11DF.tmp
+            [error] => 0
+            [size] => 2688
+        )
+
+)

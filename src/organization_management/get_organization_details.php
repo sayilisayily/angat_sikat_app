@@ -4,7 +4,7 @@ include 'connection.php';
 if (isset($_POST['organization_id'])) {
     $organization_id = $_POST['organization_id'];
 
-    $query = "SELECT organization_name, organization_logo, organization_members, organization_status FROM organizations WHERE organization_id = ?";
+    $query = "SELECT * FROM organizations WHERE organization_id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $organization_id);
     $stmt->execute();

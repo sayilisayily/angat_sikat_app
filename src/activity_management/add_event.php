@@ -21,6 +21,13 @@ if (empty($_POST['title'])) {
     }
 }
 
+// Validate the plan_id
+if (empty($_POST['plan_id'])) {
+    $errors['plan_id'] = 'Plan ID is required.';
+} else {
+    $plan_id = intval($_POST['plan_id']); // Ensure plan_id is an integer
+}
+
 // Validate other fields
 if (empty($_POST['venue'])) {
     $errors['venue'] = 'Event venue is required.';
@@ -50,8 +57,8 @@ if (!empty($errors)) {
     $type = mysqli_real_escape_string($conn, $_POST['type']);
     $organization_id = $_SESSION['organization_id'];
 
-    $query = "INSERT INTO events (title, event_venue, event_start_date, event_end_date, event_type, event_status, accomplishment_status, organization_id) 
-              VALUES ('$title', '$venue', '$start_date', '$end_date', '$type', 'Pending', 0, $organization_id)";
+    $query = "INSERT INTO events (title, plan_id, event_venue, event_start_date, event_end_date, event_type, event_status, accomplishment_status, organization_id) 
+              VALUES ('$title', $plan_id, '$venue', '$start_date', '$end_date', '$type', 'Pending', 0, $organization_id)";
     
     if (mysqli_query($conn, $query)) {
         $data['success'] = true;

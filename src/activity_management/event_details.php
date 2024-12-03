@@ -146,9 +146,12 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                 <th>Unit</th>
                                 <th>Amount</th>
                                 <?php if ($event['event_type'] === 'Income'): ?>
-                                    <th>Markup</th>
+                                    <th>Profit</th>
                                 <?php endif; ?>
                                 <th>Total Amount</th>
+                                <?php if ($event['event_type'] === 'Income'): ?>
+                                    <th>Total Profit</th>
+                                <?php endif; ?>
                                 <?php if ($event['accomplishment_status'] === 0): ?>
                                     <th>Actions</th>
                                 <?php endif; ?>
@@ -159,18 +162,24 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                             $grand_total = 0; // Initialize the total amount for all items
                             if (!empty($items)) {
                                 foreach ($items as $item) {
-                                    $total_amount = $item['quantity'] * $item['amount'];
-                                    $grand_total += $total_amount; // Add to the grand total
+                                    
+                                    $grand_total += $item['total_amount']; // Add to the grand total
                                     echo "<tr>
                                             <td>{$item['description']}</td>
                                             <td>{$item['quantity']}</td>
                                             <td>{$item['unit']}</td>
-                                            <td>{$item['amount']}</td>
-                                            <td>{$total_amount}</td>";
+                                            <td>{$item['amount']}</td>";
+                                    if ($event['event_type'] === 'Income'){ 
+                                        echo " <td>{$item['profit']}</td>}";
+                                    }
+                                        echo "<td>{$item['total_amount']}</td>";
+                                    if ($event['event_type'] === 'Income'){ 
+                                        echo " <td>{$item['total_profit']}</td>}";
+                                    }
                                     if ($event['accomplishment_status'] === 0) {
                                         echo "<td>
-                                                <button class='btn edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#editItemModal' data-id='{$item['item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
-                                                <button class='btn delete-btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteItemModal' data-id='{$item['item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
+                                                <button class='btn edit-btn btn-primary btn-sm mb-3' data-bs-toggle='modal' data-bs-target='#editItemModal' data-id='{$item['item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
+                                                <button class='btn delete-btn btn-danger btn-sm mb-3' data-bs-toggle='modal' data-bs-target='#deleteItemModal' data-id='{$item['item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
                                             </td>";
                                     }
                                     echo "</tr>";
@@ -220,10 +229,13 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     <th>Amount</th>
                                     <?php
                                     if ($event['event_type'] === 'Income') {
-                                        echo "<th> Markup </th>";
+                                        echo "<th> Profit </th>";
                                     }
                                     ?>
                                     <th>Total Amount</th>
+                                    <?php if ($event['event_type'] === 'Income'): ?>
+                                    <th>Total Profit</th>
+                                    <?php endif; ?>
                                     <th>References</th>
                                     <th>Actions</th>
                                 </tr>
@@ -232,17 +244,23 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                 <?php
                                 if (!empty($summaryItems)) {
                                     foreach ($summaryItems as $item) {
-                                        $total_amount = $item['quantity'] * $item['amount'];
+                                        $total_amount = $item['total_amount'];
                                         echo "<tr>
                                                 <td>{$item['description']}</td>
                                                 <td>{$item['quantity']}</td>
                                                 <td>{$item['unit']}</td>
-                                                <td>{$item['amount']}</td>
-                                                <td>{$total_amount}</td>
-                                                <td>{$item['reference']}</td>
+                                                <td>{$item['amount']}</td>";
+                                                if ($event['event_type'] === 'Income'){ 
+                                                    echo " <td>{$item['profit']}</td>}";
+                                                }
+                                                echo "<td>{$item['total_amount']}</td>";
+                                                if ($event['event_type'] === 'Income'){ 
+                                                    echo " <td>{$item['total_profit']}</td>}";
+                                                }
+                                                echo "<td>{$item['reference']}</td>
                                                 <td>
-                                                    <button class='btn summary-edit-btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#summaryEditItemModal' data-id='{$item['summary_item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
-                                                    <button class='btn summary-delete-btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#summaryDeleteItemModal' data-id='{$item['summary_item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
+                                                    <button class='btn summary-edit-btn btn-primary btn-sm mb-3' data-bs-toggle='modal' data-bs-target='#summaryEditItemModal' data-id='{$item['summary_item_id']}' data-description='{$item['description']}' data-quantity='{$item['quantity']}' data-unit='{$item['unit']}' data-amount='{$item['amount']}'><i class='fa-solid fa-pen'></i> Edit</button>
+                                                    <button class='btn summary-delete-btn btn-danger btn-sm mb-3' data-bs-toggle='modal' data-bs-target='#summaryDeleteItemModal' data-id='{$item['summary_item_id']}'><i class='fa-solid fa-trash'></i> Delete</button>
                                                 </td>
                                             </tr>";
                                     }
@@ -299,7 +317,18 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                                 name="amount" required>
                                         </div>
                                     </div>
-
+                                    <?php if ($event['event_type'] === 'Income') {
+                                        echo "<div class='form-group row mb-2'>
+                                                <div class='col'>
+                                                    <label for='profit'>Profit</label>
+                                                    <input type='number' step='0.01' class='form-control' id='profit' name='profit' required>
+                                                </div>
+                                                <div class='col'>
+                                                </div>
+                                            </div>";
+                                    }
+                                    
+                                    ?>
                                     <!-- Success Message Alert -->
                                     <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
                                         Item added successfully!
@@ -356,7 +385,18 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                                 name="amount" required>
                                         </div>
                                     </div>
-
+                                    <?php if ($event['event_type'] === 'Income') {
+                                        echo "<div class='form-group row mb-2'>
+                                                <div class='col'>
+                                                    <label for='profit'>Profit</label>
+                                                    <input type='number' step='0.01' class='form-control' id='edit_profit' name='profit' required>
+                                                </div>
+                                                <div class='col'>
+                                                </div>
+                                            </div>";
+                                    }
+                                    
+                                    ?>
                                     <!-- Success Message Alert -->
                                     <div id="successMessage2" class="alert alert-success d-none mt-3" role="alert">
                                         Item updated successfully!
@@ -415,7 +455,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                     aria-labelledby="summaryAddItemModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form id="summaryAddItemForm">
+                            <form id="summaryAddItemForm" enctype="multipart/form-data">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="summaryAddItemModalLabel">Add Item</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -458,16 +498,33 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                             <input type="text" class="form-control" id="summary_unit" name="unit"
                                                 required>
                                         </div>
+    
                                         <div class="col">
                                             <label for="summary_amount">Amount</label>
                                             <input type="number" step="0.01" class="form-control" id="summary_amount"
                                                 name="amount" required>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                            <label for="reference">Reference</label>
-                                            <input type="file" class="form-control" id="reference" name="reference" required>
-                                    </div>
+                                    <?php if ($event['event_type'] === 'Expense'){
+                                            echo "<div class='form-group'>
+                                            <label for='reference'>Reference</label>
+                                            <input type='file' class='form-control' id='reference' name='reference' required>
+                                            </div>";
+                                            } else if ($event['event_type'] === 'Income') {
+                                            echo "<div class='form-group row mb-2'>
+                                                    <div class='col'>
+                                                        <label for='profit'>Profit</label>
+                                                        <input type='number' step='0.01' class='form-control' id='summary_profit' name='profit' required>
+                                                    </div>
+                                                    <div class='col'>
+                                                        <label for='reference'>Reference</label>
+                                                        <input type='file' class='form-control' id='reference' name='reference' required>
+                                                    </div>
+                                                </div>";
+                                        }
+                                        
+                                        ?>
+                                    
                                     <div id="successMessage4" class="alert alert-success d-none mt-3"
                                         role="alert">Item added successfully!</div>
                                     <div id="errorMessage4" class="alert alert-danger d-none mt-3" role="alert">
@@ -487,7 +544,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                     aria-labelledby="summaryEditItemModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form id="summaryEditItemForm">
+                            <form id="summaryEditItemForm" enctype="multipart/form-data">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="summaryEditItemModalLabel">Edit Item</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -497,30 +554,45 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     <input type="hidden" id="summary_edit_item_id" name="summary_item_id">
                                     <input type="hidden" id="summary_edit_event_id" name="event_id"
                                         value="<?php echo $event_id; ?>">
-                                    <div class="form-group row mb-2">
-                                        <div class="col">
-                                            <label for="summary_edit_description">Description</label>
-                                            <input type="text" class="form-control" id="summary_edit_description"
-                                                name="description" required>
-                                        </div>
+                                    <div class="form-group mb-2">
+                                        <label for="summary_edit_description">Description</label>
+                                        <input type="text" class="form-control" id="summary_edit_description"
+                                            name="description" required>
+                                    </div>
+                                    <div class="form-group row mb-2">    
                                         <div class="col">
                                             <label for="summary_edit_quantity">Quantity</label>
                                             <input type="number" class="form-control" id="summary_edit_quantity"
                                                 name="quantity" required>
                                         </div>
-                                    </div>
-                                    <div class="form-group row mb-2">
                                         <div class="col">
                                             <label for="summary_edit_unit">Unit</label>
                                             <input type="text" class="form-control" id="summary_edit_unit" name="unit"
                                                 required>
                                         </div>
+                                    </div>
+                                    <div class="form-group <?php if ($event['event_type'] === 'Income') {echo 'row';} ?> mb-2">       
                                         <div class="col">
                                             <label for="summary_edit_amount">Amount</label>
                                             <input type="number" step="0.01" class="form-control"
                                                 id="summary_edit_amount" name="amount" required>
                                         </div>
+                                        <?php if ($event['event_type'] === 'Income') {
+                                        echo "<div class='col'>
+                                                    <label for='profit'>Profit</label>
+                                                    <input type='number' step='0.01' class='form-control' id='summary_edit_profit' name='profit' required>            
+                                            </div>";
+                                    }
+                                    
+                                    ?>
                                     </div>
+                                    
+                                    <div class="form-group">
+                                            <label for="reference">Reference</label>
+                                            <input type="file" class="form-control" id="edit_reference" name="reference">
+                                            <div id="currentAttachment" class="mt-2"></div>
+                                    </div>
+                                    
                                     <div id="successMessage5" class="alert alert-success d-none mt-3"
                                         role="alert">Item updated successfully!</div>
                                     <div id="errorMessage5" class="alert alert-danger d-none mt-3"

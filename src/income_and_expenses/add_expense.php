@@ -1,67 +1,109 @@
-<?php
-include '../connection.php';
+<?php 
+include('../connection.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get inputs from the form
-    $category = $_POST['category'];
-    $title = $_POST['title'];
-    $amount = $_POST['amount'];
-    $organization_id = 1; // Change as needed or fetch from the session
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Handle file upload for the reference
-    $reference = null; // Default value for reference
-    if (isset($_FILES['reference']) && $_FILES['reference']['error'] == 0) {
-        $file = $_FILES['reference'];
-        $uploadDirectory = 'uploads/'; // Adjust path as needed
-        $uploadFile = $uploadDirectory . basename($file['name']);
-        
-        // Validate file upload
-        $fileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
-        $allowedTypes = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'txt'];
+    $errors = [];
+    $data = [];
 
-        if (in_array($fileType, $allowedTypes)) {
-            if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-                $reference = $uploadFile; // Store file path for the database
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Failed to upload file.']);
-                exit;
-            }
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Invalid file type.']);
-            exit;
-        }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'File upload error.']);
+    // Retrieve data from POST
+    $title = isset($_POST['title']) ? trim($_POST['title']) : null;
+    $id = isset($_POST['id']) ? intval($_POST['id']) : null;
+    $amount = isset($_POST['amount']) ? floatval($_POST['amount']) : null;
+
+    // Input Validation
+    if (empty($title)) {
+        $errors[] = 'Title is required.';
+    }
+
+    if (empty($id)) {
+        $errors[] = 'Record ID is required.';
+    }
+
+    if (empty($amount) || $amount <= 0) {
+        $errors[] = 'Valid amount is required.';
+    }
+
+    // Return validation errors
+    if (!empty($errors)) {
+        $data['success'] = false;
+        $data['errors'] = $errors;
+        echo json_encode($data);
         exit;
     }
 
-    // Validate inputs
-    $errors = [];
-    if (empty($category)) {
-        $errors[] = "Category is required.";
-    }
-    if (empty($title)) {
-        $errors[] = "Title is required.";
-    }
-    if (empty($amount) || !is_numeric($amount)) {
-        $errors[] = "Valid amount is required.";
-    }
+    // Determine the category based on the ID
+    $category = null;
 
-    // If no errors, insert the expense entry
-    if (empty($errors)) {
-        $stmt = $conn->prepare("INSERT INTO expenses (category, title, amount, reference, organization_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssdsi", $category, $title, $amount, $reference, $organization_id);
+    // Check in events_summary table
+    $event_query = "SELECT title FROM events_summary WHERE event_id = ?";
+    $stmt = $conn->prepare($event_query);
+    if (!$stmt) {
+        $data['success'] = false;
+        $data['errors'] = ['database' => 'Failed to prepare statement for events_summary.'];
+        echo json_encode($data);
+        exit;
+    }
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        $category = 'Activities';
+    }
+    $stmt->close();
 
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Expense added successfully!']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to add expense.']);
+    // Check in purchases_summary table if not found
+    if (!$category) {
+        $purchase_query = "SELECT title FROM purchases_summary WHERE purchase_id = ?";
+        $stmt = $conn->prepare($purchase_query);
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $category = 'Purchases';
         }
         $stmt->close();
-    } else {
-        echo json_encode(['success' => false, 'errors' => $errors]);
     }
-}
 
-$conn->close();
+    // Check in maintenance_summary table if not found
+    if (!$category) {
+        $maintenance_query = "SELECT title FROM maintenance_summary WHERE maintenance_id = ?";
+        $stmt = $conn->prepare($maintenance_query);
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $category = 'Maintenance';
+        }
+        $stmt->close();
+    }
+
+    // Handle the case where no category is found
+    if (empty($category)) {
+        $errors['category'] = 'Event title not found in any category.';
+    } else {
+        // Insert the new expense record
+        $query = "INSERT INTO expenses (category, title, amount) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        if (!$stmt) {
+            $data['success'] = false;
+            $data['errors'] = ['database' => 'Failed to prepare insert statement.'];
+            echo json_encode($data);
+            exit;
+        }
+        $stmt->bind_param('ssd', $category, $title, $amount);
+
+        if ($stmt->execute()) {
+            $data['success'] = true;
+            $data['message'] = 'Expense added successfully!';
+        } else {
+            $data['success'] = false;
+            $data['errors'] = ['database' => 'Failed to add the expense to the database.'];
+        }
+        $stmt->close();
+    }
+
+    // Return the response
+    echo json_encode($data);
+}
 ?>

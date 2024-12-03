@@ -21,26 +21,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($data);
         exit;
     } else {
-        // Prepare the SQL query using a prepared statement
-        $query = "DELETE FROM event_items WHERE item_id = ?";
-        $stmt = $conn->prepare($query);
+        try {
+            // Start a transaction
+            $conn->begin_transaction();
 
-        if ($stmt) {
-            // Bind parameters and execute the query
-            $stmt->bind_param('i', $item_id);
+            // Prepare the SQL query to get the item details
+            $query = "SELECT event_id, quantity, amount, profit, total_amount FROM event_items WHERE item_id = ?";
+            $stmt = $conn->prepare($query);
 
-            if ($stmt->execute()) {
-                $data['success'] = true;
-                $data['message'] = 'Item deleted successfully!';
-            } else {
-                $data['success'] = false;
-                $data['errors'] = ['database' => 'Failed to delete item from the database.'];
+            if (!$stmt) {
+                throw new Exception('Failed to prepare query to retrieve item details.');
             }
 
+            $stmt->bind_param('i', $item_id);
+            $stmt->execute();
+            $stmt->bind_result($event_id, $quantity, $amount, $profit, $item_total);
+            $stmt->fetch();
             $stmt->close();
-        } else {
+
+            // Retrieve event type
+            $stmt = $conn->prepare("SELECT event_type FROM events WHERE event_id = ?");
+            $stmt->bind_param("i", $event_id);
+            $stmt->execute();
+            $stmt->bind_result($event_type);
+            $stmt->fetch();
+            $stmt->close();
+
+            if (empty($event_type)) {
+                throw new Exception('Event not found for this item.');
+            }
+
+            // Delete the item from the event_items table
+            $stmt = $conn->prepare("DELETE FROM event_items WHERE item_id = ?");
+            $stmt->bind_param('i', $item_id);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to delete item from the database.');
+            }
+            $stmt->close();
+
+            // Adjust total amounts
+            $new_total_amount = -$item_total; // Subtract item total from event total
+
+            // Update total_amount in the events table
+            $stmt = $conn->prepare("UPDATE events SET total_amount = total_amount + ? WHERE event_id = ?");
+            $stmt->bind_param("di", $new_total_amount, $event_id);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to update event total after deletion.');
+            }
+            $stmt->close();
+
+            // Adjust total profit only for income events
+            if ($event_type === 'Income') {
+                $new_total_profit = -($quantity * $profit); // Subtract the total profit of the item
+                $stmt = $conn->prepare("UPDATE events SET total_profit = total_profit + ? WHERE event_id = ?");
+                $stmt->bind_param("di", $new_total_profit, $event_id);
+                if (!$stmt->execute()) {
+                    throw new Exception('Failed to update event profit after deletion.');
+                }
+                $stmt->close();
+            }
+
+            // Commit transaction
+            $conn->commit();
+
+            $data['success'] = true;
+            $data['message'] = 'Item deleted successfully.';
+        } catch (Exception $e) {
+            // Rollback transaction if any error occurs
+            $conn->rollback();
             $data['success'] = false;
-            $data['errors'] = ['database' => 'Failed to prepare the delete statement.'];
+            $data['errors'] = ['database' => $e->getMessage()];
         }
     }
 }

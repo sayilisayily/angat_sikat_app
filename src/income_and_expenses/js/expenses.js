@@ -10,14 +10,38 @@ $(document).ready(function() {
     });
 });
 
+// Add an event listener to the title selector dropdown
+document.getElementById("title").addEventListener("change", function () {
+    const selectedOption = this.options[this.selectedIndex];
+
+    if (selectedOption && selectedOption.value) {
+        // Extract data from the selected option
+        const id = selectedOption.getAttribute("data-id") || "";
+        const amount = selectedOption.getAttribute("data-amount") || "";
+
+        // Populate the modal fields
+        document.getElementById("id").value = id;
+        document.getElementById("amount").value = amount;
+    } else {
+        // Clear the fields if no title is selected
+        document.getElementById("id").value = "";
+        document.getElementById("amount").value = "";
+    }
+});
+
 // Handle Add Expense Form Submission
 $('#addExpenseForm').on('submit', function(event) {
-    event.preventDefault(); 
+    event.preventDefault();
+
+    // Create a new FormData object from the form
+    var formData = new FormData(this);
 
     $.ajax({
         url: 'add_expense.php',
         type: 'POST',
-        data: $(this).serialize(), // Required for FormData
+        data: formData, // Send the FormData object
+        processData: false, // Prevent jQuery from processing the data
+        contentType: false, // Prevent jQuery from setting the content-type header (FormData handles it)
         success: function(response) {
             try {
                 // Parse the JSON response (in case it's returned as a string)
@@ -64,6 +88,7 @@ $('#addExpenseForm').on('submit', function(event) {
         }
     });
 });
+
 
 $('.edit-btn').on('click', function() {
       var expenseId = $(this).data('id'); // Get expense_id from the button

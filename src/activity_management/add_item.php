@@ -11,139 +11,120 @@ if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST[
     $quantity = intval($_POST['quantity']);
     $unit = trim($_POST['unit']);
     $amount = floatval($_POST['amount']);
-    
-    // Check for validation errors
+    $profit = isset($_POST['profit']) ? floatval($_POST['profit']) : 0;
+
+    // Validation checks
     if (empty($description)) {
-        $response['errors']['description'] = 'Description is required';
+        $response['errors']['description'] = 'Description is required.';
     }
     if ($quantity <= 0) {
-        $response['errors']['quantity'] = 'Quantity must be greater than zero';
+        $response['errors']['quantity'] = 'Quantity must be greater than zero.';
     }
     if (empty($unit)) {
-        $response['errors']['unit'] = 'Unit is required';
+        $response['errors']['unit'] = 'Unit is required.';
     }
     if ($amount <= 0) {
-        $response['errors']['amount'] = 'Amount must be greater than zero';
+        $response['errors']['amount'] = 'Amount must be greater than zero.';
     }
 
     // If there are no validation errors
     if (empty($response['errors'])) {
-        // Check for duplicate descriptions
-        $stmt = $conn->prepare("SELECT COUNT(*) FROM event_items WHERE event_id = ? AND description = ?");
-        $stmt->bind_param("is", $event_id, $description);
-        if (!$stmt->execute()) {
-            $response['errors']['database'] = 'Failed to check for duplicate descriptions: ' . $stmt->error;
-        } else {
-            $stmt->bind_result($count);
+        // Start a transaction to ensure atomicity
+        $conn->begin_transaction();
+
+        try {
+            // Check for duplicate description
+            $stmt = $conn->prepare("SELECT 1 FROM event_items WHERE event_id = ? AND description = ?");
+            $stmt->bind_param("is", $event_id, $description);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                throw new Exception('An item with this description already exists for this event.');
+            }
+            $stmt->close();
+
+            // Retrieve event type and plan_id from the events table
+            $stmt = $conn->prepare("SELECT event_type, plan_id FROM events WHERE event_id = ?");
+            $stmt->bind_param("i", $event_id);
+            $stmt->execute();
+            $stmt->bind_result($event_type, $plan_id);
             $stmt->fetch();
             $stmt->close();
 
-            if ($count > 0) {
-                $response['errors']['description'] = 'An item with the same description already exists for this event';
+            if (empty($event_type) || empty($plan_id)) {
+                throw new Exception('Event not found or plan_id is missing.');
             }
-        }
 
-        if (empty($response['errors'])) {
-            // Start a transaction to ensure atomicity
-            $conn->begin_transaction();
-            
-            try {
-                // Retrieve the event title based on the event_id to get the corresponding title in the financial plan
-                $stmt = $conn->prepare("SELECT title FROM events WHERE event_id = ?");
-                $stmt->bind_param("i", $event_id);
-                if (!$stmt->execute()) {
-                    throw new Exception('Failed to fetch event title: ' . $stmt->error);
-                }
-                $stmt->bind_result($event_title);
-                $stmt->fetch();
-                $stmt->close();
+            // Fetch allocated budget from the financial plan table using plan_id
+            $stmt = $conn->prepare("SELECT amount FROM financial_plan WHERE plan_id = ?");
+            $stmt->bind_param("i", $plan_id);
+            $stmt->execute();
+            $stmt->bind_result($allocated_budget);
+            $stmt->fetch();
+            $stmt->close();
 
-                // If no event title is found, return an error
-                if (empty($event_title)) {
-                    throw new Exception('Event title not found for this event_id');
-                }
-
-                // Retrieve the allocated budget for the event based on its title in the financial plan table
-                $stmt = $conn->prepare("SELECT amount FROM financial_plan WHERE title = ?");
-                $stmt->bind_param("s", $event_title);
-                if (!$stmt->execute()) {
-                    throw new Exception('Failed to fetch allocated budget: ' . $stmt->error);
-                }
-                $stmt->bind_result($allocated_budget);
-                $stmt->fetch();
-                $stmt->close();
-
-                // If no allocated budget is found, return an error
-                if ($allocated_budget === null) {
-                    throw new Exception('No allocated budget found for this event');
-                }
-
-                // Now, retrieve the current total amount of event items
-                $stmt = $conn->prepare("SELECT SUM(amount * quantity) AS total_items_amount FROM event_items WHERE event_id = ?");
-                $stmt->bind_param("i", $event_id);
-                if (!$stmt->execute()) {
-                    throw new Exception('Failed to fetch current total amount: ' . $stmt->error);
-                }
-                $stmt->bind_result($current_total_amount);
-                $stmt->fetch();
-                $stmt->close();
-
-                // If there is no total amount (in case of no items), initialize it to 0
-                if ($current_total_amount === null) {
-                    $current_total_amount = 0;
-                }
-
-                // Calculate the new total amount after adding this item
-                $new_total_amount = $current_total_amount + ($quantity * $amount);
-
-                // Check if the new total amount exceeds the allocated budget
-                if ($new_total_amount > $allocated_budget) {
-                    $response['errors']['budget'] = 'The total amount of items exceeds the allocated budget for this event';
-                } else {
-                    // Prepare the SQL statement to insert the event item
-                    $stmt = $conn->prepare("INSERT INTO event_items (event_id, description, quantity, unit, amount) VALUES (?, ?, ?, ?, ?)");
-                    if ($stmt === false) {
-                        throw new Exception('Prepare failed: ' . $conn->error);
-                    }
-
-                    // Bind the parameters
-                    $stmt->bind_param("isisi", $event_id, $description, $quantity, $unit, $amount);
-
-                    // Execute the query to insert the new item
-                    if (!$stmt->execute()) {
-                        throw new Exception('Failed to add item: ' . $stmt->error);
-                    }
-
-                    // Close the statement after insertion
-                    $stmt->close();
-
-                    // Update the event's total amount
-                    $stmt = $conn->prepare("UPDATE events SET total_amount = ? WHERE event_id = ?");
-                    $stmt->bind_param("di", $new_total_amount, $event_id);
-                    if (!$stmt->execute()) {
-                        throw new Exception('Failed to update event total amount: ' . $stmt->error);
-                    }
-
-                    // Close the update statement
-                    $stmt->close();
-
-                    // Commit the transaction
-                    $conn->commit();
-
-                    // Return success response
-                    $response['success'] = true;
-                }
-            } catch (Exception $e) {
-                // Rollback transaction if any error occurs
-                $conn->rollback();
-
-                // Return error response
-                $response['errors']['database'] = $e->getMessage();
+            if (empty($allocated_budget)) {
+                throw new Exception('Allocated budget not found for the given plan_id.');
             }
+
+            // Calculate total amount for the new item
+            $item_total = ($event_type === 'Income') 
+                ? $quantity * ($amount + $profit) // Total amount = quantity * (amount + profit)
+                : $quantity * $amount; // For expense events, total amount = quantity * amount
+
+            // Calculate total profit for income events (quantity * profit)
+            $total_profit = ($event_type === 'Income') ? $quantity * $profit : 0;
+
+            // Calculate current total expense or income
+            $stmt = $conn->prepare("SELECT COALESCE(SUM(total_amount), 0) AS current_total, COALESCE(SUM(total_profit), 0) AS current_profit FROM event_items WHERE event_id = ?");
+            $stmt->bind_param("i", $event_id);
+            $stmt->execute();
+            $stmt->bind_result($current_total, $current_profit);
+            $stmt->fetch();
+            $stmt->close();
+
+            // Check for budget overruns for expense events
+            if ($event_type === 'Expense' && ($current_total + $item_total) > $allocated_budget) {
+                throw new Exception('Adding this item exceeds the allocated budget for the event.');
+            }
+
+            // Insert the new item
+            $stmt = $conn->prepare("INSERT INTO event_items (event_id, description, quantity, unit, amount, profit, total_amount, total_profit) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("isisiddd", $event_id, $description, $quantity, $unit, $amount, $profit, $item_total, $total_profit);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to add item: ' . $stmt->error);
+            }
+            $stmt->close();
+
+            // Update the total amount in the events table
+            if ($event_type === 'Expense') {
+                $new_total_amount = $current_total + $item_total;
+                $new_total_profit = 0;
+            } else if ($event_type === 'Income') {
+                $new_total_amount = $current_total + $item_total;
+                $new_total_profit = $current_profit + $total_profit;
+            }
+
+            // Update total_amount and total_profit in the events table
+            $stmt = $conn->prepare("UPDATE events SET total_amount = ?, total_profit = ? WHERE event_id = ?");
+            $stmt->bind_param("ddi", $new_total_amount, $new_total_profit, $event_id);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to update event totals: ' . $stmt->error);
+            }
+            $stmt->close();
+
+            // Commit the transaction
+            $conn->commit();
+            $response['success'] = true;
+
+        } catch (Exception $e) {
+            // Rollback transaction if any error occurs
+            $conn->rollback();
+            $response['errors']['database'] = $e->getMessage();
         }
     }
 } else {
-    $response['errors']['form'] = 'Required fields are missing';
+    $response['errors']['form'] = 'Required fields are missing.';
 }
 
 // Return the response in JSON format
