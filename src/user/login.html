@@ -10,6 +10,68 @@
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
 
   <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      /* Full viewport height */
+      position: relative;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      /* Add a default font */
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('../user/CCAT-Campus-Scaled.jpg');
+      /* Replace with your image path */
+      background-size: cover;
+      /* Cover the entire area */
+      background-position: center;
+      /* Center the image */
+      filter: blur(8px);
+      /* Adjust the blur effect */
+      z-index: 1;
+      /* Behind the content */
+    }
+
+    .page-wrapper {
+      position: relative;
+      z-index: 2;
+      /* On top of the background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Style for the form container */
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.9);
+      /* Semi-transparent white */
+      max-width: 850px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      z-index: 2;
+      /* Ensure the form is above the background */
+      display: flex;
+      /* Use flexbox for layout */
+      flex-direction: row;
+      /* Horizontal layout */
+    }
+
+    .form-section {
+      flex: 1;
+      /* Allow the form section to take available space */
+      padding: 20px;
+      /* Padding around the form section */
+    }
+
     /* Style for the checkbox */
     .form-check-input.primary {
       background-color: #00542F;
@@ -21,6 +83,22 @@
       background-color: #00542F;
       border-color: #00542F;
     }
+
+    /* Style for the password input group */
+    .input-group.password-input {
+      position: relative;
+    }
+
+    .input-group.password-input .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #00542F;
+      font-size: 1.5rem;
+      /* Increase the font size for the icon */
+    }
   </style>
 </head>
 
@@ -28,73 +106,82 @@
   <!-- Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
-    <div
-      class="position-relative overflow-hidden text-bg-light min-vh-100 d-flex align-items-center justify-content-center">
-      <div class="container d-flex align-items-center justify-content-center" style="max-width: 900px;">
 
-        <!-- Combined Container for Form and Image with White Background -->
-        <div class="row w-100 shadow-lg p-4 rounded d-flex align-items-stretch"
-          style="background-color: white; max-width: 850px;">
+    <div class="container d-flex align-items-center justify-content-center" style="max-width: 900px;">
+      <!-- Combined Container for Form -->
+      <div class="form-container shadow-lg rounded">
 
-          <!-- Login Form Section -->
-          <div class="col-md-6 d-flex flex-column justify-content-center p-4">
-            <a href="" class="text-center d-block py-3 w-100"
-              style="display: flex; flex-direction: column; align-items: center;">
-              <img src="angat sikat.png" alt="Logo" width="70" height="70">
-              <span style="font-weight: bold; font-size: 20px; display: block; text-align: center;">ANGATSIKAT</span>
-            </a>
-            <p class="text-center mb-4" style="color: #6c757d; font-size: 0.9rem;">Budget and Expense Tracker for
-              Organization in CVSU CCAT CAMPUS</p>
+        <!-- Login Form Section -->
+        <div class="form-section">
+          <a href="" class="text-center d-block py-3 w-100"
+            style="display: flex; flex-direction: column; align-items: center;">
+            <img src="angat sikat.png" alt="Logo" width="70" height="70">
+            <span style="font-weight: bold; font-size: 20px; display: block; text-align: center;">ANGATSIKAT</span>
+          </a>
+          <p class="text-center mb-4" style="color: #6c757d; font-size: 0.9rem;">Budget and Expense Tracker for
+            Organization in CVSU CCAT CAMPUS</p>
 
-
-            <!-- Form with ID, action, and method -->
-            <form id="loginForm" action="login.php" method="post">
-              <div class="mb-3 input-group">
-                <span class="input-group-text"><i class='bx bx-user'></i></span>
-                <input type="email" name="email" id="email" class="form-control" placeholder="Email" required>
-              </div>
-              <div class="mb-4 input-group">
-                <span class="input-group-text"><i class='bx bx-lock'></i></span>
-                <input type="password" class="form-control" name="password" placeholder="Password">
-              </div>
-              <div class="d-flex align-items-center justify-content-between mb-4">
-                <div class="form-check">
-                  <input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked">
-                  <label class="form-check-label" for="flexCheckChecked" style="color: #00542F;">Remember Me</label>
-                </div>
-                <a class="fw-bold" href="forgot.php" style="color: #00542F;">Forgot Password?</a>
-              </div>
-              <button type="submit" class="btn w-100 mb-4"
-                style="background-color: #3E7044; color: white; width: 100%; padding: 10px; border-radius: 8px;">Sign
-                In</button>
-
-              <!-- Adjusted Account Creation Link -->
-              <div class="text-center d-flex justify-content-center align-items-center">
-                <p class="mb-0 fw-normal text-muted" style="font-size: 0.8rem; margin-right: 5px;">Don't have an
-                  account?</p>
-                <a class="fw-bold" href="./register.php" style="color: #00542F;">Create an account</a>
-              </div>
-            </form>
-          </div>
-
-          <!-- Image Section -->
-          <div class="col-md-6 d-none d-md-block p-4">
-            <div class="image-container" style="height: 100%; display: flex; align-items: center;">
-              <img src="login.jpg" alt="Login Illustration" class="img-fluid rounded"
-                style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+          <!-- Form with ID, action, and method -->
+          <form id="loginForm" action="login.php" method="post">
+            <div class="mb-3 input-group">
+              <span class="input-group-text"><i class='bx bx-user'></i></span>
+              <input type="email" name="email" id="email" class="form-control" placeholder="Email" required>
             </div>
-          </div>
+            <div class="mb-4 input-group password-input">
+              <span class="input-group-text"><i class='bx bx-lock'></i></span>
+              <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+              <i class='bx bx-show toggle-password' id="togglePassword"></i>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <div class="form-check">
+                <input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked">
+                <label class="form-check-label" for="flexCheckChecked" style="color: #00542F;">Remember Me</label>
+              </div>
+              <a class="fw-bold" href="forgot.php" style="color: #00542F;">Forgot Password?</a>
+            </div>
+            <button type="submit" class="btn w-100 mb-4"
+              style="background-color: #3E7044; color: white; width: 100%; padding: 10px; border-radius: 8px;">Sign
+              In</button>
 
+            <div class="text-center d-flex justify-content-center align-items-center">
+              <p class="mb-0 fw-normal text-muted" style="font-size: 0.8rem; margin-right: 5px;">Don't have an
+                account?</p>
+              <a class="fw-bold" href="./register.php" style="color: #00542F;">Create an account</a>
+            </div>
+          </form>
         </div>
+
+        <!-- Image Section -->
+        <div class="col-md-6 d-none d-md-block">
+          <div class="image-container" style="height: 100%; display: flex; align-items: center;">
+            <img src="login.jpg" alt="Login Illustration" class="img-fluid rounded"
+              style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
-
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+  <script>
+    // JavaScript to toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const passwordField = document.getElementById('password');
+      const toggleIcon = this;
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.classList.remove('bx-show');
+        toggleIcon.classList.add('bx-hide');
+      } else {
+        passwordField.type = 'password';
+        toggleIcon.classList.remove('bx-hide');
+        toggleIcon.classList.add('bx-show');
+      }
+    });
+  </script>
 </body>
 
 </html>
