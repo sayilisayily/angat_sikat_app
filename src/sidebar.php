@@ -15,7 +15,7 @@
                 <span class="logo-text">ANGATSIKAT</span>
                 </div>
                 <!-- Sidebar navigation -->
-                <nav class="sidebar-nav">
+                <nav class="sidebar-nav mx-4">
                     <ul id="sidebarnav">
                         <li class="sidebar-item">
                         <a class="sidebar-link" href="../dashboard/officer_dashboard.php" aria-expanded="false" data-tooltip="Dashboard">
@@ -29,11 +29,11 @@
                             <span class="hide-menu">Budget</span>
                         </a>
                         <div class="submenu">
-                            <a href="../budget_management/budget_overview.php">› Overview </a>
-                            <a href="../budget_management/financial_plan.php">› Plan </a>
-                            <a href="#purchases">› Purchases</a>
-                            <a href="#moe">› MOE</a>
-                            <a href="../budget_management/budget_approval_table.php">› Approval</a>
+                            <a href="../budget_management/budget_overview.php"> Overview </a>
+                            <a href="../budget_management/financial_plan.php"> Plan </a>
+                            <a href="../budget_management/purchases/purchases.php"> Purchases</a>
+                            <a href="../budget_management/maintenance/maintenance.php"> MOE</a>
+                            <a href="../budget_management/budget_approval_table.php"> Approval</a>
                         </div>
                         </li>
                         <li class="sidebar-item">
