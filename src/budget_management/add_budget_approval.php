@@ -62,7 +62,7 @@ if (!empty($errors)) {
         $event_result = mysqli_query($conn, $event_query);
         
         if (mysqli_num_rows($event_result) > 0) {
-            $category = 'Events';
+            $category = 'Activities';
         }
     
         // Check in purchases table

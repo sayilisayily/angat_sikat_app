@@ -302,35 +302,42 @@ include '../user_query.php';
 
                             <form id="addBudgetApprovalForm" enctype="multipart/form-data">
                                 <div class="form-group">
+                                    <input type="hidden" name="id" id="id">
                                     <label for="title">Title</label>
-                                    <select name="title" class="form-control" required>
+                                    <select name="title" id="title" class="form-control" required>
                                         <option value="">Select Title</option>
                                         <!-- Fetch titles from events, purchases, and maintenance -->
                                         <?php
                                         // Fetch events
-                                        $event_query = "SELECT title FROM events where archived = 0 and organization_id = $organization_id";
+                                        $event_query = "SELECT title, event_id FROM events where archived = 0 and organization_id = $organization_id";
                                         $event_result = mysqli_query($conn, $event_query);
                                         echo "<optgroup label='Events'>";
                                         while ($row = mysqli_fetch_assoc($event_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . "</option>";
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['event_id']) .'">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
                                         }
                                         echo "</optgroup>";
         
                                         // Fetch purchases
-                                        $purchase_query = "SELECT title FROM purchases where archived = 0 and organization_id = $organization_id";
+                                        $purchase_query = "SELECT title, purchase_id FROM purchases where archived = 0 and organization_id = $organization_id";
                                         $purchase_result = mysqli_query($conn, $purchase_query);
                                         echo "<optgroup label='Purchases'>";
                                         while ($row = mysqli_fetch_assoc($purchase_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . " </option>";
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['purchase_id']) .'">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
                                         }
                                         echo "</optgroup>";
         
                                         // Fetch maintenance
-                                        $maintenance_query = "SELECT title FROM maintenance where archived = 0 and organization_id = $organization_id";
+                                        $maintenance_query = "SELECT title, maintenance_id FROM maintenance where archived = 0 and organization_id = $organization_id";
                                         $maintenance_result = mysqli_query($conn, $maintenance_query);
                                         echo "<optgroup label='Mainteance and Other Expenses'>";
                                         while ($row = mysqli_fetch_assoc($maintenance_result)) {
-                                            echo "<option value='" . $row['title'] . "'>" . $row['title'] . " </option>";
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['maintenance_id']) .'">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
                                         }
                                         echo "</optgroup>";
                                         ?>
@@ -370,7 +377,7 @@ include '../user_query.php';
 
                             <form id="editBudgetApprovalForm" enctype="multipart/form-data">
                                 <input type="hidden" name="approval_id" id="editApprovalId">
-
+                                
                                 <div class="form-group">
                                     <label for="editTitle">Title</label>
                                     <input name="title" class="form-control" id="editTitle" readonly>
