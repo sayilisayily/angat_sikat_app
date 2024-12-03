@@ -61,41 +61,41 @@
 <body>
     <!-- Overall Body Wrapper -->
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-        data-sidebar-position="fixed" data-header-position="fixed">
-        <!-- Sidebar Start -->
-        <aside class="left-sidebar" id="sidebar">
-            <div class="top-bar">
-                <div id="toggleSidebar" class="burger-icon">
+    data-sidebar-position="fixed" data-header-position="fixed">
+    
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar" id="sidebar">
+        <div class="top-bar">
+            <div id="toggleSidebar" class="burger-icon">
                 <i class="bx bx-menu"></i>
-                </div>
             </div>
-            <!-- Sidebar scroll -->
-            <div>
-                <!-- Brand Logo -->
-                <div class="brand-logo logo-container">
+        </div>
+        <!-- Sidebar scroll -->
+        <div>
+            <!-- Brand Logo -->
+            <div class="brand-logo logo-container">
                 <a href="../html/officer_dashboard.html" class="logo-img">
                     <img src="angat sikat.png" alt="Angat Sikat Logo" class="sidebar-logo">
                 </a>
                 <span class="logo-text">ANGATSIKAT</span>
-                </div>
-                <!-- Sidebar navigation -->
-                <nav class="sidebar-nav">
-                    <ul id="sidebarnav">
-                        <li class="sidebar-item">
+            </div>
+            <!-- Sidebar navigation -->
+            <nav class="sidebar-nav">
+                <ul id="sidebarnav">
+                    <li class="sidebar-item">
                         <a class="sidebar-link" href="../dashboard/officer_dashboard.php" aria-expanded="false" data-tooltip="Dashboard">
                             <i class="bx bxs-dashboard"></i>
                             <span class="hide-menu">Dashboard</span>
                         </a>
-                        </li>
-                        <li class="sidebar-item">
-                        <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false"
-                            data-tooltip="Manage Events">
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false" data-tooltip="Manage Events">
                             <i class="bx bx-calendar"></i>
                             <span class="hide-menu">Manage Events</span>
                         </a>
-                        </li>
-                        <li class="sidebar-item">
-                        <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget">
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget" onclick="toggleSidebar();">
                             <i class="bx bx-wallet"></i>
                             <span class="hide-menu">Budget</span>
                         </a>
@@ -105,14 +105,14 @@
                             <a href="#moe">› MOE</a>
                             <a href="../budget_management/budget_approval_table.php">› Approval</a>
                         </div>
-                        </li>
-                        <li class="sidebar-item">
+                    </li>
+                    <li class="sidebar-item">
                         <a class="sidebar-link" href="#transactions" aria-expanded="false" data-tooltip="Transactions">
                             <i class="bx bx-dollar-circle"></i>
                             <span class="hide-menu">Transactions</span>
                         </a>
-                        </li>
-                        <li class="sidebar-item">
+                    </li>
+                    <li class="sidebar-item">
                         <a class="sidebar-link" aria-expanded="false" data-tooltip="Income & Expenses">
                             <i class="bx bx-chart"></i>
                             <span class="hide-menu">Income & Expenses</span>
@@ -121,51 +121,99 @@
                             <a href="#income">› Income</a>
                             <a href="../income_and_expenses/expenses.php">› Expenses</a>
                         </div>
-                        </li>
-                        <li class="sidebar-item">
+                    </li>
+                    <li class="sidebar-item">
                         <a class="sidebar-link" href="reports.php" aria-expanded="false" data-tooltip="Reports">
                             <i class="bx bx-file"></i>
                             <span class="hide-menu">Reports</span>
                         </a>
-                        </li>
-                        <li class="sidebar-item profile-container">
+                    </li>
+                    <li class="sidebar-item profile-container">
                         <a class="sidebar-link" href="../user/profile.html" aria-expanded="false" data-tooltip="Profile">
                             <div class="profile-pic-border">
-                            <img src="byte.png" alt="Profile Picture" class="profile-pic" />
+                                <img src="byte.png" alt="Profile Picture" class="profile-pic" />
                             </div>
                             <span class="profile-name">BYTE</span>
                         </a>
-                        </li>
-                    </ul>
-                </nav>
-                <!-- End Sidebar navigation -->
-            </div>
-            <!-- End Sidebar scroll-->
-        </aside>
-        <!-- Sidebar End -->
+                    </li>
+                </ul>
+            </nav>
+            <!-- End Sidebar navigation -->
+        </div>
+        <!-- End Sidebar scroll-->
+    </aside>
+    <!-- Sidebar End -->
 
-        <!-- JavaScript to toggle submenu visibility -->
-        <script>
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.addEventListener('click', function () {
-                    // Toggle the submenu for the clicked item
-                    this.classList.toggle('show-submenu');
+    <!-- JavaScript to toggle submenu and sidebar visibility -->
+    <script>
+        // Toggle sidebar with burger icon
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            toggleSidebar();
+        });
 
-                    // Close other submenus
-                    document.querySelectorAll('.sidebar-item').forEach(otherItem => {
-                        if (otherItem !== this) {
-                        otherItem.classList.remove('show-submenu');
-                        }
-                    });
-                });
-            });
-        </script>
+        // Toggle sidebar and main wrapper
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainWrapper = document.getElementById('main-wrapper');
 
-        <!-- JavaScript to toggle the sidebar -->
-        <script>
-            document.getElementById('toggleSidebar').addEventListener('click', function () { document.getElementById('sidebar').classList.toggle('collapsed'); });
-        </script>
+            // Toggle classes for sidebar and main content
+            sidebar.classList.toggle('collapsed');
+            mainWrapper.classList.toggle('expanded');
+        }
+    </script>
 
+    <style>
+        /* Sidebar initial styles */
+        .left-sidebar {
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #00542F;
+            overflow: hidden; /* Hide content if collapsed */
+            transition: width 0.3s ease-in-out;
+        }
+
+        /* Collapsed sidebar */
+        .left-sidebar.collapsed {
+            width: 70px; /* Set a smaller width for the collapsed state */
+        }
+
+        /* Main wrapper styles */
+        #main-wrapper {
+            margin-left: 250px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        /* Adjust main wrapper when sidebar is collapsed */
+        #main-wrapper.expanded {
+            margin-left: 70px; /* Align with collapsed sidebar width */
+        }
+
+        /* Optional: Hide text in collapsed state */
+        .left-sidebar.collapsed .hide-menu {
+            display: none;
+        }
+
+        /* Submenu styles */
+        .submenu {
+            display: none; /* Hide submenu by default */
+            padding-left: 20px; /* Indentation */
+            background-color: #006f4e; /* Optional background color */
+        }
+
+        .sidebar-item.show-submenu .submenu {
+            display: block; /* Show submenu when parent is active */
+        }
+
+        /* Optional: Center icons in the collapsed sidebar */
+        .left-sidebar.collapsed i {
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</div>
         <!--  2nd Body wrapper -->
         <div class="body-wrapper">
             <!-- Header Start -->
