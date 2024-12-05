@@ -24,6 +24,13 @@
                         </a>
                         </li>
                         <li class="sidebar-item">
+                        <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false"
+                            data-tooltip="Manage Events">
+                            <i class="bx bx-calendar"></i>
+                            <span class="hide-menu">Manage Events</span>
+                        </a>
+                        </li>
+                        <li class="sidebar-item">
                         <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget">
                             <i class="bx bx-wallet"></i>
                             <span class="hide-menu">Budget</span>
@@ -37,13 +44,6 @@
                         </div>
                         </li>
                         <li class="sidebar-item">
-                        <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false"
-                            data-tooltip="Manage Events">
-                            <i class="bx bx-calendar"></i>
-                            <span class="hide-menu">Manage Events</span>
-                        </a>
-                        </li>
-                        <li class="sidebar-item">
                         <a class="sidebar-link" href="#transactions" aria-expanded="false" data-tooltip="Transactions">
                             <i class="bx bx-dollar-circle"></i>
                             <span class="hide-menu">Transactions</span>
@@ -55,8 +55,8 @@
                             <span class="hide-menu">Income & Expenses</span>
                         </a>
                         <div class="submenu">
-                            <a href="#income">› Income</a>
-                            <a href="../income_and_expenses/expenses.php">› Expenses</a>
+                            <a href="#income"> Income</a>
+                            <a href="../income_and_expenses/expenses.php"> Expenses</a>
                         </div>
                         </li>
                         <li class="sidebar-item">

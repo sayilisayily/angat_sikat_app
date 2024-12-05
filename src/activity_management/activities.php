@@ -57,11 +57,9 @@ $result = $conn->query($sql);
     <?php include '../navbar.php';?>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
         data-sidebar-position="fixed" data-header-position="fixed">
-      <?php include '../sidebar.php'; ?>
-
+        <?php include '../sidebar.php'; ?>
         <?php include '../navbar.php';?>
-    </div>
-    <!-- End of Overall Body Wrapper -->
+    
 
     
     <div class="container mt-5 p-5">
