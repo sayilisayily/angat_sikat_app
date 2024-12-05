@@ -67,7 +67,7 @@
                 <li class="sidebar-item profile-container">
                     <a class="sidebar-link" href="../user/profile.html" aria-expanded="false" data-tooltip="Profile">
                         <div class="profile-pic-border">
-                            <img src="<?php echo !empty($profile_picture) ? '../user/uploads/' . htmlspecialchars($profile_picture) : '../user/uploads/default.png'; ?>" alt="Profile Picture" class="profile-pic" />
+                            <img src="<?php echo !empty($profile_picture) ? '../user/uploads/' . htmlspecialchars($profile_picture) : './user/uploads/default.png'; ?>" alt="Profile Picture" class="profile-pic" />
                         </div>
                         <span class="profile-name"><?php echo htmlspecialchars($user['first_name']) . ' ' . htmlspecialchars($user['last_name']); ?></span>
                     </a>
