@@ -59,7 +59,7 @@
                     </div>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="reports.php" aria-expanded="false" data-tooltip="Reports">
+                    <a class="sidebar-link" href="#reports.php" aria-expanded="false" data-tooltip="Reports">
                         <i class="bx bx-file"></i>
                         <span class="hide-menu">Reports</span>
                     </a>
@@ -83,6 +83,22 @@
     document.querySelectorAll('.sidebar-item > .sidebar-link').forEach(item => {
         item.addEventListener('click', function (e) {
             const submenu = this.nextElementSibling; // Get the submenu if it exists
+            const sidebar = document.getElementById('sidebar'); // Reference to sidebar
+
+            // Check if the clicked link is "Budget"
+            if (this.textContent.includes('Budget') && sidebar.classList.contains('collapsed')) {
+                // Expand the sidebar if it is collapsed
+                sidebar.classList.remove('collapsed');
+                const mainWrapper = document.getElementById('main-wrapper');
+                const appHeader = document.querySelector('.app-header');
+
+                // Adjust navbar width based on sidebar state
+                appHeader.style.width = 'calc(100% - 250px)';
+                appHeader.style.left = '250px';
+                mainWrapper.classList.remove('expanded'); // Adjust main wrapper margin
+            }
+
+            // Toggle submenu visibility only if there is a submenu
             if (submenu) {
                 e.preventDefault(); // Prevent default only if there's a submenu
                 this.parentElement.classList.toggle('show-submenu'); // Toggle submenu visibility
@@ -116,7 +132,7 @@
         width: 250px;
         position: fixed;
         top: 0;
-        left: 0; /* Ensure the sidebar is aligned to the left */
+        left: 10px;
         height: 100%;
         background-color: #00542F;
         overflow: hidden;
@@ -128,12 +144,12 @@
     }
 
     #main-wrapper {
-        margin-left: 0; /* Remove margin-left to fit the sidebar */
+        margin-left: 250px;
         transition: margin-left 0.3s ease-in-out;
     }
 
     #main-wrapper.expanded {
-        margin-left: 70px; /* Adjust margin when sidebar is collapsed */
+        margin-left: 70px;
     }
 
     .left-sidebar.collapsed .hide-menu {

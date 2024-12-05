@@ -58,10 +58,7 @@ $result = $conn->query($sql);
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
         data-sidebar-position="fixed" data-header-position="fixed">
         <?php include '../sidebar.php'; ?>
-        <?php include '../navbar.php';?>
-    
-
-    
+        
     <div class="container mt-5 p-5">
         <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Activities
             <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addEventModal"
