@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 03, 2024 at 06:20 PM
+-- Generation Time: Dec 08, 2024 at 01:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -71,7 +71,8 @@ INSERT INTO `budget_approvals` (`approval_id`, `title`, `category`, `attachment`
 (23, 'Test MOE', 'Maintenance', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:20:20', 0),
 (24, 'Test Purchase', 'Purchases', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:20:50', 0),
 (25, 'Test Event', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:25:28', 0),
-(26, 'Test Expense Event ', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:25:43', 0);
+(26, 'Test Expense Event ', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:25:43', 0),
+(30, 'Test Expense Event 2', 'Activities', 'coin_sorter_code_2.ino', 'Pending', 1, '2024-12-08 12:09:23', 0);
 
 -- --------------------------------------------------------
 
@@ -354,6 +355,20 @@ CREATE TABLE `maintenance_summary_items` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `recipient_id` int(11) NOT NULL,
+  `message` varchar(255) NOT NULL,
+  `is_read` tinyint(1) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `organizations`
 --
 
@@ -363,6 +378,7 @@ CREATE TABLE `organizations` (
   `organization_logo` varchar(255) DEFAULT NULL,
   `organization_members` int(11) NOT NULL DEFAULT 0,
   `organization_status` enum('Probationary','Level I','Level II') NOT NULL DEFAULT 'Probationary',
+  `organization_color` varchar(7) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `balance` decimal(15,2) DEFAULT 0.00,
   `beginning_balance` decimal(15,2) DEFAULT 0.00,
@@ -374,9 +390,9 @@ CREATE TABLE `organizations` (
 -- Dumping data for table `organizations`
 --
 
-INSERT INTO `organizations` (`organization_id`, `organization_name`, `organization_logo`, `organization_members`, `organization_status`, `created_at`, `balance`, `beginning_balance`, `cash_on_bank`, `cash_on_hand`) VALUES
-(1, 'Beacon of Youth Technology Enthusiasts', NULL, 500, 'Level I', '2024-09-22 12:16:55', 72500.00, 100000.00, 22000.00, 500.00),
-(2, 'The CvSU-R Nexus', NULL, 20, 'Level I', '2024-09-22 12:17:31', 110000.00, 120000.00, 100000.00, 0.00);
+INSERT INTO `organizations` (`organization_id`, `organization_name`, `organization_logo`, `organization_members`, `organization_status`, `organization_color`, `created_at`, `balance`, `beginning_balance`, `cash_on_bank`, `cash_on_hand`) VALUES
+(1, 'Beacon of Youth Technology Enthusiasts', NULL, 500, 'Level I', NULL, '2024-09-22 12:16:55', 72500.00, 100000.00, 22000.00, 500.00),
+(2, 'The CvSU-R Nexus', NULL, 20, 'Level I', NULL, '2024-09-22 12:17:31', 110000.00, 120000.00, 100000.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -587,6 +603,13 @@ ALTER TABLE `maintenance_summary_items`
   ADD KEY `maintenance_id` (`maintenance_id`);
 
 --
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `recipient_id` (`recipient_id`);
+
+--
 -- Indexes for table `organizations`
 --
 ALTER TABLE `organizations`
@@ -645,7 +668,7 @@ ALTER TABLE `budget_allocation`
 -- AUTO_INCREMENT for table `budget_approvals`
 --
 ALTER TABLE `budget_approvals`
-  MODIFY `approval_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `approval_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -712,6 +735,12 @@ ALTER TABLE `maintenance_summary`
 --
 ALTER TABLE `maintenance_summary_items`
   MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `organizations`
@@ -829,6 +858,12 @@ ALTER TABLE `maintenance_summary`
 --
 ALTER TABLE `maintenance_summary_items`
   ADD CONSTRAINT `maintenance_summary_items_ibfk_1` FOREIGN KEY (`maintenance_id`) REFERENCES `maintenance` (`maintenance_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`recipient_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `purchases`
