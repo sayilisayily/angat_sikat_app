@@ -80,7 +80,7 @@
                 <span class="logo-text">ANGATSIKAT</span>
             </div>
             <!-- Sidebar navigation -->
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav mx-4">
                 <ul id="sidebarnav">
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="../dashboard/officer_dashboard.php" aria-expanded="false" data-tooltip="Dashboard">
@@ -95,15 +95,16 @@
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget" onclick="toggleSidebar();">
+                        <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget">
                             <i class="bx bx-wallet"></i>
                             <span class="hide-menu">Budget</span>
                         </a>
                         <div class="submenu">
-                            <a href="../budget_management/budget_overview.php">› Overall</a>
-                            <a href="#purchases">› Purchases</a>
-                            <a href="#moe">› MOE</a>
-                            <a href="../budget_management/budget_approval_table.php">› Approval</a>
+                            <a href="../budget_management/budget_overview.php"> Overview </a>
+                            <a href="../budget_management/financial_plan.php"> Plan </a>
+                            <a href="../budget_management/purchases/purchases.php"> Purchases</a>
+                            <a href="../budget_management/maintenance/maintenance.php"> MOE</a>
+                            <a href="../budget_management/budget_approval_table.php"> Approval</a>
                         </div>
                     </li>
                     <li class="sidebar-item">
@@ -118,12 +119,12 @@
                             <span class="hide-menu">Income & Expenses</span>
                         </a>
                         <div class="submenu">
-                            <a href="#income">› Income</a>
-                            <a href="../income_and_expenses/expenses.php">› Expenses</a>
+                            <a href="#income"> Income</a>
+                            <a href="../income_and_expenses/expenses.php"> Expenses</a>
                         </div>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="reports.php" aria-expanded="false" data-tooltip="Reports">
+                        <a class="sidebar-link" href="#reports.php" aria-expanded="false" data-tooltip="Reports">
                             <i class="bx bx-file"></i>
                             <span class="hide-menu">Reports</span>
                         </a>
@@ -160,57 +161,62 @@
             sidebar.classList.toggle('collapsed');
             mainWrapper.classList.toggle('expanded');
         }
+        //toggle submenu visibility
+        document.querySelectorAll('.sidebar-item > .sidebar-link').forEach(item => {
+            item.addEventListener('click', function (e) {
+                const submenu = this.nextElementSibling; // Get the submenu if it exists
+                const sidebar = document.getElementById('sidebar'); // Reference to sidebar
+
+                // Check if the clicked link is "Budget"
+                if (this.textContent.includes('Budget') && sidebar.classList.contains('collapsed')) {
+                    // Expand the sidebar if it is collapsed
+                    sidebar.classList.remove('collapsed');
+                    const mainWrapper = document.getElementById('main-wrapper');
+                    const appHeader = document.querySelector('.app-header');
+
+                    // Adjust navbar width based on sidebar state
+                    appHeader.style.width = 'calc(100% - 250px)';
+                    appHeader.style.left = '250px';
+                    mainWrapper.classList.remove('expanded'); // Adjust main wrapper margin
+                }
+
+                // Toggle submenu visibility only if there is a submenu
+                if (submenu) {
+                    e.preventDefault(); // Prevent default only if there's a submenu
+                    this.parentElement.classList.toggle('show-submenu'); // Toggle submenu visibility
+                }
+            });
+        });
+
+        // Toggle sidebar and main wrapper
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainWrapper = document.getElementById('main-wrapper');
+
+            // Toggle classes for sidebar and main content
+            sidebar.classList.toggle('collapsed');
+            mainWrapper.classList.toggle('expanded');
+
+            // Adjust main wrapper width based on sidebar state
+            if (sidebar.classList.contains('collapsed')) {
+                mainWrapper.style.marginLeft = '80px'; // Adjust this value based on your sidebar width
+            } else {
+                mainWrapper.style.marginLeft = '250px'; // Full width of sidebar when expanded
+            }
+        }
     </script>
 
     <style>
-        /* Sidebar initial styles */
-        .left-sidebar {
-            width: 250px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background-color: #00542F;
-            overflow: hidden; /* Hide content if collapsed */
-            transition: width 0.3s ease-in-out;
-        }
-
-        /* Collapsed sidebar */
-        .left-sidebar.collapsed {
-            width: 70px; /* Set a smaller width for the collapsed state */
-        }
-
-        /* Main wrapper styles */
         #main-wrapper {
-            margin-left: 250px;
-            transition: margin-left 0.3s ease-in-out;
+            transition: margin-left 0.3s ease; /* Smooth transition */
         }
 
-        /* Adjust main wrapper when sidebar is collapsed */
-        #main-wrapper.expanded {
-            margin-left: 70px; /* Align with collapsed sidebar width */
+        .left-sidebar.collapsed {
+            width: 80px; /* Adjust this for collapsed sidebar */
         }
 
-        /* Optional: Hide text in collapsed state */
-        .left-sidebar.collapsed .hide-menu {
-            display: none;
-        }
-
-        /* Submenu styles */
-        .submenu {
-            display: none; /* Hide submenu by default */
-            padding-left: 20px; /* Indentation */
-            background-color: #006f4e; /* Optional background color */
-        }
-
-        .sidebar-item.show-submenu .submenu {
-            display: block; /* Show submenu when parent is active */
-        }
-
-        /* Optional: Center icons in the collapsed sidebar */
-        .left-sidebar.collapsed i {
-            text-align: center;
-            width: 100%;
+        .left-sidebar {
+            width: 250px; /* Full width of sidebar */
         }
     </style>
 </div>
@@ -231,18 +237,7 @@
                     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                         <div class="container-fluid d-flex justify-content-end align-items-center"
                             style="padding: 0 1rem; background-color: transparent;">
-                            <!-- Search Bar -->
-                            <div class="d-none d-sm-flex position-relative" style=" width: 250px; margin-right: 10px;">
-                                <input class="form-control py-1 ps-4 pe-3 border border-dark rounded-pill" type="search"
-                                    placeholder="Search" id="searchInput" style="width: 100%; padding: 0.25rem 1rem;">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary"
-                                    width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                    id="searchIcon" style="margin-left: 8px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 19l-2-2m0 0a7 7 0 1110 0l-2 2m-2-2a7 7 0 110-14 7 7 0 010 14z" />
-                                </svg>
-                            </div>
+
 
                             <!-- Notification Icon -->
                             <button id="notificationBtn"

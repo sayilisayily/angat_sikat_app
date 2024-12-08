@@ -60,29 +60,21 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* Center vertically */
             height: 100%;
-            /* Use full height */
             position: relative;
             z-index: 3;
             text-align: center;
             padding: 0 20px;
-            /* Add some horizontal padding */
             margin-top: -50px;
-            /* Move content up slightly */
         }
 
         h1 {
             font-size: 48px;
             margin: 0;
             animation: fadeIn 1s ease-in-out, typing 5s steps(30, end) infinite;
-            /* Slower typing */
             white-space: nowrap;
-            /* Prevent wrapping */
             overflow: hidden;
-            /* Hide overflow */
             width: 0;
-            /* Start with width 0 for typing effect */
         }
 
         h1 span:nth-child(1) {
@@ -114,7 +106,6 @@
             animation: fadeIn 2s ease-in-out, pulse 1.5s infinite;
             transition: background-color 0.3s ease;
             margin-top: 20px;
-            /* Space between the button and text */
         }
 
         .get-started:hover {
@@ -155,17 +146,14 @@
 
             70% {
                 width: 100%;
-                /* Final width for typing effect */
             }
 
             90% {
                 width: 100%;
-                /* Hold the final width */
             }
 
             100% {
                 width: 0;
-                /* Reset for looping effect */
             }
         }
 

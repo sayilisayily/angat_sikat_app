@@ -53,12 +53,247 @@ $result = $conn->query($sql);
 </head>
 
 <body>
+    <!-- 2nd Body wrapper -->
+    <div class="body-wrapper">
+        <!-- Header Start -->
+        <header class="app-header">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <ul class="navbar-nav">
+                    <li class="nav-item d-block d-xl-none">
+                        <a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)">
+                            <i class="ti ti-menu-2"></i>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+                    <div class="container-fluid d-flex justify-content-end align-items-center" style="padding: 0 1rem;">
+                        <!-- Notification Icon -->
+                        <button id="notificationBtn" style="background-color: transparent; border: none; padding: 0;">
+                            <lord-icon src="https://cdn.lordicon.com/lznlxwtc.json" trigger="hover"
+                                colors="primary:#004024" style="width:30px; height:30px;">
+                            </lord-icon>
+                        </button>
+
+                        <!-- Profile Dropdown -->
+                        <div class="dropdown">
+                            <a href="#" class="dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown"
+                                aria-expanded="false" style="text-decoration: none;">
+                                <img class="border border-dark rounded-circle" src="<?php echo !empty($profile_picture) ? 'default.png' . htmlspecialchars($profile_picture) : 'default.png'; ?>" alt="Profile"
+                                    style="width: 40px; height: 40px; margin-left: 10px;">
+                                <span class="visually-hidden"><?php echo htmlspecialchars($user['username']); ?></span>
+                                <div class="d-flex flex-column align-items-start ms-2">
+                                    <span style="font-weight: bold; color: #004024;"><?php echo htmlspecialchars($fullname); ?></span>
+                                    <span style="font-size: 0.85em; color: #6c757d;"><?php echo htmlspecialchars($email); ?></span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="../user/profile.html"><i class="bx bx-user"></i> My Profile</a></li>
+                                <li><a class="dropdown-item" href="../user/logout.php"><i class="bx bx-log-out"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <!-- Header End -->
+    </div>
+    <!-- End of 2nd Body Wrapper -->
+
+    <style>
+        /* Navbar styles */
+        .app-header {
+            position: fixed; /* Fix the position of the navbar */
+            width: calc(100% - 250px); /* Adjust width based on sidebar */
+            top: 0; /* Align to the top */
+            left: 250px; /* Align next to the sidebar */
+            transition: width 0.3s ease-in-out, left 0.3s ease-in-out; /* Smooth transition */
+            z-index: 1000; /* Keep navbar above other content */
+        }
+
+        /* Adjust navbar width when sidebar is collapsed */
+        .left-sidebar.collapsed + .app-header {
+            width: calc(100% - 70px);
+            left: 70px;
+        }
+    </style>
     <!-- Overall Body Wrapper -->
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
         data-sidebar-position="fixed" data-header-position="fixed">
-        <?php include '../../sidebar.php'; ?>
+        <!-- Sidebar Start -->
+        <aside class="left-sidebar" id="sidebar">
+            <div class="top-bar">
+                <div id="toggleSidebar" class="burger-icon">
+                    <i class="bx bx-menu"></i>
+                </div>
+            </div>
+            <!-- Sidebar scroll -->
+            <div>
+                <!-- Brand Logo -->
+                <div class="brand-logo logo-container">
+                    <a href="../html/officer_dashboard.html" class="logo-img">
+                        <img src="angat sikat.png" alt="Angat Sikat Logo" class="sidebar-logo">
+                    </a>
+                    <span class="logo-text">ANGATSIKAT</span>
+                </div>
+                <!-- Sidebar navigation -->
+                <nav class="sidebar-nav mx-4">
+                    <ul id="sidebarnav">
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../dashboard/officer_dashboard.php" aria-expanded="false" data-tooltip="Dashboard">
+                                <i class="bx bxs-dashboard"></i>
+                                <span class="hide-menu">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false" data-tooltip="Manage Events">
+                                <i class="bx bx-calendar"></i>
+                                <span class="hide-menu">Manage Events</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget">
+                                <i class="bx bx-wallet"></i>
+                                <span class="hide-menu">Budget</span>
+                            </a>
+                            <div class="submenu">
+                                <a href="../budget_overview.php"> Overview </a>
+                                <a href="../financial_plan.php"> Plan </a>
+                                <a href="../purchases/purchases.php"> Purchases</a>
+                                <a href="../maintenance/maintenance.php"> MOE</a>
+                                <a href="../budget_approval_table.php"> Approval</a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="#transactions" aria-expanded="false" data-tooltip="Transactions">
+                                <i class="bx bx-dollar-circle"></i>
+                                <span class="hide-menu">Transactions</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" aria-expanded="false" data-tooltip="Income & Expenses">
+                                <i class="bx bx-chart"></i>
+                                <span class="hide-menu">Income & Expenses</span>
+                            </a>
+                            <div class="submenu">
+                                <a href="#income"> Income</a>
+                                <a href="../income_and_expenses/expenses.php"> Expenses</a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="#reports.php" aria-expanded="false" data-tooltip="Reports">
+                                <i class="bx bx-file"></i>
+                                <span class="hide-menu">Reports</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item profile-container">
+                            <a class="sidebar-link" href="../user/profile.html" aria-expanded="false" data-tooltip="Profile">
+                                <div class="profile-pic-border">
+                                    <img src="<?php echo !empty($profile_picture) ? 'default.png' . htmlspecialchars($profile_picture) : 'default.png'; ?>" alt="Profile Picture" class="profile-pic" />
+                                </div>
+                                <span class="profile-name"><?php echo htmlspecialchars($user['first_name']) . ' ' . htmlspecialchars($user['last_name']); ?></span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+        <!-- Sidebar End -->
 
-        <?php include '../../navbar.php';?>
+        <!-- JavaScript to toggle submenu visibility -->
+        <script>
+            document.querySelectorAll('.sidebar-item > .sidebar-link').forEach(item => {
+                item.addEventListener('click', function (e) {
+                    const submenu = this.nextElementSibling; // Get the submenu if it exists
+                    const sidebar = document.getElementById('sidebar'); // Reference to sidebar
+
+                    // Check if the clicked link is "Budget"
+                    if (this.textContent.includes('Budget') && sidebar.classList.contains('collapsed')) {
+                        // Expand the sidebar if it is collapsed
+                        sidebar.classList.remove('collapsed');
+                        const mainWrapper = document.getElementById('main-wrapper');
+                        const appHeader = document.querySelector('.app-header');
+
+                        // Adjust navbar width based on sidebar state
+                        appHeader.style.width = 'calc(100% - 250px)';
+                        appHeader.style.left = '250px';
+                        mainWrapper.classList.remove('expanded'); // Adjust main wrapper margin
+                    }
+
+                    // Toggle submenu visibility only if there is a submenu
+                    if (submenu) {
+                        e.preventDefault(); // Prevent default only if there's a submenu
+                        this.parentElement.classList.toggle('show-submenu'); // Toggle submenu visibility
+                    }
+                });
+            });
+
+            // Sidebar toggle functionality
+            document.getElementById('toggleSidebar').addEventListener('click', function () {
+                const sidebar = document.getElementById('sidebar');
+                const mainWrapper = document.getElementById('main-wrapper');
+                const appHeader = document.querySelector('.app-header');
+
+                sidebar.classList.toggle('collapsed');
+                mainWrapper.classList.toggle('expanded');
+
+                // Adjust navbar width based on sidebar state
+                if (sidebar.classList.contains('collapsed')) {
+                    appHeader.style.width = 'calc(100% - 70px)';
+                    appHeader.style.left = '70px';
+                } else {
+                    appHeader.style.width = 'calc(100% - 250px)';
+                    appHeader.style.left = '250px';
+                }
+            });
+        </script>
+
+        <style>
+            /* Sidebar initial styles */
+            .left-sidebar {
+                width: 250px;
+                position: fixed;
+                top: 0;
+                left: 10px;
+                height: 100%;
+                background-color: #00542F;
+                overflow: hidden;
+                transition: width 0.3s ease-in-out;
+            }
+
+            .left-sidebar.collapsed {
+                width: 70px;
+            }
+
+            #main-wrapper {
+                margin-left: 250px;
+                transition: margin-left 0.3s ease-in-out;
+            }
+
+            #main-wrapper.expanded {
+                margin-left: 70px;
+            }
+
+            .left-sidebar.collapsed .hide-menu {
+                display: none;
+            }
+
+            .left-sidebar.collapsed i {
+                text-align: center;
+                width: 100%;
+            }
+
+            .submenu {
+                display: none;
+                padding-left: 20px;
+                background-color: #006f4e;
+            }
+
+            .sidebar-item.show-submenu .submenu {
+                display: block;
+            }
+        </style>
+
             <div class="container mt-5 p-5">
                 <h2 class="mb-4 d-flex align-items-center justify-content-between">
                     <div>    
