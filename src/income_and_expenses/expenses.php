@@ -59,7 +59,7 @@ $result = $conn->query($sql);
                     <span class="logo-text">ANGATSIKAT</span>
                 </div>
                 <!-- Sidebar navigation -->
-                <nav class="sidebar-nav">
+                <nav class="sidebar-nav mx-4">
                     <ul id="sidebarnav">
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="../dashboard/officer_dashboard.php" aria-expanded="false"
@@ -81,11 +81,12 @@ $result = $conn->query($sql);
                                 <span class="hide-menu">Budget</span>
                             </a>
                             <div class="submenu">
-                                <a href="../budget_management/budget_overview.php">› Overall</a>
-                                <a href="#purchases">› Purchases</a>
-                                <a href="#moe">› MOE</a>
-                                <a href="../budget_management/budget_approval_table.php">› Approval</a>
-                            </div>
+                            <a href="../budget_management/budget_overview.php"> Overview </a>
+                            <a href="../budget_management/financial_plan.php"> Plan </a>
+                            <a href="../budget_management/purchases/purchases.php"> Purchases</a>
+                            <a href="../budget_management/maintenance/maintenance.php"> MOE</a>
+                            <a href="../budget_management/budget_approval_table.php"> Approval</a>
+                        </div>
                         </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="#transactions" aria-expanded="false"
@@ -100,12 +101,12 @@ $result = $conn->query($sql);
                                 <span class="hide-menu">Income & Expenses</span>
                             </a>
                             <div class="submenu">
-                                <a href="#income">› Income</a>
-                                <a href="../income_and_expenses/expenses.php">› Expenses</a>
+                                <a href="#income"> Income</a>
+                                <a href="../income_and_expenses/expenses.php"> Expenses</a>
                             </div>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="reports.php" aria-expanded="false" data-tooltip="Reports">
+                            <a class="sidebar-link" href="#reports.php" aria-expanded="false" data-tooltip="Reports">
                                 <i class="bx bx-file"></i>
                                 <span class="hide-menu">Reports</span>
                             </a>
@@ -167,18 +168,6 @@ $result = $conn->query($sql);
                     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                         <div class="container-fluid d-flex justify-content-end align-items-center"
                             style="padding: 0 1rem; background-color: transparent;">
-                            <!-- Search Bar -->
-                            <div class="d-none d-sm-flex position-relative" style=" width: 250px; margin-right: 10px;">
-                                <input class="form-control py-1 ps-4 pe-3 border border-dark rounded-pill" type="search"
-                                    placeholder="Search" id="searchInput" style="width: 100%; padding: 0.25rem 1rem;">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary"
-                                    width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                    id="searchIcon" style="margin-left: 8px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 19l-2-2m0 0a7 7 0 1110 0l-2 2m-2-2a7 7 0 110-14 7 7 0 010 14z" />
-                                </svg>
-                            </div>
 
                             <!-- Notification Icon -->
                             <button id="notificationBtn"

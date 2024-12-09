@@ -54,7 +54,7 @@ include '../organization_query.php';
                         </h1>
 
                         <!-- Organization Info Box -->
-                        <div class="organization-card p-4 rounded shadow-sm bg-white border mb-4">
+                        <div class="organization-card p-4 ps- rounded shadow-sm bg-white border mb-4">
                             <!-- Display organization logo, fallback to a default image if empty -->
                             <img class="organization-logo me-3"
                                 src="<?= !empty($org_logo) ? '../organization_management/uploads/' . $org_logo : '../organization_management/uploads/default_logo.png' ?>"
@@ -80,6 +80,7 @@ include '../organization_query.php';
                                 </div>
                             </div>
                         </div>
+                    
                         <!-- End of Organization Info Box -->
 
                         <!-- Financial Summary Cards Row -->
@@ -285,15 +286,15 @@ include '../organization_query.php';
                                     <div class="text-center">
                                         <img class="rounded-circle border border-dark h-20" src="Sir Renato.jpg" alt=""
                                             style="width: 40px; height: 40px;" />
-                                        <p class="fw-semibold text-sm">Renato Bautista</p>
-                                        <p class="text-xs text-secondary">Instructor, DCS</p>
+                                        <p class="fw-semibold text-sm text-black">Renato Bautista</p>
+                                        <p class="text-xs text-gray">Instructor, DCS</p>
                                     </div>
 
                                     <div class="text-center">
                                         <img class="rounded-circle border border-dark h-20" src="Maam Janessa.jpg"
                                             alt="" style="width: 40px; height: 40px;" />
-                                        <p class="fw-semibold text-sm">Janessa Dela Cruz</p>
-                                        <p class="text-xs text-secondary">Instructor, DCS</p>
+                                        <p class="fw-semibold text-sm text-black">Janessa Dela Cruz</p>
+                                        <p class="text-xs text-gray">Instructor, DCS</p>
                                     </div>
                                 </div>
                             </div>
@@ -304,23 +305,23 @@ include '../organization_query.php';
                                     <lord-icon src="https://cdn.lordicon.com/ysqeagpz.json" trigger="loop"
                                         colors="primary:#6acbff"
                                         style="width:40px;height:40px;transform: rotate(360deg);"></lord-icon>
-                                    <h1 class="text-secondary fw-bold h5 ms-2">Financial Deadlines</h1>
+                                    <h1 class="text-black fw-bold h5 ms-2">Financial Deadlines</h1>
                                 </div>
 
                                 <div class="ms-2 mt-3">
                                     <div class="mt-1">
-                                        <h1 class="fw-bold text-xs fs-5">Office Supplies</h1>
-                                        <p class="text-secondary fw-semibold text-xs">October 12, 2024</p>
+                                        <h1 class="fw-bold text-xs fs-5 text-black">Office Supplies</h1>
+                                        <p class="text-gray fw-semibold text-xs">October 12, 2024</p>
                                     </div>
 
                                     <div class="mt-1">
-                                        <h1 class="fw-bold text-xs fs-5">Transportation</h1>
-                                        <p class="text-secondary fw-semibold text-xs">L-300</p>
+                                        <h1 class="fw-bold text-xs fs-5 text-black">Transportation</h1>
+                                        <p class="text-gray fw-semibold text-xs">L-300</p>
                                     </div>
 
                                     <div class="mt-1">
-                                        <h1 class="fw-bold text-xs fs-5">Speakers</h1>
-                                        <p class="text-secondary fw-semibold text-xs">November 11, 2024</p>
+                                        <h1 class="fw-bold text-xs fs-5 text-black">Speakers</h1>
+                                        <p class="text-gray fw-semibold text-xs">November 11, 2024</p>
                                     </div>
                                 </div>
                             </div>
@@ -329,11 +330,11 @@ include '../organization_query.php';
                             <div class="d-flex justify-evenly gap-5 p-4 bg-white rounded mt-4 shadow-sm">
                                 <div class="d-flex align-items-center">
                                     <div>
-                                        <h1 class="fw-bold fs-7">Balance</h1>
-                                        <p class="fw-semibold text-secondary">Total Monthly</p>
-                                        <h1 class="fw-bold h6">₱ 50,000 <span
-                                                class="bg-warning text-white rounded-pill mx-auto px-3 py-1">73.4%</span>
+                                        <h1 class="fw-bold fs-7 text-black">Balance</h1>
+                                        <p class="fw-semibold text-black">Total Monthly</p>
+                                        <h1 class="fw-bold h6">₱ 50,000
                                         </h1>
+                                        <p class="bg-warning text-white rounded-pill mx-auto px-3 py-1">73.4%</p>
                                     </div>
                                 </div>
 
@@ -356,7 +357,7 @@ include '../organization_query.php';
                                             <!-- Centered Text -->
                                             <div class="position-absolute text-center">
                                                 <p class="h6 fw-bold text-dark">₱27,500</p>
-                                                <p class="text-sm fw-semibold text-secondary">Remaining balance</p>
+                                                <p class="text-sm fw-semibold text-black">Remaining balance</p>
                                             </div>
                                         </div>
                                     </div>

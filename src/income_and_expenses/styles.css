@@ -1,11 +1,9 @@
-
-
 /* General Layout */
 body {
-    display: flex;
-    margin: 0;
-    padding: 0;
-    height: 100%;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 html {
@@ -23,17 +21,20 @@ h1 {
 }
 
 #main {
-  transition: margin-left .5s; /* If you want a transition effect */
+  transition: margin-left 0.5s; /* If you want a transition effect */
   padding: 20px;
 }
 
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
-  .sidebar {padding-top: 15px;}
-  .sidebar a {font-size: 18px;}
+  .sidebar {
+    padding-top: 15px;
+  }
+  .sidebar a {
+    font-size: 18px;
+  }
 }
 
-  
 img,
 picture,
 video {
@@ -50,71 +51,70 @@ video {
 /* Table Styles */
 
 table td .form-check-input {
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    width: 1.25em;
-    height: 1.25em;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  width: 1.25em;
+  height: 1.25em;
 }
 
 table {
-    table-layout: auto;
-    max-width: 100%;
-    height: auto;
-    border-collapse: collapse; 
+  table-layout: auto;
+  max-width: 100%;
+  height: auto;
+  border-collapse: collapse;
 }
-
 
 /* Button and Checkbox Styling */
 .btn-primary {
-    background-color: #FFB000;
-    border-color: #FFB000;
+  background-color: #ffb000;
+  border-color: #ffb000;
 }
 
 .btn-primary:hover {
-    background-color: #D99600;
-    border-color: #D99600;
+  background-color: #d99600;
+  border-color: #d99600;
 }
 
 .form-check-input:checked {
-    background-color: #FFB000;
-    border-color: #FFB000;
+  background-color: #ffb000;
+  border-color: #ffb000;
 }
 
 .close {
-    border:0px solid #fff;
-    outline:none;
-    background-color: #fff;
+  border: 0px solid #fff;
+  outline: none;
+  background-color: #fff;
 }
 
 /* Badges */
 
 .rounded-pill {
-    border-radius: 50px; 
-    font-size: 0.9rem;   
-    font-weight: 400;    
-    display: inline-block;
-    text-align: center;
-    white-space: nowrap;
-    width: 100px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+  width: 100px;
 }
 
 /* Approved Badge (Green) */
 .badge.rounded-pill.approved {
-    background-color: #00B415; 
-    color: #fff;              
+  background-color: #00b415;
+  color: #fff;
 }
 
 /* Disapproved Badge (Red) */
 .badge.rounded-pill.disapproved {
-    background-color: #E02329; 
-    color: #fff;               
+  background-color: #e02329;
+  color: #fff;
 }
 
 /* Pending Badge (Gray) */
 .badge.rounded-pill.pending {
-    background-color: #929292; 
-    color: #fff;               
+  background-color: #929292;
+  color: #fff;
 }
 
 /* Sidebar */
@@ -130,6 +130,12 @@ table {
   overflow-x: hidden;
   transition: 0.5s; /* Smooth slide in/out */
   padding-top: 60px;
+  border-radius: 0; /* Remove border radius */
+}
+
+.sidebar.open {
+  left: 0; /* Show sidebar */
+  border-radius: 0; /* Ensure no radius when open */
 }
 
 .sidebar a {
@@ -168,4 +174,3 @@ table {
 .openbtn:hover {
   background-color: #444;
 }
-
