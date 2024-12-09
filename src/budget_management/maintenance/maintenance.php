@@ -140,13 +140,13 @@ $result = $conn->query($sql);
                 <nav class="sidebar-nav mx-4">
                     <ul id="sidebarnav">
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../dashboard/officer_dashboard.php" aria-expanded="false" data-tooltip="Dashboard">
+                            <a class="sidebar-link" href="../../dashboard/officer_dashboard.php" aria-expanded="false" data-tooltip="Dashboard">
                                 <i class="bx bxs-dashboard"></i>
                                 <span class="hide-menu">Dashboard</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false" data-tooltip="Manage Events">
+                            <a class="sidebar-link" href="../../activity_management/activities.php" aria-expanded="false" data-tooltip="Manage Events">
                                 <i class="bx bx-calendar"></i>
                                 <span class="hide-menu">Manage Events</span>
                             </a>
@@ -177,7 +177,7 @@ $result = $conn->query($sql);
                             </a>
                             <div class="submenu">
                                 <a href="#income"> Income</a>
-                                <a href="../income_and_expenses/expenses.php"> Expenses</a>
+                                <a href="../../income_and_expenses/expenses.php"> Expenses</a>
                             </div>
                         </li>
                         <li class="sidebar-item">
