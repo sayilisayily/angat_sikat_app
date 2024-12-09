@@ -10,6 +10,109 @@ $(document).ready(function () {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    const notificationCount = document.getElementById('notificationCount');
+    const notificationList = document.getElementById('notificationList');
+    const noNotifications = document.getElementById('noNotifications');
+    
+    // Fetch and display notifications when button is clicked
+    notificationBtn.addEventListener('click', async () => {
+        await loadNotifications();
+        toggleDropdown();
+    });
+    
+    // Function to load notifications from the server
+    async function loadNotifications() {
+        try {
+            const response = await fetch('../fetch_notifications.php');
+            const notifications = await response.json();
+            console.log(notifications); // Debug the fetched notifications
+            console.log('Unread Notifications:', notifications.filter(n => n.is_read === 0));
+    
+    
+            // Update the notification dropdown
+            notificationList.innerHTML = ''; // Clear existing notifications
+            if (notifications.length > 0) {
+                noNotifications.style.display = 'none';
+                notifications.forEach(notification => {
+                    const notificationItem = document.createElement('div');
+                    notificationItem.classList.add('notification-item');
+                    notificationItem.style.borderBottom = '1px solid #ccc';
+                    notificationItem.style.padding = '10px';
+                    notificationItem.style.cursor = 'pointer';
+    
+                    notificationItem.innerHTML = `
+                        <p style="margin: 0;">${notification.message}</p>
+                        <small style="color: gray;">${new Date(notification.created_at).toLocaleString()}</small>
+                    `;
+    
+                    // Mark as read when clicked
+                    notificationItem.addEventListener('click', () => {
+                        markAsRead(notification.id);
+                        notificationItem.style.backgroundColor = '#f0f0f0'; // Optional feedback
+                    });
+    
+                    notificationList.appendChild(notificationItem);
+                });
+            } else {
+                noNotifications.style.display = 'block';
+            }
+    
+            // Update unread notification count
+            updateNotificationBadge(notifications.filter(n => n.is_read === 0).length);
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    }
+    
+    // Function to update the notification count badge
+    function updateNotificationBadge(count) {
+    try {
+        console.log('Notification Count:', count); // Debug count
+        if (count > 0) {
+            notificationCount.textContent = count;
+            notificationCount.style.display = 'block';
+        } else {
+            notificationCount.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error updating badge:', error);
+    }
+    }
+    
+    
+    
+    // Function to mark a notification as read
+    async function markAsRead(notificationId) {
+        try {
+            await fetch('../notification_read.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: notificationId }),
+            });
+    
+            // Reload notifications to refresh the unread count
+            await loadNotifications();
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+        }
+    }
+    
+    // Function to toggle the dropdown
+    function toggleDropdown() {
+        console.log('Dropdown toggled'); // Debug toggle
+        notificationDropdown.style.display = notificationDropdown.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    
+    // Initial fetch to load unread notifications count
+    loadNotifications();
+    });
+    
 // Add an event listener to the title selector dropdown
 document.getElementById("title").addEventListener("change", function () {
     const selectedOption = this.options[this.selectedIndex];
@@ -43,6 +146,7 @@ $('#addBudgetApprovalForm').on('submit', function (e) {
         success: function (response) {
             try {
                 response = JSON.parse(response);
+                console.log(response);
                 if (response.success) {
                     // Hide any existing error messages
                     $('#errorMessage').addClass('d-none');

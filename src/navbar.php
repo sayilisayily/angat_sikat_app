@@ -14,11 +14,43 @@
             <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                 <div class="container-fluid d-flex justify-content-end align-items-center" style="padding: 0 1rem;">
                     <!-- Notification Icon -->
-                    <button id="notificationBtn" style="background-color: transparent; border: none; padding: 0;">
-                        <lord-icon src="https://cdn.lordicon.com/lznlxwtc.json" trigger="hover"
-                            colors="primary:#004024" style="width:30px; height:30px;">
-                        </lord-icon>
-                    </button>
+                    <div style="position: relative; display: inline-block;">
+                            <button id="notificationBtn" style="background-color: transparent; border: none; padding: 0; position: relative;">
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/lznlxwtc.json"
+                                    trigger="hover"
+                                    colors="primary:#004024"
+                                    style="width:30px; height:30px;">
+                                </lord-icon>
+                                <!-- Notification Count Badge -->
+                                <span id="notificationCount" style="
+                                    position: absolute;
+                                    top: -5px;
+                                    right: -5px;
+                                    background-color: red;
+                                    color: white;
+                                    font-size: 12px;
+                                    padding: 2px 6px;
+                                    border-radius: 50%;
+                                    display: none;">0</span>
+                            </button>
+
+
+                                <!-- Notification Dropdown -->
+                                <div id="notificationDropdown" class="dropdown-menu p-2 shadow" 
+                                    style="display: none; position: absolute; right: 0; top: 35px; width: 300px; max-height: 400px; 
+                                    overflow-y: auto; background-color: white; border-radius: 5px; z-index: 1000;">
+                                    <p style="margin: 0; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+                                        Notifications
+                                    </p>
+                                    <div id="notificationList">
+                                        <!-- Notifications will be dynamically loaded here -->
+                                    </div>
+                                    <p id="noNotifications" style="text-align: center; margin-top: 10px; color: gray; display: none;">
+                                        No new notifications
+                                    </p>
+                                </div>
+                            </div>
 
                     <!-- Profile Dropdown -->
                     <div class="dropdown">
