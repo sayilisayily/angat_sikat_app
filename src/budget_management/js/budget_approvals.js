@@ -10,6 +10,23 @@ $(document).ready(function () {
     });
 });
 
+// Add an event listener to the title selector dropdown
+document.getElementById("title").addEventListener("change", function () {
+    const selectedOption = this.options[this.selectedIndex];
+
+    if (selectedOption && selectedOption.value) {
+        // Extract data from the selected option
+        const id = selectedOption.getAttribute("data-id") || "";
+
+        // Populate the modal fields
+        document.getElementById("id").value = id;
+    } else {
+        // Clear the fields if no title is selected
+        document.getElementById("id").value = "";
+    }
+});
+
+
 // Add Budget Approval Form Submission via AJAX
 $('#addBudgetApprovalForm').on('submit', function (e) {
     e.preventDefault();
@@ -18,7 +35,7 @@ $('#addBudgetApprovalForm').on('submit', function (e) {
     let formData = new FormData(this);
 
     $.ajax({
-        url: 'budget_approval.php', // Add form submission PHP file
+        url: 'add_budget_approval.php', // Add form submission PHP file
         type: 'POST',
         data: formData, // Use formData object
         contentType: false, // Important for file upload
