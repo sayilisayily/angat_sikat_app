@@ -127,47 +127,53 @@
 </script>
 
 <style>
-    /* Sidebar initial styles */
-    .left-sidebar {
-        width: 250px;
-        position: fixed;
-        top: 0;
-        left: 10px;
-        height: 100%;
-        background-color: #00542F;
-        overflow: hidden;
-        transition: width 0.3s ease-in-out;
-    }
+/* Sidebar initial styles */
+.left-sidebar {
+    width: 250px;
+    position: fixed;
+    top: 0; /* Stick to the top */
+    left: 10px; /* Position from the left */
+    height: 100vh; /* Full height of the viewport */
+    background-color: #00542F;
+    overflow: hidden;
+    transition: width 0.3s ease-in-out; /* Smooth transition for width */
+    border-radius: 0; /* Remove border radius */
+}
 
-    .left-sidebar.collapsed {
-        width: 70px;
-    }
+.left-sidebar.collapsed {
+    width: 70px;
+    border-radius: 0; /* Maintain no border radius when collapsed */
+}
 
-    #main-wrapper {
-        margin-left: 250px;
-        transition: margin-left 0.3s ease-in-out;
-    }
+.top-bar {
+    border-radius: 0; /* Remove border radius from top bar */
+}
 
-    #main-wrapper.expanded {
-        margin-left: 70px;
-    }
+#main-wrapper {
+    margin-left: 250px; /* Initial margin for the main wrapper */
+    transition: margin-left 0.3s ease-in-out; /* Smooth transition for margin */
+}
 
-    .left-sidebar.collapsed .hide-menu {
-        display: none;
-    }
+#main-wrapper.expanded {
+    margin-left: 70px; /* Adjust margin when sidebar is collapsed */
+}
 
-    .left-sidebar.collapsed i {
-        text-align: center;
-        width: 100%;
-    }
+.left-sidebar.collapsed .hide-menu {
+    display: none; /* Hide menu items when collapsed */
+}
 
-    .submenu {
-        display: none;
-        padding-left: 20px;
-        background-color: #006f4e;
-    }
+.left-sidebar.collapsed i {
+    text-align: center;
+    width: 100%; /* Center icons when collapsed */
+}
 
-    .sidebar-item.show-submenu .submenu {
-        display: block;
-    }
+.submenu {
+    display: none; /* Initially hide submenus */
+    padding-left: 20px;
+    background-color: #006f4e;
+}
+
+.sidebar-item.show-submenu .submenu {
+    display: block; /* Show submenu when toggled */
+}
 </style>
