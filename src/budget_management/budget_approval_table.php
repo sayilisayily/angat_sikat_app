@@ -425,7 +425,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'officer') {
                                     <input type="file" name="attachment" id="editAttachment" class="form-control">
                                     <div id="currentAttachment" class="mt-2"></div> <!-- Display current file -->
                                 </div>
-                                <div id="editMessage" class="alert d-none"></div>
+                                <!-- Success Message Alert -->
+                                <div id="editSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                                    Request updated successfully!
+                                </div>
+                                <!-- Error Message Alert -->
+                                <div id="editErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                                    <ul id="editErrorList"></ul> <!-- List for showing validation errors -->
+                                </div>
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
                             </form>                            
                         </div>

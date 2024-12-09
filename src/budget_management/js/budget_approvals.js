@@ -215,32 +215,58 @@ $(document).on('click', '.edit-btn', function () {
 });
 
 $('#editBudgetApprovalForm').on('submit', function (e) {
-    e.preventDefault();
-    var formData = new FormData(this);
-
-    $.ajax({
-        url: 'update_budget_approval.php', // Edit form submission PHP file
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (response) {
-            var result = JSON.parse(response);
-            if (result.success) {
-                $('#editMessage').removeClass('d-none alert-danger').addClass('alert-success').text(result.message);
-                setTimeout(function () {
-                    $('#editBudgetApprovalModal').modal('hide'); // Hide modal after success
-                    location.reload(); // Reload the page
-                }, 2000); // Reload after 2 seconds
-            } else {
-                $('#editMessage').removeClass('d-none alert-success').addClass('alert-danger').text(result.message);
+        e.preventDefault();
+    
+        // Create FormData object to include file uploads
+        let formData = new FormData(this);
+    
+        $.ajax({
+            url: 'update_budget_approval.php', // Add form submission PHP file
+            type: 'POST',
+            data: formData, // Use formData object
+            contentType: false, // Important for file upload
+            processData: false, // Important for file upload
+            success: function (response) {
+                try {
+                    response = JSON.parse(response);
+                    console.log(response);
+                    if (response.success) {
+                        // Hide any existing error messages
+                        $('#editErrorMessage').addClass('d-none');
+    
+                        // Show success message
+                        $('#editSuccessMessage').removeClass('d-none');
+    
+                        setTimeout(function () {
+                            $('#editBudgetApprovalModal').modal('hide'); // Hide modal after success
+    
+                            // Reset the form and hide the success message
+                            $('#editBudgetApprovalForm')[0].reset();
+                            $('#editSuccessMessage').addClass('d-none');
+    
+                            location.reload();
+                        }, 2000); // Reload after 2 seconds
+                    } else {
+                        // Hide any existing success messages
+                        $('#editSuccessMessage').addClass('d-none');
+    
+                        // Show error messages
+                        $('#editErrorMessage').removeClass('d-none');
+                        let errorHtml = '';
+                        for (let field in response.errors) {
+                            errorHtml += `<li>${response.errors[field]}</li>`;
+                        }
+                        $('#editErrorList').html(errorHtml);
+                    }
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error adding event:', error);
             }
-        },
-        error: function () {
-            $('#editMessage').removeClass('d-none alert-success').addClass('alert-danger').text('Error submitting form.');
-        }
+        });
     });
-});
 
 // Event delegation for dynamically loaded archive buttons (for budget approval)
 $(document).on('click', '.archive-btn', function () {

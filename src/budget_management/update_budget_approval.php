@@ -46,6 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!mysqli_query($conn, $insert_notification_query_admin)) {
                     error_log("Admin Notification Error: " . mysqli_error($conn));
                     error_log("Query: " . $insert_notification_query_admin);
+                } else {
+                    $data['success'] = true;
+                    $data['message'] = 'Request and notifications added successfully!';
                 }
             }
         } else {
