@@ -166,18 +166,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'officer') {
                     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                         <div class="container-fluid d-flex justify-content-end align-items-center"
                             style="padding: 0 1rem; background-color: transparent;">
-                            <!-- Search Bar -->
-                            <div class="d-none d-sm-flex position-relative" style=" width: 250px; margin-right: 10px;">
-                                <input class="form-control py-1 ps-4 pe-3 border border-dark rounded-pill" type="search"
-                                    placeholder="Search" id="searchInput" style="width: 100%; padding: 0.25rem 1rem;">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary"
-                                    width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                    id="searchIcon" style="margin-left: 8px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 19l-2-2m0 0a7 7 0 1110 0l-2 2m-2-2a7 7 0 110-14 7 7 0 010 14z" />
-                                </svg>
-                            </div>
+                            
 
                             <!-- Notification Icon -->
                             <div style="position: relative; display: inline-block;">
