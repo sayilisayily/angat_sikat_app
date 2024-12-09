@@ -28,6 +28,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($stmt->execute()) {
+        // Send notification to the admin about the update
+        $notification_message = "Budget approval request for '$title' has been updated.";
+
+        // Query to get all admin users
+        $admin_query = "SELECT user_id FROM users WHERE role = 'admin'";
+        $admin_result = mysqli_query($conn, $admin_query);
+
+        if ($admin_result && mysqli_num_rows($admin_result) > 0) {
+            while ($row = mysqli_fetch_assoc($admin_result)) {
+                $admin_id = $row['user_id'];
+
+                // Insert notification for the admin
+                $insert_notification_query_admin = "INSERT INTO notifications (recipient_id, message, is_read, created_at) 
+                                                     VALUES ($admin_id, '$notification_message', 0, NOW())";
+
+                if (!mysqli_query($conn, $insert_notification_query_admin)) {
+                    error_log("Admin Notification Error: " . mysqli_error($conn));
+                    error_log("Query: " . $insert_notification_query_admin);
+                }
+            }
+        } else {
+            error_log("Admin query failed or returned no results: " . mysqli_error($conn));
+        }
+
         echo json_encode(['success' => true, 'message' => 'Budget approval updated successfully']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to update budget approval']);

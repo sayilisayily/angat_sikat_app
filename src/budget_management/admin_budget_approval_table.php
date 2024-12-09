@@ -159,26 +159,46 @@ include '../user_query.php';
                     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                         <div class="container-fluid d-flex justify-content-end align-items-center"
                             style="padding: 0 1rem; background-color: transparent;">
-                            <!-- Search Bar -->
-                            <div class="d-none d-sm-flex position-relative" style=" width: 250px; margin-right: 10px;">
-                                <input class="form-control py-1 ps-4 pe-3 border border-dark rounded-pill" type="search"
-                                    placeholder="Search" id="searchInput" style="width: 100%; padding: 0.25rem 1rem;">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary"
-                                    width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                    id="searchIcon" style="margin-left: 8px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 19l-2-2m0 0a7 7 0 1110 0l-2 2m-2-2a7 7 0 110-14 7 7 0 010 14z" />
-                                </svg>
-                            </div>
+                            
 
                             <!-- Notification Icon -->
-                            <button id="notificationBtn"
-                                style="background-color: transparent; border: none; padding: 0;">
-                                <lord-icon src="https://cdn.lordicon.com/lznlxwtc.json" trigger="hover"
-                                    colors="primary:#004024" style="width:30px; height:30px;">
+                            <div style="position: relative; display: inline-block;">
+                            <button id="notificationBtn" style="background-color: transparent; border: none; padding: 0; position: relative;">
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/lznlxwtc.json"
+                                    trigger="hover"
+                                    colors="primary:#004024"
+                                    style="width:30px; height:30px;">
                                 </lord-icon>
+                                <!-- Notification Count Badge -->
+                                <span id="notificationCount" style="
+                                    position: absolute;
+                                    top: -5px;
+                                    right: -5px;
+                                    background-color: red;
+                                    color: white;
+                                    font-size: 12px;
+                                    padding: 2px 6px;
+                                    border-radius: 50%;
+                                    display: none;">0</span>
                             </button>
+
+
+                                <!-- Notification Dropdown -->
+                                <div id="notificationDropdown" class="dropdown-menu p-2 shadow" 
+                                    style="display: none; position: absolute; right: 0; top: 35px; width: 300px; max-height: 400px; 
+                                    overflow-y: auto; background-color: white; border-radius: 5px; z-index: 1000;">
+                                    <p style="margin: 0; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+                                        Notifications
+                                    </p>
+                                    <div id="notificationList">
+                                        <!-- Notifications will be dynamically loaded here -->
+                                    </div>
+                                    <p id="noNotifications" style="text-align: center; margin-top: 10px; color: gray; display: none;">
+                                        No new notifications
+                                    </p>
+                                </div>
+                            </div>
 
                             <!-- Profile Dropdown -->
                             <div class="dropdown">
@@ -336,88 +356,7 @@ include '../user_query.php';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#approvalsTable').DataTable({
-                "paging": true,
-                "searching": true,
-                "info": true,
-                "lengthChange": true,
-                "pageLength": 10,
-                "ordering": true,
-                "order": [],
-            });
-        });
-
-        // JavaScript to handle the modal data population
-        document.addEventListener('DOMContentLoaded', function () {
-            const confirmationModal = document.getElementById('confirmationModal');
-            const confirmIdInput = document.getElementById('confirmId');
-            const confirmActionInput = document.getElementById('confirmAction');
-            const actionText = document.getElementById('actionText');
-
-            confirmationModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget; // Button that triggered the modal
-                const action = button.getAttribute('data-action'); // Extract action from data attributes
-                const id = button.getAttribute('data-id'); // Extract ID from data attributes
-
-                // Set the form values
-                confirmIdInput.value = id;
-                confirmActionInput.value = action;
-
-                // Update modal text
-                actionText.textContent = action === 'approve' ? 'approve' : 'disapprove';
-            });
-        });
-
-        // Handle confirmation when "Confirm" button in modal is clicked
-        $('#confirmationForm').on('submit', function (e) {
-            e.preventDefault(); // Prevent default form submission
-
-            var formData = $(this).serialize(); // Serialize the form data
-
-            // Send an AJAX request to process the approval/disapproval
-            $.ajax({
-                url: 'admin_budget_approval.php', // PHP file to handle the action
-                type: 'POST',
-                data: formData,
-                dataType: 'json',
-                success: function (response) {
-                    try {
-                        if (response.success) {
-                            // Show success message
-                            $('#successMessage').removeClass('d-none').text(response.message);
-
-                            // Hide the error message if previously shown
-                            $('#errorMessage').addClass('d-none');
-
-                            // Close the modal and reload the table after a delay
-                            setTimeout(function () {
-                                $('#confirmationModal').modal('hide');
-                                $('#successMessage').addClass('d-none');
-                                location.reload(); // Reload the page to reflect changes
-                            }, 2000);
-                        } else {
-                            // Show validation or other errors
-                            $('#errorMessage').removeClass('d-none');
-                            let errorHtml = '';
-                            for (let field in response.errors) {
-                                errorHtml += `<li>${response.errors[field]}</li>`;
-                            }
-                            $('#errorList').html(errorHtml);
-                        }
-                    } catch (error) {
-                        console.error('Error parsing JSON:', error);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error processing approval/disapproval:', error);
-                    console.log(xhr.responseText);
-                }
-            });
-        });
-
-    </script>
+    <script src="js/admin_budget_approvals.js"></script>
 </body>
 
 </html>
