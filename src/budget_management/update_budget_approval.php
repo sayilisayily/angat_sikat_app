@@ -20,11 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => false, 'message' => 'Failed to upload file']);
             exit;
         }
-    } else {
-        // Update only the title if no new attachment is provided
-        $query = "UPDATE budget_approvals SET title = ? WHERE approval_id = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("si", $title, $approval_id);
     }
 
     if ($stmt->execute()) {
@@ -40,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $admin_id = $row['user_id'];
 
                 // Insert notification for the admin
-                $insert_notification_query_admin = "INSERT INTO notifications (recipient_id, message, is_read, created_at) 
+                $insert_notification_query = "INSERT INTO notifications (recipient_id, message, is_read, created_at) 
                                                      VALUES ($admin_id, '$notification_message', 0, NOW())";
 
-                if (!mysqli_query($conn, $insert_notification_query_admin)) {
+                if (!mysqli_query($conn, $insert_notification_query)) {
                     error_log("Admin Notification Error: " . mysqli_error($conn));
-                    error_log("Query: " . $insert_notification_query_admin);
+                    error_log("Query: " . $insert_notification_query);
                 } else {
                     $data['success'] = true;
                     $data['message'] = 'Request and notifications added successfully!';

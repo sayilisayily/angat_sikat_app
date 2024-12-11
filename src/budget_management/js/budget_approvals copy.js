@@ -10,94 +10,121 @@ $(document).ready(function () {
   });
 });
 
-$(document).ready(function () {
-  const notificationBtn = $("#notificationBtn");
-  const notificationBadge = $("#notificationBadge");
-  const notificationDropdown = $("#notificationDropdown");
-  const notificationList = $("#notificationList");
+document.addEventListener("DOMContentLoaded", function () {
+  const notificationBtn = document.getElementById("notificationBtn");
+  const notificationDropdown = document.getElementById("notificationDropdown");
+  const notificationCount = document.getElementById("notificationCount");
+  const notificationList = document.getElementById("notificationList");
+  const noNotifications = document.getElementById("noNotifications");
 
-  // Fetch notifications when the page loads
-  function fetchNotifications() {
-    $.ajax({
-      url: "../get_notifications.php", // Adjust path as needed
-      method: "GET",
-      dataType: "json",
-      success: function (data) {
-        // Clear the notification list
-        notificationList.empty();
+  // Fetch and display notifications when button is clicked
+  notificationBtn.addEventListener("click", async () => {
+    await loadNotifications();
+    toggleDropdown();
+  });
 
-        if (data.length > 0) {
-          let hasUnread = false;
+  // Function to load notifications from the server
+  async function loadNotifications() {
+    try {
+      const response = await fetch("../fetch_notifications.php");
+      const data = await response.json();
 
-          data.forEach((notification) => {
-            const isReadClass = notification.is_read == 1 ? "read" : "unread";
-            if (notification.is_read == 0) hasUnread = true;
+      // Debug: Log the response
+      console.log("API Response:", data);
 
-            notificationList.append(`
-                            <div class="notification-item ${isReadClass} p-2 border-bottom" data-id="${
-              notification.id
-            }" style="cursor: pointer;">
-                                <p style="margin: 0;">${
-                                  notification.message
-                                }</p>
-                                <small class="text-muted">${new Date(
-                                  notification.created_at
-                                ).toLocaleString()}</small>
-                            </div>
-                        `);
+      // Check if the response indicates success
+      if (data.success) {
+        const notifications = data.notifications;
+        const unreadCount = notifications.filter(
+          (n) => parseInt(n.is_read) === 0
+        ).length;
+
+        // Debug: Log notifications and unread count
+        console.log("Notifications:", notifications);
+        console.log("Unread Notifications:", unreadCount);
+
+        // Update the notification dropdown
+        notificationList.innerHTML = ""; // Clear existing notifications
+        if (notifications.length > 0) {
+          noNotifications.classList.add("d-none");
+
+          // Render each notification
+          notifications.forEach((notification) => {
+            const notificationItem = document.createElement("div");
+            notificationItem.classList.add(
+              "dropdown-item",
+              "notification-item"
+            );
+            notificationItem.style.borderBottom = "1px solid #ccc";
+            notificationItem.style.padding = "10px";
+            notificationItem.style.cursor = "pointer";
+
+            notificationItem.innerHTML = `
+              <p class="mb-0">${notification.message}</p>
+                        <small class="text-muted">${new Date(
+                          notification.created_at
+                        ).toLocaleString()}</small>
+            `;
+
+            // Mark as read when clicked
+            notificationItem.addEventListener("click", () => {
+              markAsRead(notification.id);
+              notificationItem.classList.add("bg-light"); // Optional feedback
+            });
+
+            notificationList.appendChild(notificationItem);
           });
-
-          // Show or hide the badge based on unread notifications
-          if (hasUnread) {
-            notificationBadge.removeClass("d-none");
-          } else {
-            notificationBadge.addClass("d-none");
-          }
         } else {
-          notificationList.html(`
-                        <p id="noNotifications" class="text-center text-muted mt-2">
-                            No new notifications
-                        </p>
-                    `);
-          notificationBadge.addClass("d-none");
+          noNotifications.classList.remove("d-none");
         }
-      },
-      error: function (err) {
-        console.error("Error fetching notifications:", err);
-        notificationList.html(`
-                    <p id="noNotifications" class="text-center text-danger mt-2">
-                        Failed to load notifications
-                    </p>
-                `);
-      },
-    });
+
+        // Update unread notification count
+        updateNotificationBadge(unreadCount);
+      } else {
+        console.error("Error: Unable to fetch notifications:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
   }
 
-  // Toggle dropdown visibility on button click
-  notificationBtn.click(function () {
-    notificationDropdown.toggleClass("d-none");
-    if (!notificationDropdown.hasClass("d-none")) {
-      fetchNotifications(); // Fetch notifications when opening the dropdown
+  // Function to update the notification count badge
+  function updateNotificationBadge(count) {
+    console.log("Notification Count:", count); // Debug count
+    if (count > 0) {
+      notificationCount.textContent = count;
+      notificationCount.classList.remove("d-none"); // Show the badge
+    } else {
+      notificationCount.classList.add("d-none"); // Hide the badge
     }
-  });
+  }
 
-  // Mark notification as read on click (optional functionality)
-  $(document).on("click", ".notification-item", function () {
-    const notificationId = $(this).data("id");
+  // Function to mark a notification as read
+  async function markAsRead(notificationId) {
+    try {
+      await fetch("../notification_read.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: notificationId }),
+      });
 
-    // Make an AJAX call to mark the notification as read
-    $.ajax({
-      url: "../notification_read.php", // Create this PHP file to handle marking as read
-      method: "POST",
-      data: { id: notificationId },
-      success: function () {
-        fetchNotifications(); // Refresh notifications
-      },
-      error: function (err) {
-        console.error("Error marking notification as read:", err);
-      },
-    });
-  });
+      // Reload notifications to refresh the unread count
+      await loadNotifications();
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  }
+
+  // Function to toggle the dropdown
+  function toggleDropdown() {
+    console.log("Dropdown toggled"); // Debug toggle
+    notificationDropdown.classList.toggle("d-none");
+  }
+
+  // Initial fetch to load unread notifications count
+  loadNotifications();
 });
 
 // Add an event listener to the title selector dropdown
