@@ -54,7 +54,7 @@
                         <span class="hide-menu">Income & Expenses</span>
                     </a>
                     <div class="submenu">
-                        <a href="#income"> Income</a>
+                        <a href="../income_and_expenses/income.php"> Income</a>
                         <a href="../income_and_expenses/expenses.php"> Expenses</a>
                     </div>
                 </li>
