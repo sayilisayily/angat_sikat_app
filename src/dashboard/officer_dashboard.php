@@ -688,10 +688,6 @@ include '../organization_query.php';
                                             <h2 class="mr-5"><span
                                                     class="text-warning fw-bold me-2 fs-10">|</span>Activities</h2>
                                         </div>
-                                        <div class="col-md-4 d-flex justify-content-end">
-                                            <button class="btn btn-primary custom-btn mx-2">Beacon of Youth Technology
-                                                Enthusiast</button>
-                                        </div>
 
                                     </div>
                                 </div>
