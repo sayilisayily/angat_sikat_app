@@ -21,6 +21,8 @@ include '../organization_query.php';
     <title>Dashboard</title>
     <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
+    <!--Custom CSS for Activities-->
+    <link rel="stylesheet" href="../activity_management/css/activities.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Boxicon-->
@@ -365,112 +367,6 @@ include '../organization_query.php';
                             </div>
                         </div>
                     </div>
-
-
-
-                    <!-- Transaction Chart -->
-                    <div class="container-fluid">
-                        <div class="h5 fw-black fs-10 ps-5 mx-xs-5">
-                            <h2 class="mr-5"><span class="text-warning fw-bold me-2 fs-10">|</span>Transactions</h2>
-                        </div>
-
-                        <div class="p-4 bg-white rounded border shadow-md justify-center card"
-                            style="height: 450px; width: 1150px; margin: 1px 200px 5px 0;">
-                            <div class="card-body">
-                                <div class="d-sm-flex d-block align-items-center justify-content-between mb-4">
-                                    <h5 class="card-title fw-semibold mb-0">This Month 53 | P350</h5>
-                                    <div>
-                                        <select class="form-select">
-                                            <option value="1">March 2024</option>
-                                            <option value="2">April 2024</option>
-                                            <option value="3">May 2024</option>
-                                            <option value="4">June 2024</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div id="sales-profit" style="height: 300px;"></div> <!-- Placeholder for chart -->
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End of Transaction Chart -->
-
-                    <!--Recent Transaction dashboard-->
-                    <div>
-                        <div class="h5 fw-black fs-10 ps-5 mx-xs-5">
-                            <h2 class="mr-5"><span class="text-warning fw-bold me-2 fs-10">|</span>Recent Transactions
-                            </h2>
-                        </div>
-                        <div class="container mt-5">
-                            <button id="printButton" class="btn btn-primary mb-3">Print</button>
-                            <button id="pdfButton" class="btn btn-success mb-3">Download PDF</button>
-
-                            <div id="tableContent">
-                                <table class="table table-bordered">
-                                    <thead class="thead-light fw-bold">
-                                        <tr class="fw-bold fs-4 text-dark">
-                                            <th>Type</th>
-                                            <th>Due Date</th>
-                                            <th>Description</th>
-                                            <th>Amount</th>
-                                            <th>Payer</th>
-                                            <th>Reference</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Invoice</td>
-                                            <td>2023-10-20</td>
-                                            <td>Payment for services rendered</td>
-                                            <td>$1,000.00</td>
-                                            <td>Company A</td>
-                                            <td>INV-001</td>
-                                            <td>Paid</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Expense</td>
-                                            <td>2023-10-22</td>
-                                            <td>Office supplies purchase</td>
-                                            <td>$250.00</td>
-                                            <td>Tom</td>
-                                            <td>EXP-002</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Invoice</td>
-                                            <td>2023-10-25</td>
-                                            <td>Consultation services</td>
-                                            <td>$500.00</td>
-                                            <td>Company B</td>
-                                            <td>INV-003</td>
-                                            <td>Paid</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-                        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-                        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-                        <script
-                            src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-                        <script>
-                            // Print function
-                            document.getElementById('printButton').addEventListener('click', function () {
-                                window.print();
-                            });
-
-                            // PDF download function
-                            document.getElementById('pdfButton').addEventListener('click', function () {
-                                const element = document.getElementById('tableContent');
-                                html2pdf()
-                                    .from(element)
-                                    .save('transaction_report.pdf');
-                            });
-                        </script>
-                    </div>
-                    <!--Recent Transaction End-->
 
                     <!--Upcoming Events-->
                     <div>
@@ -858,50 +754,63 @@ include '../organization_query.php';
 
                                     </div>
                                 </div>
-
+                                <?php 
+                                    $sql = "SELECT * FROM events WHERE archived = 0 AND organization_id = $organization_id ORDER BY event_id DESC LIMIT 5";
+                                    $result = $conn->query($sql);
+                                ?>
                                 <div class="container pt-5 mx-auto">
                                     <div id="tableContent">
                                         <table class="table table-bordered">
                                             <thead class="thead-light fw-bold">
-                                                <tr class="fw-bold fs-4 text-dark">
-                                                    <th>Title</th>
-                                                    <th>from</th>
-                                                    <th>to</th>
-                                                    <th>Type</th>
-                                                    <th>Venue</th>
-                                                    <th>Status</th>
-                                                    <th>Accomplishment Status</th>
+                                                <tr>
+                                                    <th rowspan=2>Title</th>
+                                                    <th rowspan=2>Venue</th>
+                                                    <th colspan=2 style="text-align: center;"> Date </th>
+                                                    <th rowspan=2>Type</th>
+                                                    <th rowspan=2>Status</th>
+                                                    <th rowspan=2>Accomplished</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Start</th>
+                                                    <th>End</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>TechFest</td>
-                                                    <td>03-21</td>
-                                                    <td>03-22</td>
-                                                    <td>Co-Curricular</td>
-                                                    <td>Court 1</td>
-                                                    <td>Approved</td>
-                                                    <td>Accomplished</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>TechFest</td>
-                                                    <td>03-21</td>
-                                                    <td>03-22</td>
-                                                    <td>Co-Curricular</td>
-                                                    <td>Court 1</td>
-                                                    <td>Approved</td>
-                                                    <td>Accomplished</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>TechFest</td>
-                                                    <td>03-21</td>
-                                                    <td>03-22</td>
-                                                    <td>Co-Curricular</td>
-                                                    <td>Court 1</td>
-                                                    <td>Approved</td>
-                                                    <td>Accomplished</td>
-                                                </tr>
+                                                <?php
+                                                if ($result->num_rows > 0) {
+                                                    while ($row = $result->fetch_assoc()) {
+                                                        $checked = $row['accomplishment_status'] ? 'checked' : '';
+                                                        $disabled = ($row['event_status'] !== 'Approved') ? 'disabled' : '';
+                                                        echo "<tr>
+                                                                <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
+                                                                <td>{$row['event_venue']}</td>
+                                                                <td>" . date('F j, Y', strtotime($row['event_start_date'])) . "</td>
+                                                                <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
+                                                                <td>{$row['event_type']}</td>
+                                                                <td>";
+                                                        // Handle event status with badges
+                                                        if ($row['event_status'] == 'Pending') {
+                                                            echo "<span class='badge rounded-pill pending'>Pending</span>";
+                                                        } elseif ($row['event_status'] == 'Approved') {
+                                                            echo "<span class='badge rounded-pill approved'>Approved</span>";
+                                                        } elseif ($row['event_status'] == 'Disapproved') {
+                                                            echo "<span class='badge rounded-pill disapproved'>Disapproved</span>";
+                                                        }
+                                                        echo "</td>";
+                                                        // Render accomplishment status
+                                                        echo "<td>";
+                                                        echo ($row['accomplishment_status'] == 1) 
+                                                            ? "Accomplished" 
+                                                            : "Not Accomplished";
+                                                        echo "</td>";
+                                                        echo "</tr>";
+                                                    }
+                                                } else {
+                                                    echo "<tr><td colspan='9' class='text-center'>No events found</td></tr>";
+                                                }
+                                                ?>
                                             </tbody>
+
                                         </table>
                                     </div>
                                 </div>
