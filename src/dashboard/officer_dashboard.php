@@ -86,6 +86,60 @@ include '../organization_query.php';
                         <!-- End of Organization Info Box -->
 
                         <!-- Financial Summary Cards Row -->
+                        <div class="row">
+                            <!-- Balance Card -->
+                            <div class="col-md-4 mb-3">
+                                <div class="card financial-card p-3 shadow-sm bg-purple-200 mx-2">
+                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Balance</h7>
+                                    <div class="d-flex align-items-center">
+                                        <h1 class="fw-bold" style="margin-left: 2px;">
+                                            <?php echo number_format($balance, 2); ?>
+                                        </h1>
+                                        <i class="bx bx-trending-up"
+                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="badge bg-warning text-white fw-medium percentage-box"
+                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Income Card -->
+                            <div class="col-md-4 mb-3">
+                                <div class="card financial-card p-3 shadow-sm bg-pink-200 mx-2">
+                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Income</h7>
+                                    <div class="d-flex align-items-center">
+                                        <h1 class="fw-bold" style="margin-left: 2px;">₱59,690</h1>
+                                        <i class="bx bx-trending-up"
+                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="badge bg-warning text-white fw-medium percentage-box"
+                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Expense Card -->
+                            <div class="col-md-4 mb-3">
+                                <div class="card financial-card p-3 shadow-sm bg-blue-200 mx-2">
+                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Expense</h7>
+                                    <div class="d-flex align-items-center">
+                                        <h1 class="fw-bold" style="margin-left: 2px;">₱59,690</h1>
+                                        <i class="bx bx-trending-up"
+                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="badge bg-warning text-white fw-medium percentage-box"
+                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End of Financial Summary Cards Row -->
+
+                        <!-- Balance Report Section -->
                         <?php 
                         $query = "SELECT MONTH(updated_at) AS month, YEAR(updated_at) AS year, balance 
                                 FROM balance_history 
@@ -158,15 +212,6 @@ include '../organization_query.php';
                             </div>
                         </div>
                         <!-- Balance Report End -->
-
-                        <script>
-                            // Function to switch views (monthly, quarterly, yearly)
-                            function switchView(view) {
-                                alert('Switching to ' + view + ' view. Logic not yet implemented.');
-                                // Add logic to handle data filtering and re-rendering based on selected view
-                            }
-                        </script>
-                        <!-- Balance Report End -->
                     </div>
 
                     <!-- Right Column for Advisers and Financial Deadlines (Third Container) -->
@@ -218,7 +263,7 @@ include '../organization_query.php';
                                     </div>
 
                                     <div class="mt-1">
-                                        <h1 class="fw-bold text-xs fs-5 text-black">Budget Request</h1>
+                                        <h1 class="fw-bold text-xs fs-5 text-black">Budget</h1>
                                         <p class="text-gray fw-semibold text-xs">November 11, 2024</p>
                                     </div>
                                 </div>
