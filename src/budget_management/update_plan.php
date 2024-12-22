@@ -18,11 +18,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $type = mysqli_real_escape_string($conn, $_POST['edit_type'] ?? '');
     $category = mysqli_real_escape_string($conn, $_POST['edit_category'] ?? '');
     $date = mysqli_real_escape_string($conn, $_POST['edit_date'] ?? '');
-    $amount = mysqli_real_escape_string($conn, $_POST['edit_amount'] ?? '');
+    $amount = floatval($_POST['edit_amount'] ?? 0); // Convert amount to float
 
     // Basic validations
     if (empty($title)) $errors[] = 'Plan title is required.';
-    if (empty($amount) || !is_numeric($amount) || $amount < 0) $errors[] = 'Amount must be a valid positive number.';
+    if ($amount <= 0) $errors[] = 'Amount must be a valid positive number.';
     if (empty($type)) $errors[] = 'Plan type is required.';
     if ($type === 'Expense' && empty($category)) $errors[] = 'Category is required for expense plans.';
     if (($type === 'Income' || ($type === 'Expense' && $category === 'Activities')) && empty($date)) {
@@ -38,16 +38,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Check budget allocation (for Expense)
     if ($type === 'Expense' && !empty($category)) {
+        // Query to fetch old amount
+        $old_amount_query = "SELECT amount FROM financial_plan WHERE plan_id = '$plan_id'";
+        $old_amount_result = mysqli_query($conn, $old_amount_query);
+        $old_amount = floatval(mysqli_fetch_assoc($old_amount_result)['amount'] ?? 0);
+
+        // Query to calculate total plans amount for the category
         $sum_query = "SELECT SUM(amount) as total_plans FROM financial_plan WHERE category = '$category' AND organization_id = $organization_id";
-        $allocation_query = "SELECT allocated_budget FROM budget_allocation WHERE category = '$category' AND organization_id = $organization_id";
-
         $sum_result = mysqli_query($conn, $sum_query);
+        $total_plans = floatval(mysqli_fetch_assoc($sum_result)['total_plans'] ?? 0);
+
+        // Query to fetch allocated budget for the category
+        $allocation_query = "SELECT allocated_budget FROM budget_allocation WHERE category = '$category' AND organization_id = $organization_id";
         $allocation_result = mysqli_query($conn, $allocation_query);
+        $allocated_budget = floatval(mysqli_fetch_assoc($allocation_result)['allocated_budget'] ?? 0);
 
-        $total_plans = mysqli_fetch_assoc($sum_result)['total_plans'] ?? 0;
-        $allocated_budget = mysqli_fetch_assoc($allocation_result)['allocated_budget'] ?? 0;
-
-        if (($total_plans + $amount) > $allocated_budget) {
+        // Validate budget
+        if (($total_plans - $old_amount + $amount) > $allocated_budget) {
             $errors[] = 'Total plans exceed the allocated budget for this category.';
         }
     }
