@@ -86,58 +86,32 @@ include '../organization_query.php';
                         <!-- End of Organization Info Box -->
 
                         <!-- Financial Summary Cards Row -->
-                        <div class="row">
-                            <!-- Balance Card -->
-                            <div class="col-md-4 mb-3">
-                                <div class="card financial-card p-3 shadow-sm bg-purple-200 mx-2">
-                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Balance</h7>
-                                    <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">
-                                            <?php echo number_format($balance, 2); ?>
-                                        </h1>
-                                        <i class="bx bx-trending-up"
-                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
-                                    </div>
-                                    <div class="d-flex justify-content-end">
-                                        <div class="badge bg-warning text-white fw-medium percentage-box"
-                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
-                                    </div>
-                                </div>
-                            </div>
+                        <?php 
+                        $query = "SELECT MONTH(updated_at) AS month, YEAR(updated_at) AS year, balance 
+                                FROM balance_history 
+                                WHERE organization_id = ? 
+                                ORDER BY year ASC, month ASC";
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param('i', $organization_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
 
-                            <!-- Income Card -->
-                            <div class="col-md-4 mb-3">
-                                <div class="card financial-card p-3 shadow-sm bg-pink-200 mx-2">
-                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Income</h7>
-                                    <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">₱59,690</h1>
-                                        <i class="bx bx-trending-up"
-                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
-                                    </div>
-                                    <div class="d-flex justify-content-end">
-                                        <div class="badge bg-warning text-white fw-medium percentage-box"
-                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
-                                    </div>
-                                </div>
-                            </div>
+                        $balances = [];
+                        while ($row = $result->fetch_assoc()) {
+                            $balances[] = $row; // Store all rows for rendering in the graph
+                        }
+                        $stmt->close();
 
-                            <!-- Expense Card -->
-                            <div class="col-md-4 mb-3">
-                                <div class="card financial-card p-3 shadow-sm bg-blue-200 mx-2">
-                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Expense</h7>
-                                    <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">₱59,690</h1>
-                                        <i class="bx bx-trending-up"
-                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
-                                    </div>
-                                    <div class="d-flex justify-content-end">
-                                        <div class="badge bg-warning text-white fw-medium percentage-box"
-                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End of Financial Summary Cards Row -->
+                        // Prepare data for visualization
+                        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        $monthly_balances = array_fill(1, 12, 0); // Initialize balances for all months
+                        $max_balance = 0;
+
+                        foreach ($balances as $balance) {
+                            $monthly_balances[(int)$balance['month']] = $balance['balance'];
+                            $max_balance = max($max_balance, $balance['balance']); // Determine max balance
+                        }
+                        ?>
 
                         <!-- Balance Report Section -->
                         <div class="p-4 bg-white mx-auto rounded border shadow-md justify-center balance-report"
@@ -145,131 +119,53 @@ include '../organization_query.php';
                             <div class="d-flex justify-content-start gap-5">
                                 <h2 class="text-lg fw-bold">Balance Report</h2>
                                 <div class="d-flex gap-3">
-                                    <button class="btn btn-secondary btn-sm">Monthly</button>
-                                    <button class="btn btn-secondary btn-sm">Quarterly</button>
-                                    <button class="btn btn-secondary btn-sm">Yearly</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="switchView('monthly')">Monthly</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="switchView('quarterly')">Quarterly</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="switchView('yearly')">Yearly</button>
                                 </div>
                             </div>
                             <div class="mt-2">
                                 <p class="fw-semibold">Average per month</p>
-                                <h1 class="fw-bold h5 text-success">₱5,500</h1>
-                                <p class="fw-medium mt-1" style="color: #5C5C5C;">Median ₱45,000</p>
+                                <?php
+                                if (count($balances) > 0) {
+                                    $total_balance = array_sum($monthly_balances);
+                                    $average_balance = $total_balance / count($balances);
+                                    echo "<h1 class='fw-bold h5 text-success'>₱" . number_format($average_balance, 2) . "</h1>";
+                                } else {
+                                    echo "<h1 class='fw-bold h5 text-muted'>No data available</h1>";
+                                }
+                                ?>
                             </div>
 
                             <div class="container mx-auto mt-3">
                                 <!-- Bar Graph Container -->
                                 <div class="row g-3">
-                                    <!-- Bar for January-->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 90px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Jan</p>
-                                    </div>
-
-                                    <!-- Bar for February -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 70px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Feb</p>
-                                    </div>
-
-                                    <!-- Bar for March -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 50px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Mar</p>
-                                    </div>
-
-                                    <!-- Bar for April -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 30px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Apr</p>
-                                    </div>
-
-                                    <!-- Bar for May -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 10px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">May</p>
-                                    </div>
-
-                                    <!-- Bar for June -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 20px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Jun</p>
-                                    </div>
-
-                                    <!-- Bar for July -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 40px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Jul</p>
-                                    </div>
-
-                                    <!-- Bar for August -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 30px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Aug</p>
-                                    </div>
-
-                                    <!-- Bar for September -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 40px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Sep</p>
-                                    </div>
-
-                                    <!-- Bar for October -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 50px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Oct</p>
-                                    </div>
-
-                                    <!-- Bar for November -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 60px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Nov</p>
-                                    </div>
-
-                                    <!-- Bar for December -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 70px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Dec</p>
-                                    </div>
-
+                                    <?php
+                                    foreach ($months as $index => $month) {
+                                        $month_number = $index + 1;
+                                        $month_balance = $monthly_balances[$month_number];
+                                        $height = $max_balance > 0 ? ($month_balance / $max_balance) * 100 : 0; // Scale height
+                                        echo "
+                                        <div class='col-1'>
+                                            <div class='d-flex flex-column-reverse align-items-center' style='height: 100px;'>
+                                                <div class='w-100 bg-success' style='height: {$height}px;'></div>
+                                            </div>
+                                            <p class='mt-1 text-sm font-medium text-center'>{$month}</p>
+                                        </div>";
+                                    }
+                                    ?>
                                 </div>
                             </div>
                         </div>
+                        <!-- Balance Report End -->
+
+                        <script>
+                            // Function to switch views (monthly, quarterly, yearly)
+                            function switchView(view) {
+                                alert('Switching to ' + view + ' view. Logic not yet implemented.');
+                                // Add logic to handle data filtering and re-rendering based on selected view
+                            }
+                        </script>
                         <!-- Balance Report End -->
                     </div>
 
@@ -307,22 +203,22 @@ include '../organization_query.php';
                                     <lord-icon src="https://cdn.lordicon.com/ysqeagpz.json" trigger="loop"
                                         colors="primary:#6acbff"
                                         style="width:40px;height:40px;transform: rotate(360deg);"></lord-icon>
-                                    <h1 class="text-black fw-bold h5 ms-2">Financial Deadlines</h1>
+                                    <h1 class="text-black fw-bold h5 ms-2">Deadlines</h1>
                                 </div>
 
                                 <div class="ms-2 mt-3">
                                     <div class="mt-1">
-                                        <h1 class="fw-bold text-xs fs-5 text-black">Office Supplies</h1>
+                                        <h1 class="fw-bold text-xs fs-5 text-black">Accomplishment Report</h1>
                                         <p class="text-gray fw-semibold text-xs">October 12, 2024</p>
                                     </div>
 
                                     <div class="mt-1">
-                                        <h1 class="fw-bold text-xs fs-5 text-black">Transportation</h1>
+                                        <h1 class="fw-bold text-xs fs-5 text-black">Project Proposal</h1>
                                         <p class="text-gray fw-semibold text-xs">L-300</p>
                                     </div>
 
                                     <div class="mt-1">
-                                        <h1 class="fw-bold text-xs fs-5 text-black">Speakers</h1>
+                                        <h1 class="fw-bold text-xs fs-5 text-black">Budget Request</h1>
                                         <p class="text-gray fw-semibold text-xs">November 11, 2024</p>
                                     </div>
                                 </div>
