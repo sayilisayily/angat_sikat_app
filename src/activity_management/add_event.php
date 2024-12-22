@@ -23,9 +23,17 @@ if (empty($_POST['title'])) {
 
 // Validate the plan_id
 if (empty($_POST['plan_id'])) {
-    $errors['plan_id'] = 'Plan ID is required.';
+    $errors['plan_id'] = 'Event plan_id is required.';
 } else {
-    $plan_id = intval($_POST['plan_id']); // Ensure plan_id is an integer
+    $plan_id = mysqli_real_escape_string($conn, $_POST['plan_id']);
+    
+    // Check if the event with the same plan_id already exists for the organization
+    $query = "SELECT * FROM events WHERE plan_id = '$plan_id' AND organization_id = {$_SESSION['organization_id']}";
+    $result = mysqli_query($conn, $query);
+    
+    if (mysqli_num_rows($result) > 0) {
+        $errors['plan_id'] = 'Event already exists.';
+    }
 }
 
 // Validate other fields
