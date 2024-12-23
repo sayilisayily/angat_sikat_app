@@ -30,25 +30,31 @@ if (!empty($errors)) {
         $category = '';
         $attachment = '';
 
-        // File upload handling
-        if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] == 0) {
-            $file_tmp = $_FILES['attachment']['tmp_name'];
-            $file_name = $_FILES['attachment']['name'];
+        // File upload handling with type validation
+        if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] !== UPLOAD_ERR_NO_FILE) {
+            if ($_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+                $file_tmp = $_FILES['attachment']['tmp_name'];
+                $file_name = $_FILES['attachment']['name'];
+                $file_extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                $allowed_extensions = ['doc', 'docx', 'xls', 'xlsx', 'pdf'];
 
-            if (!empty($file_name)) {
-                $upload_dir = 'uploads/';
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0777, true);
-                }
-
-                $file_path = $upload_dir . basename($file_name);
-                if (move_uploaded_file($file_tmp, $file_path)) {
-                    $attachment = $file_name;
+                if (!in_array($file_extension, $allowed_extensions)) {
+                    $errors['attachment'] = 'Invalid file type.';
                 } else {
-                    $errors['attachment'] = 'Error moving the uploaded file.';
+                    $upload_dir = 'uploads/';
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0777, true);
+                    }
+
+                    $file_path = $upload_dir . basename($file_name);
+                    if (move_uploaded_file($file_tmp, $file_path)) {
+                        $attachment = $file_name;
+                    } else {
+                        $errors['attachment'] = 'Error moving the uploaded file.';
+                    }
                 }
             } else {
-                $errors['attachment'] = 'Uploaded file name is empty.';
+                $errors['attachment'] = 'File upload error.';
             }
         }
 
@@ -66,7 +72,7 @@ if (!empty($errors)) {
 
         if (empty($category)) {
             $errors['category'] = 'Event title not found in any category.';
-        } else {
+        } else if (empty($errors)) {
             // Insert into budget_approvals table
             $insert_query = "INSERT INTO budget_approvals (title, category, attachment, status, organization_id) 
                              VALUES ('$title', '$category', '$attachment', '$status', $organization_id)";
@@ -103,6 +109,11 @@ if (!empty($errors)) {
             }
         }
     }
+}
+
+if (!empty($errors)) {
+    $data['success'] = false;
+    $data['errors'] = $errors;
 }
 
 echo json_encode($data);
