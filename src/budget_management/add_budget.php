@@ -17,13 +17,13 @@ if (!isset($_SESSION['organization_id']) || !is_numeric($_SESSION['organization_
 if (empty($_POST['category'])) {
     $errors['category'] = 'Budget category is required.';
 } else {
-    $category = mysqli_real_escape_string($conn, $_POST['category']);
+    $category = mysqli_real_escape_string($conn, $_POST['category']); // Use category name, not category_id
 
     // Check for duplicate category in the budget allocation table
     $duplicate_check_query = "SELECT COUNT(*) as count FROM budget_allocation 
-                              WHERE organization_id = ? AND category = ?";
+                              WHERE organization_id = ? AND category = ?"; // Check against category name
     $stmt = $conn->prepare($duplicate_check_query);
-    $stmt->bind_param('is', $organization_id, $category);
+    $stmt->bind_param('is', $organization_id, $category); // Bind as string for category
     $stmt->execute();
     $stmt->bind_result($count);
     $stmt->fetch();
