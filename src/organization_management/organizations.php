@@ -434,7 +434,7 @@ $result = $conn->query($sql);
                         </div>
                         <!-- Error Message Alert -->
                         <div id="archiveErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                            <ul id="archiveErrorList3"></ul> <!-- List for showing validation errors -->
+                            <ul id="archiveErrorList"></ul> <!-- List for showing validation errors -->
                         </div>
                 </div>
                 <div class="modal-footer">
