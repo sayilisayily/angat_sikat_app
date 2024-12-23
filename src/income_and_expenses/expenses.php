@@ -267,21 +267,53 @@ $result = $conn->query($sql);
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <!-- Category Field -->
-                                <div class="form-group">
-                                    <label for="category">Category</label>
-                                    <select class="form-control" id="category" name="category" required>
-                                        <option value="">Select Category</option>
-                                        <option value="activities">Activities</option>
-                                        <option value="purchases">Purchases</option>
-                                        <option value="maintenance">Maintenance</option>
-                                    </select>
-                                </div>
-
+                                
                                 <!-- Title Field -->
                                 <div class="form-group mt-3">
                                     <label for="title">Title</label>
-                                    <input type="text" class="form-control" id="title" name="title" required>
+                                    <select name="title" id="title" class="form-control" required>
+                                        <option value="">Select Title</option>
+                                        <!-- Fetch titles from events, purchases, and maintenance -->
+                                        <?php
+                                        // Fetch events
+                                        $event_query = "SELECT title, event_id FROM events where event_type = 'Expense' AND accomplishment_status = 1 AND archived = 0 AND organization_id = $organization_id";
+                                        $event_result = mysqli_query($conn, $event_query);
+                                        echo "<optgroup label='Events'>";
+                                        while ($row = mysqli_fetch_assoc($event_result)) {
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['event_id']) .'">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
+                                        }
+                                        echo "</optgroup>";
+        
+                                        // Fetch purchases
+                                        $purchase_query = "SELECT title, purchase_id FROM purchases WHERE completion_status = 1 AND archived = 0 AND organization_id = $organization_id";
+                                        $purchase_result = mysqli_query($conn, $purchase_query);
+                                        echo "<optgroup label='Purchases'>";
+                                        while ($row = mysqli_fetch_assoc($purchase_result)) {
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['purchase_id']) .'">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
+                                        }
+                                        echo "</optgroup>";
+        
+                                        // Fetch maintenance
+                                        $maintenance_query = "SELECT title, maintenance_id FROM maintenance WHERE completion_status = 1 AND archived = 0 AND organization_id = $organization_id";
+                                        $maintenance_result = mysqli_query($conn, $maintenance_query);
+                                        echo "<optgroup label='Mainteance and Other Expenses'>";
+                                        while ($row = mysqli_fetch_assoc($maintenance_result)) {
+                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
+                                                    data-id="' . htmlspecialchars($row['maintenance_id']) .'">' 
+                                                    . htmlspecialchars($row['title']) . '</option>';
+                                        }
+                                        echo "</optgroup>";
+                                        ?>
+                                    </select>   
+                                </div>
+                                <!-- Category Field -->
+                                <div class="form-group">
+                                    <label for="category">Category</label>
+                                    <input type="text" class="form-control" id="title" name="title" readonly>
                                 </div>
 
                                 <!-- Amount Field -->
@@ -293,7 +325,7 @@ $result = $conn->query($sql);
 
                                 <!-- Reference (File Upload) Field -->
                                 <div class="form-group mt-3">
-                                    <label for="reference">Reference (File Upload)</label>
+                                    <label for="reference">Reference</label>
                                     <input type="file" class="form-control" id="reference" name="reference"
                                         accept=".pdf,.jpg,.png,.doc,.docx" required>
                                 </div>
