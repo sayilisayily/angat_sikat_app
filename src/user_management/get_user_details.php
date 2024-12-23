@@ -1,8 +1,8 @@
-<?php
+<?php 
 include '../connection.php';
 
-if (isset($_POST['user_id'])) {
-    $user_id = $_POST['user_id'];
+if (isset($_POST['user_id']) && !empty($_POST['user_id'])) {
+    $user_id = intval($_POST['user_id']);
 
     // SQL query to fetch user details and associated organization_id
     $query = "SELECT u.*, o.organization_id 

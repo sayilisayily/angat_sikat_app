@@ -218,65 +218,64 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
         </div>
         <!-- End of 2nd Body Wrapper -->
+         <div class="container mt-5 p-5">
+            <h2 class="mb-4">Users
+                <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addUserModal"
+                    style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                    <i class="fa-solid fa-plus"></i> Add User
+                </button>
+            </h2>
+            <table id="usersTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Organization</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                // Fetch users with role = 'officer' and join with organizations table to get organization name
+                $userQuery = "SELECT users.*, organizations.organization_name 
+                            FROM users 
+                            JOIN organizations ON users.organization_id = organizations.organization_id 
+                            WHERE users.role = 'officer'";
+                $userResult = $conn->query($userQuery);
+
+                if ($userResult->num_rows > 0) {
+                    while ($userRow = $userResult->fetch_assoc()) {
+                        echo "<tr>
+                                <td>{$userRow['username']}</td>
+                                <td>{$userRow['first_name']}</td>
+                                <td>{$userRow['last_name']}</td>
+                                <td>{$userRow['email']}</td>
+                                <td>{$userRow['organization_name']}</td>
+                                <td>
+                                    <button class='btn btn-primary btn-sm edit-btn mb-3' 
+                                            data-bs-toggle='modal' 
+                                            data-bs-target='#editUserModal' 
+                                            data-id='{$userRow['user_id']}'>
+                                        <i class='fa-solid fa-pen'></i> Edit
+                                    </button>
+                                    <button class='btn btn-danger btn-sm delete-btn mb-3' 
+                                            data-id='{$userRow['user_id']}'>
+                                        <i class='fa-solid fa-trash'></i> Delete
+                                    </button>
+                                </td>
+                            </tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='7' class='text-center'>No users found</td></tr>";
+                }
+                ?>
+                </tbody>
+            </table>
+        </div>
     </div>
     <!-- End of Overall Body Wrapper -->
-
-    <div class="container mt-5 p-5">
-        <h2 class="mb-4">Users
-            <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addUserModal"
-                style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                <i class="fa-solid fa-plus"></i> Add User
-            </button>
-        </h2>
-        <table id="usersTable" class="table">
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Organization</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-            // Fetch users and join with organizations table to get organization name
-            $userQuery = "SELECT users.*, organizations.organization_name FROM users 
-                          JOIN organizations ON users.organization_id = organizations.organization_id";
-            $userResult = $conn->query($userQuery);
-
-            if ($userResult->num_rows > 0) {
-                while ($userRow = $userResult->fetch_assoc()) {
-                    echo "<tr>
-                            <td>{$userRow['username']}</td>
-                            <td>{$userRow['first_name']}</td>
-                            <td>{$userRow['last_name']}</td>
-                            <td>{$userRow['email']}</td>
-                            <td>{$userRow['role']}</td>
-                            <td>{$userRow['organization_name']}</td>
-                            <td>
-                                <button class='btn btn-primary btn-sm edit-btn mb-3' 
-                                        data-bs-toggle='modal' 
-                                        data-bs-target='#editUserModal' 
-                                        data-id='{$userRow['user_id']}'>
-                                    <i class='fa-solid fa-pen'></i> Edit
-                                </button>
-                                <button class='btn btn-danger btn-sm delete-btn mb-3' 
-                                        data-id='{$userRow['user_id']}'>
-                                    <i class='fa-solid fa-trash'></i> Delete
-                                </button>
-                            </td>
-                        </tr>";
-                }
-            } else {
-                echo "<tr><td colspan='7' class='text-center'>No users found</td></tr>";
-            }
-            ?>
-            </tbody>
-        </table>
-    </div>
 
     <!-- Add User Modal -->
     <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserLabel"
@@ -290,56 +289,89 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                     </div>
                     <div class="modal-body">
                         <!-- Form fields -->
-                        <div class="form-group row mb-2">
-                            <div class="col">
-                                <label for="username">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username" required>
                             </div>
-                            <div class="col">
-                                <label for="email">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-envelope'></i></span>
+                                <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" required>
+                            </div>
                             </div>
                         </div>
 
-                        <div class="form-group row mb-2">
-                            <div class="col">
-                                <label for="first_name">First Name</label>
-                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        <!-- First Name and Last Name Row -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                <input type="text" class="form-control" name="fname" id="firstname" placeholder="Enter First Name" required>
                             </div>
-                            <div class="col">
-                                <label for="last_name">Last Name</label>
-                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            </div>
+                            <div class="col-md-6">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                <input type="text" class="form-control" name="lname" id="lastname" placeholder="Enter Last Name" required>
+                            </div>
                             </div>
                         </div>
-                        <div class="form-group row mb-2">
+
+                        <!-- Organization and Role Row -->
+                        <div class="row mb-3">
                             <div class="col">
-                                <label for="role">Role</label>
-                                <select class="form-control" id="role" name="role">
-                                    <option value="admin">Admin</option>
-                                    <option value="officer">Officer</option>
-                                    <option value="member">Member</option>
-                                </select>
-                            </div>
-                            <div class="col">
-                                <label for="organization">Organization</label>
-                                <select class="form-control" id="organization" name="organization_id">
+                                <label for="organization" class="form-label">Organization</label>
+                                <select class="form-select" name="organization" id="organization" required>
+                                    <option value="">Select Organization</option>
                                     <?php
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<option value='{$row['organization_id']}'>{$row['organization_name']}</option>";
-                    }
-                }
-                ?>
+                                    $query = "SELECT organization_id, organization_name FROM organizations";
+                                    $result = mysqli_query($conn, $query);
+                                    if ($result) {
+                                    while ($org = mysqli_fetch_assoc($result)) {
+                                        echo "<option value='{$org['organization_id']}'>{$org['organization_name']}</option>";
+                                    }
+                                    } else {
+                                    echo "<option value=''>No Organizations Available</option>";
+                                    }
+                                    ?>
                                 </select>
                             </div>
                         </div>
+
+                        <!-- Password and Confirm Password Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-lock'></i></span>
+                                <input type="password" class="form-control" name="password" placeholder="Password" required>
+                            </div>
+                            </div>
+                            <div class="col-md-6">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-lock'></i></span>
+                                <input type="password" class="form-control" id="confirmpassword" name="confirm_password" placeholder="Re-type Password" required>
+                            </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="role" id="role" value="Officer">
                         <!-- Success Message Alert -->
                         <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
                             User added successfully!
                         </div>
+
                         <!-- Error Message Alert -->
                         <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                            <ul id="errorList"></ul> <!-- List for showing validation errors -->
+                            <ul id="errorList"></ul>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -365,42 +397,81 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                         <!-- Hidden field for user ID -->
                         <input type="hidden" id="editUserId" name="user_id">
                         <!-- Form fields -->
-                        <div class="form-group mb-3">
-                            <label for="editUsername">Username</label>
-                            <input type="text" class="form-control" id="editUsername" name="username" required>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                <input type="text" class="form-control" name="username" id="edit_username" placeholder="Enter Username" required>
+                            </div>
+                            </div>
+                            <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-envelope'></i></span>
+                                <input type="email" class="form-control" name="email" id="edit_email" placeholder="Enter Email" required>
+                            </div>
+                            </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="editFirstName">First Name</label>
-                            <input type="text" class="form-control" id="editFirstName" name="first_name" required>
+
+                        <!-- First Name and Last Name Row -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                <input type="text" class="form-control" name="first_name" id="edit_firstname" placeholder="Enter First Name" required>
+                            </div>
+                            </div>
+                            <div class="col-md-6">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                <input type="text" class="form-control" name="last_name" id="edit_lastname" placeholder="Enter Last Name" required>
+                            </div>
+                            </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="editLastName">Last Name</label>
-                            <input type="text" class="form-control" id="editLastName" name="last_name" required>
+
+                        <!-- Organization and Role Row -->
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="organization" class="form-label">Organization</label>
+                                <select class="form-select" name="organization" id="edit_organization" required>
+                                    <option value="">Select Organization</option>
+                                    <?php
+                                    $query = "SELECT organization_id, organization_name FROM organizations";
+                                    $result = mysqli_query($conn, $query);
+                                    if ($result) {
+                                    while ($org = mysqli_fetch_assoc($result)) {
+                                        echo "<option value='{$org['organization_id']}'>{$org['organization_name']}</option>";
+                                    }
+                                    } else {
+                                    echo "<option value=''>No Organizations Available</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="editEmail">Email</label>
-                            <input type="email" class="form-control" id="editEmail" name="email" required>
+
+                        <!-- Password and Confirm Password Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class='bx bx-lock'></i></span>
+                                <input type="password" class="form-control" id="edit_password" name="password" placeholder="Password" required>
+                            </div>
+                            </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="editRole">Role</label>
-                            <select class="form-control" id="editRole" name="role">
-                                <option value="admin">Admin</option>
-                                <option value="officer">Officer</option>
-                                <option value="member">Member</option>
-                            </select>
+                        
+                        <!-- Success Message Alert -->
+                        <div id="editSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                            User updated successfully!
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="editOrganization">Organization</label>
-                            <select class="form-control" id="editOrganization" name="organization_id">
-                                <?php
-              // Repopulate organizations in the edit modal
-              if ($result->num_rows > 0) {
-                  while ($row = $result->fetch_assoc()) {
-                      echo "<option value='{$row['organization_id']}'>{$row['organization_name']}</option>";
-                  }
-              }
-              ?>
-                            </select>
+
+                        <!-- Error Message Alert -->
+                        <div id="editErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                            <ul id="editErrorList"></ul>
                         </div>
                     </div>
                     <div class="modal-footer">

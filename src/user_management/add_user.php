@@ -1,72 +1,66 @@
 <?php
 include '../connection.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get inputs from the form
-    $username = $_POST['username'];
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $email = $_POST['email'];
-    $role = $_POST['role'];
-    $organization_id = $_POST['organization_id']; // This should be passed from the form or fetched from the session
+// Initialize an array to hold any errors
+$errors = [];
+$data = [];
 
-    // Handle file upload for the profile picture (optional)
-    $profile_picture = null; // Default value for profile picture
-    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
-        $file = $_FILES['profile_picture'];
-        $uploadDirectory = 'uploads/'; // Adjust path as needed
-        $uploadFile = $uploadDirectory . basename($file['name']);
-        
-        // Validate file upload
-        $fileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
-        $allowedTypes = ['jpg', 'jpeg', 'png'];
+// Check if the form has been submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve form data and sanitize inputs
+    $username = trim(mysqli_real_escape_string($conn, $_POST['username']));
+    $fname = trim(mysqli_real_escape_string($conn, $_POST['fname']));
+    $lname = trim(mysqli_real_escape_string($conn, $_POST['lname']));
+    $organization = mysqli_real_escape_string($conn, $_POST['organization']);
+    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $email = trim(mysqli_real_escape_string($conn, $_POST['email']));
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
 
-        if (in_array($fileType, $allowedTypes)) {
-            if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-                $profile_picture = $uploadFile; // Store file path for the database
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Failed to upload profile picture.']);
-                exit;
-            }
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Invalid file type for profile picture.']);
-            exit;
-        }
+    // Validation
+    if (empty($username) || empty($fname) || empty($lname) || empty($email) || empty($password) || empty($confirm_password)) {
+        $errors[] = "All fields are required.";
     }
 
-    // Validate inputs
-    $errors = [];
-    if (empty($username)) {
-        $errors[] = "Username is required.";
-    }
-    if (empty($first_name)) {
-        $errors[] = "First name is required.";
-    }
-    if (empty($last_name)) {
-        $errors[] = "Last name is required.";
-    }
-    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Valid email is required.";
-    }
-    if (empty($role)) {
-        $errors[] = "Role is required.";
+    // Check if email is valid
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email format.";
     }
 
-    // If no errors, insert the user entry
-    if (empty($errors)) {
-        $stmt = $conn->prepare("INSERT INTO users (username, first_name, last_name, email, role, profile_picture, organization_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssssi", $username, $first_name, $last_name, $email, $role, $profile_picture, $organization_id);
+    // Check if password and confirm password match
+    if ($password !== $confirm_password) {
+        $errors[] = "Passwords do not match.";
+    }
 
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'User added successfully!']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to add user.']);
-        }
-        $stmt->close();
+    // Check if username or email already exists
+    $query = "SELECT * FROM users WHERE username = '$username' OR email = '$email'";
+    $result = mysqli_query($conn, $query);
+    if (mysqli_num_rows($result) > 0) {
+        $errors[] = "Username or email is already taken.";
+    }
+
+    // If no errors, proceed with insertion
+    if (!empty($errors)) {
+       $data['success'] = false;
+        $data['errors'] = $errors; 
     } else {
-        echo json_encode(['success' => false, 'errors' => $errors]);
+        // Hash the password
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+
+        // Insert the user into the database
+        $sql = "INSERT INTO users (username, first_name, last_name, organization_id, role, email, password) 
+                VALUES ('$username', '$fname', '$lname', '$organization', '$role', '$email', '$hashed_password')";
+
+        if (mysqli_query($conn, $sql)) {
+            // Registration successful
+            $data['success'] = true;
+            $data['message'] = 'User added successfully!';
+        } else {
+            $data['success'] = false;
+            $data['errors'] = ['database' => 'Failed to add event to the database.'];
+        }
     }
 }
 
-$conn->close();
+echo json_encode($data);
 ?>

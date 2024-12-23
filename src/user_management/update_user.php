@@ -1,96 +1,79 @@
 <?php
-// Include database connection
-include('../connection.php');
+include '../connection.php';
 
-// Initialize an array to hold validation errors
+// Initialize an array to hold any errors
 $errors = [];
 $data = [];
 
+// Check if the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate fields
-    if (empty($_POST['username'])) {
-        $errors[] = 'Username is required.';
-    } else {
-        $username = mysqli_real_escape_string($conn, $_POST['username']);
-        $user_id = mysqli_real_escape_string($conn, $_POST['user_id']); // Set $user_id for use
+    // Retrieve form data and sanitize inputs
+    $user_id = intval($_POST['user_id']);
+    $username = trim(mysqli_real_escape_string($conn, $_POST['username']));
+    $first_name = trim(mysqli_real_escape_string($conn, $_POST['first_name']));
+    $last_name = trim(mysqli_real_escape_string($conn, $_POST['last_name']));
+    $organization = intval($_POST['organization']);
+    $email = trim(mysqli_real_escape_string($conn, $_POST['email']));
+    $password = $_POST['password'];
+
+    // Validation
+    if (empty($username) || empty($first_name) || empty($last_name) || empty($email) || empty($password)) {
+        $errors[] = "All fields are required.";
     }
 
-    if (empty($_POST['first_name'])) {
-        $errors[] = 'First name is required.';
-    } else {
-        $first_name = mysqli_real_escape_string($conn, $_POST['first_name']);
+    // Check if email is valid
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email format.";
     }
 
-    if (empty($_POST['last_name'])) {
-        $errors[] = 'Last name is required.';
-    } else {
-        $last_name = mysqli_real_escape_string($conn, $_POST['last_name']);
+    // Check if username or email already exists (excluding the current user)
+    $query = "SELECT * FROM users WHERE (username = ? OR email = ?) AND user_id != ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ssi", $username, $email, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $errors[] = "Username or email is already taken.";
     }
 
-    if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'A valid email is required.';
+    // Verify the provided password matches the user's current password
+    $password_query = "SELECT password FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($password_query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        $errors[] = "User not found.";
     } else {
-        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $user = $result->fetch_assoc();
+        if (!password_verify($password, $user['password'])) {
+            $errors[] = "Incorrect password.";
+        }
     }
 
-    if (empty($_POST['role'])) {
-        $errors[] = 'Role is required.';
-    } else {
-        $role = mysqli_real_escape_string($conn, $_POST['role']);
-    }
+    // If no errors, proceed with update
+    if (empty($errors)) {
+        // Update the user in the database (password remains unchanged)
+        $update_query = "UPDATE users 
+                         SET username = ?, first_name = ?, last_name = ?, organization_id = ?, email = ? 
+                         WHERE user_id = ?";
+        $stmt = $conn->prepare($update_query);
+        $stmt->bind_param("sssisi", $username, $first_name, $last_name, $organization, $email, $user_id);
 
-    // If there are validation errors, return them
-    if (!empty($errors)) {
-        $data['success'] = false;
-        $data['errors'] = $errors;
-    } else {
-        // Prepare and execute the update query
-        $query = "UPDATE users SET 
-                    username = '$username', 
-                    first_name = '$first_name', 
-                    last_name = '$last_name', 
-                    email = '$email', 
-                    role = '$role' 
-                  WHERE user_id = '$user_id'";
-
-        if (mysqli_query($conn, $query)) {
+        if ($stmt->execute()) {
             $data['success'] = true;
             $data['message'] = 'User updated successfully!';
         } else {
-            $data['success'] = false;
-            $data['errors'] = ['database' => 'Failed to update user in the database.'];
+            $errors[] = "Failed to update the user. Please try again.";
         }
+    }
 
-        // If profile picture is uploaded, handle the update
-        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
-            $file = $_FILES['profile_picture'];
-            $uploadDirectory = 'uploads/'; // Adjust path as needed
-            $uploadFile = $uploadDirectory . basename($file['name']);
-
-            // Validate file upload
-            $fileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
-            $allowedTypes = ['jpg', 'jpeg', 'png'];
-
-            if (in_array($fileType, $allowedTypes)) {
-                if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-                    // Update the profile picture in the database
-                    $query = "UPDATE users SET profile_picture = '$uploadFile' WHERE user_id = '$user_id'";
-                    if (mysqli_query($conn, $query)) {
-                        $data['success'] = true;
-                        $data['message'] = 'User updated successfully, with new profile picture!';
-                    } else {
-                        $data['success'] = false;
-                        $data['errors'] = ['database' => 'Failed to update profile picture in the database.'];
-                    }
-                } else {
-                    $data['success'] = false;
-                    $data['errors'] = ['file_upload' => 'Failed to upload profile picture.'];
-                }
-            } else {
-                $data['success'] = false;
-                $data['errors'] = ['file_upload' => 'Invalid file type for profile picture.'];
-            }
-        }
+    // Handle errors
+    if (!empty($errors)) {
+        $data['success'] = false;
+        $data['errors'] = $errors;
     }
 }
 
