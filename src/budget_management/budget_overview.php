@@ -245,65 +245,66 @@
                         <div class="card text-white gradient-card mb-3 py-4">
                             <div class="card-header">Balance</div>
                             <div class="card-body">
-                                <h3 class="card-title">₱
-                                    <?php echo number_format($balance, 2); ?>
-                                </h3>
+                                <h5 class="card-title">
+                                    <span class="balance-value" style="display: none;">₱
+                                        <?php echo number_format($balance, 2); ?>
+                                    </span>
+                                    <span class="balance-placeholder">****</span> <!-- Placeholder text when hidden -->
+                                    <i class="fa-solid fa-eye toggle-eye" style="cursor: pointer;"></i>
+                                </h5>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
 
-                    <!-- Beginning Balance Card -->
-                    <div class="col-md-4">
-                        <div class="card gradient-card-2 text-white mb-3 py-4">
-                            <div class="card-body">
-                                <h5 class="card-title">₱
-                                    <?php echo number_format($beginning_balance, 2); ?>
-                                </h5>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between align-items-center">
-                                <span>Beginning Balance</span>
-                                <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal"
-                                    data-bs-target="#editBeginningBalanceModal"
-                                    data-id="<?php echo $organization_id; ?>"><i class="fa-solid fa-pen"></i>
-                                    Edit</button>
-                            </div>
+                <!-- Beginning Balance Card -->
+                <div class="col-md-4">
+                    <div class="card gradient-card-2 text-white mb-3 py-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span class="balance-value" style="display: none;">₱<?php echo number_format($beginning_balance, 2); ?></span>
+                                <span class="balance-placeholder">****</span> <!-- Placeholder text when hidden -->
+                                <i class="fa-solid fa-eye toggle-eye" style="cursor: pointer;"></i> <!-- Default eye icon for hidden -->
+                            </h5>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <span>Beginning Balance</span>
+                            <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal" data-bs-target="#editBeginningBalanceModal" data-id="<?php echo $organization_id; ?>"><i class="fa-solid fa-pen"></i> Edit</button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Cash on Bank Card -->
-                    <div class="col-md-4">
-                        <div class="card text-white gradient-card-3 mb-3 py-4">
-                            <div class="card-body">
-                                <h5 class="card-title">₱
-                                    <?php echo number_format($cash_on_bank, 2); ?>
-                                </h5>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between align-items-center">
-                                <span>Cash on Bank</span>
-                                <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal"
-                                    data-bs-target="#editCashOnBankModal" data-id="<?php echo $organization_id; ?>"><i
-                                        class="fa-solid fa-pen"></i> Edit</button>
-                            </div>
+                <!-- Cash on Bank Card -->
+                <div class="col-md-4">
+                    <div class="card text-white gradient-card-3 mb-3 py-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span class="balance-value" style="display: none;">₱<?php echo number_format($cash_on_bank, 2); ?></span>
+                                <span class="balance-placeholder">****</span> <!-- Placeholder text when hidden -->
+                                <i class="fa-solid fa-eye toggle-eye" style="cursor: pointer;"></i> <!-- Default eye icon for hidden -->
+                            </h5>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <span>Cash on Bank</span>
+                            <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal" data-bs-target="#editCashOnBankModal" data-id="<?php echo $organization_id; ?>"><i class="fa-solid fa-pen"></i> Edit</button>
                         </div>
                     </div>
+                </div>
 
-
-                    <!-- Cash on Hand Card -->
-                    <div class="col-md-4">
-                        <div class="card text-white gradient-card-1 mb-3 py-4">
-                            <div class="card-body">
-                                <h5 class="card-title">₱
-                                    <?php echo number_format($cash_on_hand, 2); ?>
-                                </h5>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between align-items-center">
-                                <span>Cash on Hand</span>
-                                <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal"
-                                    data-bs-target="#editCashOnHandModal" data-id="<?php echo $organization_id; ?>"><i
-                                        class="fa-solid fa-pen"></i> Edit</button>
-                            </div>
+                <!-- Cash on Hand Card -->
+                <div class="col-md-4">
+                    <div class="card text-white gradient-card-1 mb-3 py-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span class="balance-value" style="display: none;">₱<?php echo number_format($cash_on_hand, 2); ?></span>
+                                <span class="balance-placeholder">****</span> <!-- Placeholder text when hidden -->
+                                <i class="fa-solid fa-eye toggle-eye" style="cursor: pointer;"></i> <!-- Default eye icon for hidden -->
+                            </h5>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <span>Cash on Hand</span>
+                            <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal" data-bs-target="#editCashOnHandModal" data-id="<?php echo $organization_id; ?>"><i class="fa-solid fa-pen"></i> Edit</button>
                         </div>
                     </div>
                 </div>
@@ -544,28 +545,28 @@
                     <div class="mb-3">
                         <label for="category" class="form-label">Category</label>
                         <select class="form-control" id="category" name="category" required>
-                            <option value="">Select Category</option>
-                            <?php
-                            // Fetch categories
-                            $category_query = "SELECT category_id, category FROM categories"; // Updated column names as per convention
-                            $category_result = mysqli_query($conn, $category_query);
+                        <option value="">Select Category</option>
+                        <?php
+                        // Fetch categories
+                        $category_query = "SELECT category_id, category FROM categories"; // Fetch both category_id and category name
+                        $category_result = mysqli_query($conn, $category_query);
 
-                            if (!$category_result) {
-                                // Query error
-                                echo '<option value="">Error loading categories</option>';
-                            } else {
-                                if (mysqli_num_rows($category_result) > 0) {
-                                    while ($category_row = mysqli_fetch_assoc($category_result)) {
-                                        // Use htmlspecialchars to prevent XSS
-                                        echo '<option value="' . htmlspecialchars($category_row['category_id']) . '">' . htmlspecialchars($category_row['category']) . '</option>';
-                                    }
-                                } else {
-                                    // No categories available
-                                    echo '<option value="">No categories available</option>';
+                        if (!$category_result) {
+                            // Query error
+                            echo '<option value="">Error loading categories</option>';
+                        } else {
+                            if (mysqli_num_rows($category_result) > 0) {
+                                while ($category_row = mysqli_fetch_assoc($category_result)) {
+                                    // Use category name as the value for the select option
+                                    echo '<option value="' . htmlspecialchars($category_row['category']) . '">' . htmlspecialchars($category_row['category']) . '</option>';
                                 }
+                            } else {
+                                // No categories available
+                                echo '<option value="">No categories available</option>';
                             }
-                            ?>
-                        </select>
+                        }
+                        ?>
+                    </select>
                     </div>
                     <input type="hidden" name="organization_id" value="<?php echo htmlspecialchars($organization_id); ?>">
                 </form>
@@ -659,7 +660,7 @@
                         <?php
 
                             // Fetch budget allocation data from the database
-                            $query = "SELECT category, allocated_budget FROM budget_allocation";
+                            $query = "SELECT category, allocated_budget FROM budget_allocation WHERE organization_id = $organization_id";
                             $result = mysqli_query($conn, $query);
 
                             // Loop through the results and output them as JavaScript array elements
