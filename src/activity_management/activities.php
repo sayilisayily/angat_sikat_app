@@ -197,7 +197,7 @@ $result = $conn->query($sql);
                                     <option value="">Select Event Title</option>
                                     <?php
                                     // Query to fetch titles with category 'Activities'
-                                    $title_query = "SELECT plan_id, title, date, type, amount FROM financial_plan WHERE category = 'Activities' OR type = 'Income' AND organization_id = $organization_id";
+                                    $title_query = "SELECT plan_id, title, date, type, amount FROM financial_plan WHERE category = 'Activities' AND organization_id = $organization_id OR type = 'Income' AND organization_id = $organization_id";
                                     $result = mysqli_query($conn, $title_query);
 
                                     if ($result && mysqli_num_rows($result) > 0) {
