@@ -154,3 +154,60 @@ $("#editUserForm").on("submit", function (event) {
     },
   });
 });
+
+// Event delegation for dynamically loaded buttons (Archive)
+$(document).on("click", ".archive-btn", function () {
+  var userId = $(this).data("id");
+  $("#archiveId").val(userId);
+  $("#archiveModal").modal("show");
+  console.log("Selected User ID: " + userId);
+});
+
+// Handle archive confirmation when "Archive" button in modal is clicked
+$("#confirmArchiveBtn").on("click", function () {
+  var userId = $("#archiveId").val(); // Get the organization ID from the hidden input field
+
+  // Send an AJAX request to archive the organization
+  $.ajax({
+    url: "archive_user.php", // PHP file to handle archiving
+    type: "POST",
+    data: { user_id: userId },
+    dataType: "json",
+    success: function (response) {
+      try {
+        if (response.success) {
+          // Show success message (optional)
+          console.log(response.message);
+          // Hide any existing error messages
+          $("#archiveErrorMessage").addClass("d-none");
+
+          // Show success message
+          $("#archiveSuccessMessage").removeClass("d-none");
+
+          // Close the modal after a short delay
+          setTimeout(function () {
+            $("#archiveModal").modal("hide");
+            $("#archiveSuccessMessage").addClass("d-none");
+            location.reload();
+          }, 2000);
+        } else {
+          // Show validation errors
+          $("#archiveSuccessMessage").addClass("d-none");
+
+          $("#archiveErrorMessage").removeClass("d-none");
+          let errorHtml = "";
+          for (let field in response.errors) {
+            errorHtml += `<li>${response.errors[field]}</li>`;
+          }
+          $("#archiveErrorList").html(errorHtml);
+        }
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Error archiving organization:", error);
+      console.log(xhr.responseText);
+    },
+  });
+});

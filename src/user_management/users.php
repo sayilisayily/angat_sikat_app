@@ -242,7 +242,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                 $userQuery = "SELECT users.*, organizations.organization_name 
                             FROM users 
                             JOIN organizations ON users.organization_id = organizations.organization_id 
-                            WHERE users.role = 'officer'";
+                            WHERE users.role = 'officer' AND users.archived = 0";
                 $userResult = $conn->query($userQuery);
 
                 if ($userResult->num_rows > 0) {
@@ -260,9 +260,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                                             data-id='{$userRow['user_id']}'>
                                         <i class='fa-solid fa-pen'></i> Edit
                                     </button>
-                                    <button class='btn btn-danger btn-sm delete-btn mb-3' 
+                                    <button class='btn btn-danger btn-sm archive-btn mb-3' 
                                             data-id='{$userRow['user_id']}'>
-                                        <i class='fa-solid fa-trash'></i> Delete
+                                        <i class='fa-solid fa-box-archive'></i> Archive
                                     </button>
                                 </td>
                             </tr>";
@@ -479,6 +479,34 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archive Confirmation Modal -->
+    <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="archiveModalLabel">Archive User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to archive this user?
+                    <input type="hidden" id="archiveId">
+                    <!-- Success Message Alert -->
+                    <div id="archiveSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                        User archived successfully!
+                    </div>
+                    <!-- Error Message Alert -->
+                    <div id="archiveErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                        <ul id="archiveErrorList"></ul> <!-- List for showing validation errors -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmArchiveBtn" class="btn btn-danger">Archive</button>
+                </div>
             </div>
         </div>
     </div>
