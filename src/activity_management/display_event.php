@@ -2,8 +2,13 @@
 require 'connection.php'; // Include your database connection file
 include '../session_check.php';
 
-// Query to fetch event details
-$display_query = "SELECT * FROM events WHERE archived=0 and event_status='Approved'";             
+// Query to fetch event details along with the organization's color
+$display_query = "
+    SELECT e.event_id, e.title, e.event_start_date, e.event_end_date, o.organization_color
+    FROM events e
+    JOIN organizations o ON e.organization_id = o.organization_id  -- Assuming organization_id is the link
+    WHERE e.archived = 0 AND e.event_status = 'Approved'";             
+
 $results = mysqli_query($conn, $display_query); // Execute the query
 $count = mysqli_num_rows($results);  // Count the number of results
 
@@ -21,12 +26,8 @@ if($count > 0)
         $data_arr[$i]['start'] = date("Y-m-d", strtotime($data_row['event_start_date']));  // Start date (formatted)
         $data_arr[$i]['end'] = date("Y-m-d", strtotime($data_row['event_end_date']));  // End date (formatted)
         
-        // Assign colors based on event type (income vs expense)
-        if ($data_row['event_type'] === 'Income') {
-            $data_arr[$i]['color'] = '#00B415';  // Green for Income
-        } else {
-            $data_arr[$i]['color'] = '#FFB000';  // Red for Expense
-        }
+        // Assign the organization color
+        $data_arr[$i]['color'] = $data_row['organization_color'];  // Use the organization color
 
         // Optionally, include a URL to link to event details
         $data_arr[$i]['url'] = 'event_details.php?event_id=' . $data_row['event_id'];  

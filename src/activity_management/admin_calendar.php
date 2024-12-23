@@ -217,13 +217,14 @@
 
         </div>
         <!-- End of 2nd Body Wrapper -->
+         <div class="container mt-5">
+            <h2>Activities</h2>
+            <div id="calendar"></div>
+        </div>
     </div>
     <!-- End of Overall Body Wrapper -->
 
-    <div class="container mt-5">
-        <h2>Activities</h2>
-        <div id="calendar"></div>
-    </div>
+    
 
     <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
