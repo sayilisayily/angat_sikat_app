@@ -13,20 +13,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subtract_amount = $_POST['subtract_amount'] ?? 0;
 
     // Validation
-    if ($add_amount < 0) {
-        $errors['add_amount'] = 'Add amount cannot be negative.';
+    if ($add_amount < 0 && $subtract_amount < 0) {
+        $errors['amount'] = 'Either Add amount or Subtract amount must be non-negative.';
     }
 
-    if ($subtract_amount < 0) {
-        $errors['subtract_amount'] = 'Subtract amount cannot be negative.';
-    }
-
+    // If there are validation errors, return them
     if (!empty($errors)) {
         $data['success'] = false;
         $data['errors'] = $errors;
     } else {
         // Calculate new beginning balance
-        $new_beginning_balance = $current_beginning_balance + $add_amount - $subtract_amount;
+        $new_beginning_balance = (float)$current_beginning_balance + (float)$add_amount - (float)$subtract_amount;
 
         // Fetch current expenses for the organization
         $fetch_query = "SELECT SUM(amount) AS total_expenses FROM expenses WHERE organization_id = ?";
@@ -43,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $total_expenses = $total_expenses ?? 0;
 
             // Calculate the new balance (new beginning balance - total expenses)
-            $balance = $new_beginning_balance - $total_expenses;
+            $balance = $new_beginning_balance - (float)$total_expenses;
 
             // Prepare and execute the update query
             $update_query = "UPDATE organizations SET beginning_balance = ?, balance = ? WHERE organization_id = ?";
