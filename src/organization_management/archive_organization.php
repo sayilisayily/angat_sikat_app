@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../connection.php';
 
 $data = [];
 
@@ -7,7 +7,7 @@ if (isset($_POST['organization_id'])) {
     $organization_id = intval($_POST['organization_id']);
     
     // Update the archived status of the organization
-    $query = "UPDATE organizations SET organization_status = 'Archived' WHERE organization_id = $organization_id";
+    $query = "UPDATE organizations SET archived = 1 WHERE organization_id = $organization_id";
     
     if (mysqli_query($conn, $query)) {
         $data['success'] = true;

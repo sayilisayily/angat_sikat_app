@@ -3,9 +3,8 @@ include '../connection.php';
 include '../session_check.php';
 
 $errors = [];
-$data = [];
 
-// Validate organization ID (ensure it exists)
+// Validate organization ID
 if (empty($_POST['organization_id'])) {
     $errors['organization_id'] = 'Organization ID is required.';
 } else {
@@ -16,78 +15,50 @@ if (empty($_POST['organization_id'])) {
 if (empty($_POST['organization_name'])) {
     $errors['organization_name'] = 'Organization name is required.';
 } else {
-    $organization_name = mysqli_real_escape_string($conn, $_POST['organization_name']);
-
-    // Check if an organization with the same name already exists (other than the current one)
-    $query = "SELECT * FROM organizations WHERE organization_name = '$organization_name' AND organization_id != $organization_id";
-    $result = mysqli_query($conn, $query);
-    
-    if (mysqli_num_rows($result) > 0) {
-        $errors['organization_name'] = 'An organization with this name already exists.';
-    }
+    $organization_name = trim($_POST['organization_name']);
 }
 
-// Validate and upload organization logo (if uploaded)
-if (isset($_FILES['organization_logo']) && $_FILES['organization_logo']['error'] == 0) {
+// Check for duplicate organization name
+$query = "SELECT * FROM organizations WHERE organization_name = ? AND organization_id != ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param('si', $organization_name, $organization_id);
+$stmt->execute();
+if ($stmt->get_result()->num_rows > 0) {
+    $errors['organization_name'] = 'An organization with this name already exists.';
+}
+$stmt->close();
+
+// Validate other fields
+$organization_members = isset($_POST['organization_members']) ? intval($_POST['organization_members']) : 0;
+$organization_status = isset($_POST['organization_status']) ? trim($_POST['organization_status']) : '';
+$organization_color = isset($_POST['organization_color']) ? trim($_POST['organization_color']) : '#000000';
+
+// File upload logic
+$organization_logo = $_POST['existing_logo'];
+if (isset($_FILES['organization_logo']) && $_FILES['organization_logo']['error'] === UPLOAD_ERR_OK) {
+    $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
     $file_tmp = $_FILES['organization_logo']['tmp_name'];
-    $file_name = $_FILES['organization_logo']['name'];
-    
-    if (!empty($file_name)) {
+    $file_name = basename($_FILES['organization_logo']['name']);
+    $file_type = mime_content_type($file_tmp);
+
+    if (in_array($file_type, $allowed_types)) {
         $upload_dir = 'uploads/';
-        
-        // Ensure uploads directory exists
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
-        
-        // Check the file type (e.g., JPEG, PNG, GIF)
-        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-        $file_type = mime_content_type($file_tmp);
-
-        if (!in_array($file_type, $allowed_types)) {
-            $errors['organization_logo'] = 'Invalid file type.';
+        $file_path = $upload_dir . $file_name;
+        if (move_uploaded_file($file_tmp, $file_path)) {
+            $organization_logo = $file_name;
         } else {
-            // Move uploaded file to the directory
-            $file_path = $upload_dir . basename($file_name);
-            if (move_uploaded_file($file_tmp, $file_path)) {
-                $organization_logo = $file_name; // File uploaded successfully
-            } else {
-                $errors['organization_logo'] = 'Error moving the uploaded file.';
-            }
+            $errors['organization_logo'] = 'Error uploading the file.';
         }
     } else {
-        $organization_logo = $_POST['existing_logo']; // Use existing logo if no new file is uploaded
+        $errors['organization_logo'] = 'Invalid file type.';
     }
-} else {
-    $organization_logo = $_POST['existing_logo']; // Use existing logo if no new file is uploaded
 }
 
-// Validate organization members
-if (empty($_POST['organization_members']) || !is_numeric($_POST['organization_members'])) {
-    $errors['organization_members'] = 'Valid number of members is required.';
-} else {
-    $organization_members = intval($_POST['organization_members']);
-}
-
-// Validate organization status
-if (empty($_POST['organization_status'])) {
-    $errors['organization_status'] = 'Organization status is required.';
-} else {
-    $organization_status = mysqli_real_escape_string($conn, $_POST['organization_status']);
-}
-
-// Validate organization color (if provided)
-$organization_color = isset($_POST['organization_color']) ? $_POST['organization_color'] : null;
-if (!empty($organization_color) && !preg_match('/^#[a-fA-F0-9]{6}$/', $organization_color)) {
-    $errors['organization_color'] = 'Invalid color format. Please use a valid hex color code.';
-}
-
-// If there are errors, return them
-if (!empty($errors)) {
-    $data['success'] = false;
-    $data['errors'] = $errors;
-} else {
-    // Use prepared statement to update the organization in the database
+// If no errors, update the database
+if (empty($errors)) {
     $query = "UPDATE organizations SET 
               organization_name = ?, 
               organization_logo = ?, 
@@ -95,25 +66,24 @@ if (!empty($errors)) {
               organization_status = ?, 
               organization_color = ? 
               WHERE organization_id = ?";
-    
-    if ($stmt = $conn->prepare($query)) {
-        $stmt->bind_param('ssisss', $organization_name, $organization_logo, $organization_members, $organization_status, $organization_color, $organization_id);
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param(
+        'ssissi',
+        $organization_name,
+        $organization_logo,
+        $organization_members,
+        $organization_status,
+        $organization_color,
+        $organization_id
+    );
 
-        if ($stmt->execute()) {
-            $data['success'] = true;
-            $data['message'] = 'Organization updated successfully!';
-        } else {
-            $data['success'] = false;
-            $data['errors'] = ['database' => 'Failed to update organization in the database.'];
-        }
-
-        $stmt->close();
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Organization updated successfully!']);
     } else {
-        $data['success'] = false;
-        $data['errors'] = ['database' => 'Failed to prepare update statement.'];
+        echo json_encode(['success' => false, 'message' => 'Database update failed.']);
     }
+    $stmt->close();
+} else {
+    echo json_encode(['success' => false, 'errors' => $errors]);
 }
-
-// Output response as JSON
-echo json_encode($data);
 ?>

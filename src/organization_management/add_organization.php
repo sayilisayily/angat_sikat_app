@@ -14,47 +14,49 @@ if (empty($_POST['organization_name'])) {
     // Check if an organization with the same name already exists
     $query = "SELECT * FROM organizations WHERE organization_name = '$organization_name'";
     $result = mysqli_query($conn, $query);
-    
+
     if (mysqli_num_rows($result) > 0) {
         $errors['organization_name'] = 'An organization with this name already exists.';
     }
 }
 
 // Validate and upload organization logo
+$organization_logo = null;
 if (isset($_FILES['organization_logo']) && $_FILES['organization_logo']['error'] == 0) {
     $file_tmp = $_FILES['organization_logo']['tmp_name'];
     $file_name = $_FILES['organization_logo']['name'];
+    $file_size = $_FILES['organization_logo']['size'];
+    $upload_dir = 'uploads/';
     
-    if (!empty($file_name)) {
-        $upload_dir = 'uploads/';
-        
-        // Ensure uploads directory exists
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
-        
-        // Check the file type (e.g., JPEG, PNG, GIF)
-        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-        $file_type = mime_content_type($file_tmp);
+    // Ensure uploads directory exists
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
+    }
 
-        if (!in_array($file_type, $allowed_types)) {
-            $errors['organization_logo'] = 'Invalid file type.';
-        } else {
-            // Move uploaded file to the directory
-            $file_path = $upload_dir . basename($file_name);
-            if (move_uploaded_file($file_tmp, $file_path)) {
-                $organization_logo = $file_name; // File uploaded successfully
-            } else {
-                $errors['organization_logo'] = 'Error moving the uploaded file.';
-            }
-        }
+    // Check file type and size
+    $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+    $file_type = mime_content_type($file_tmp);
+    $max_file_size = 2 * 1024 * 1024; // 2 MB
+
+    if (!in_array($file_type, $allowed_types)) {
+        $errors['organization_logo'] = 'Invalid file type. Allowed types: JPEG, PNG, GIF.';
+    } elseif ($file_size > $max_file_size) {
+        $errors['organization_logo'] = 'File size exceeds the 2MB limit.';
     } else {
-        $errors['organization_logo'] = 'Uploaded file name is empty.';
+        // Generate a unique file name
+        $file_ext = pathinfo($file_name, PATHINFO_EXTENSION);
+        $unique_name = uniqid('logo_', true) . '.' . $file_ext;
+        $file_path = $upload_dir . $unique_name;
+
+        if (move_uploaded_file($file_tmp, $file_path)) {
+            $organization_logo = $unique_name; // File uploaded successfully
+        } else {
+            $errors['organization_logo'] = 'Error moving the uploaded file.';
+        }
     }
 } else {
     $errors['organization_logo'] = 'Organization logo is required.';
 }
-
 
 // Validate organization members
 if (empty($_POST['organization_members']) || !is_numeric($_POST['organization_members'])) {

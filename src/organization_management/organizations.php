@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 include '../user_query.php';
-$sql = "SELECT * FROM organizations";
+$sql = "SELECT * FROM organizations WHERE archived = 0";
 $result = $conn->query($sql);
 ?>
 
@@ -316,17 +316,18 @@ $result = $conn->query($sql);
                         <div class="form-group mb-3">
                             <label for="organization_status">Status</label>
                             <select class="form-control" id="organization_status" name="organization_status">
-                                <option value="Active">Probationary</option>
-                                <option value="Active">Level I</option>
-                                <option value="Inactive">Level II</option>
+                                <option value="Probationary">Probationary</option>
+                                <option value="Level I">Level I</option>
+                                <option value="Level II">Level II</option>
                             </select>
                         </div>
                         <div class="form-group mb-3">
                             <div class="col-sm-3">
                                 <label for="organization_color">Color</label>
-                                <input type="color" class="form-control" id="organization_color"
-                                    name="organization_color" required>
+                                <input type="color" class="form-control" id="organization_color" 
+                                    name="organization_color" value="#FFFFFF" required>
                             </div>
+
                             <div class="col-sm-3">
                             </div>
                         </div>
@@ -362,6 +363,8 @@ $result = $conn->query($sql);
                     <div class="modal-body">
                         <!-- Hidden field for organization ID -->
                         <input type="hidden" id="editOrganizationId" name="organization_id">
+                        <!-- Existing logo hidden field -->
+                        <input type="hidden" id="existingLogo" name="existing_logo" value="">
 
                         <!-- Other form fields -->
                         <div class="form-group mb-3">
@@ -382,9 +385,9 @@ $result = $conn->query($sql);
                         <div class="form-group mb-3">
                             <label for="editOrganizationStatus">Status</label>
                             <select class="form-control" id="editOrganizationStatus" name="organization_status">
-                                <option value="Active">Probationary</option>
-                                <option value="Active">Level I</option>
-                                <option value="Inactive">Level II</option>
+                                <option value="Probationary">Probationary</option>
+                                <option value="Level I">Level I</option>
+                                <option value="Level II">Level II</option>
                             </select>
                         </div>
                         <div class="form-group mb-3">
@@ -397,12 +400,12 @@ $result = $conn->query($sql);
                             </div>
                         </div>
                         <!-- Success Message Alert -->
-                        <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
+                        <div id="editSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
                             Organization updated successfully!
                         </div>
                         <!-- Error Message Alert -->
-                        <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                            <ul id="errorList"></ul> <!-- List for showing validation errors -->
+                        <div id="editErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                            <ul id="editErrorList"></ul> <!-- List for showing validation errors -->
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -410,6 +413,34 @@ $result = $conn->query($sql);
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archive Confirmation Modal -->
+    <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="archiveModalLabel">Archive Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to archive this organization?
+                    <input type="hidden" id="archiveId">
+                    <!-- Success Message Alert -->
+                    <div id="archiveSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                            Organization archived successfully!
+                        </div>
+                        <!-- Error Message Alert -->
+                        <div id="archiveErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                            <ul id="archiveErrorList3"></ul> <!-- List for showing validation errors -->
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmArchiveBtn" class="btn btn-danger">Archive</button>
+                </div>
             </div>
         </div>
     </div>
