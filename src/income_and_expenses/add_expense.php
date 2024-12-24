@@ -1,30 +1,63 @@
 <?php 
 include('../connection.php');
+include '../session_check.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $errors = [];
+    // Initialize response data
     $data = [];
+    $errors = [];
 
     // Retrieve data from POST
-    $title = isset($_POST['title']) ? trim($_POST['title']) : null;
-    $id = isset($_POST['id']) ? intval($_POST['id']) : null;
-    $amount = isset($_POST['amount']) ? floatval($_POST['amount']) : null;
+    $title = trim($_POST['title']);
+    $total_amount = floatval($_POST['total_amount']);
+    $category = trim($_POST['category']);
 
     // Input Validation
     if (empty($title)) {
         $errors[] = 'Title is required.';
     }
 
-    if (empty($id)) {
-        $errors[] = 'Record ID is required.';
-    }
-
-    if (empty($amount) || $amount <= 0) {
+    if (empty($total_amount) || $total_amount <= 0) {
         $errors[] = 'Valid amount is required.';
     }
+    
+    if (empty($category)) {
+        $errors[] = 'Category is required.';
+    }
 
-    // Return validation errors
+    // Handle file upload
+    $reference = null;
+    if (isset($_FILES['reference']) && $_FILES['reference']['error'] !== UPLOAD_ERR_NO_FILE) {
+        if ($_FILES['reference']['error'] === UPLOAD_ERR_OK) {
+            $file_tmp = $_FILES['reference']['tmp_name'];
+            $file_name = $_FILES['reference']['name'];
+            $file_extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+            $allowed_extensions = ['doc', 'docx', 'xls', 'xlsx', 'pdf'];
+
+            // Validate file extension
+            if (!in_array($file_extension, $allowed_extensions)) {
+                $errors[] = 'Invalid file type.';
+            }
+
+            // Define upload directory and handle the file upload
+            $upload_dir = 'uploads/references/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+            $file_path = $upload_dir . basename($file_name);
+
+            if (!move_uploaded_file($file_tmp, $file_path)) {
+                $errors[] = 'Error moving the uploaded file.';
+            } else {
+                $reference = $file_name; // Save the file name to be inserted into the database
+            }
+        } else {
+            $errors[] = 'File upload error.';
+        }
+    }
+
+    // Return validation errors if any
     if (!empty($errors)) {
         $data['success'] = false;
         $data['errors'] = $errors;
@@ -32,78 +65,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Determine the category based on the ID
-    $category = null;
+    // Insert the expense details into the database
+    $query = "INSERT INTO expenses (title, amount, category, reference, organization_id) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
 
-    // Check in events_summary table
-    $event_query = "SELECT title FROM events_summary WHERE event_id = ?";
-    $stmt = $conn->prepare($event_query);
     if (!$stmt) {
         $data['success'] = false;
-        $data['errors'] = ['database' => 'Failed to prepare statement for events_summary.'];
+        $data['errors'] = ['prepare_error' => $conn->error];
         echo json_encode($data);
         exit;
     }
-    $stmt->bind_param('i', $id);
-    $stmt->execute();
-    $stmt->store_result();
-    if ($stmt->num_rows > 0) {
-        $category = 'Activities';
-    }
-    $stmt->close();
 
-    // Check in purchases_summary table if not found
-    if (!$category) {
-        $purchase_query = "SELECT title FROM purchases_summary WHERE purchase_id = ?";
-        $stmt = $conn->prepare($purchase_query);
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $category = 'Purchases';
-        }
-        $stmt->close();
-    }
+    $stmt->bind_param('sdssi', $title, $total_amount, $category, $reference, $organization_id);
 
-    // Check in maintenance_summary table if not found
-    if (!$category) {
-        $maintenance_query = "SELECT title FROM maintenance_summary WHERE maintenance_id = ?";
-        $stmt = $conn->prepare($maintenance_query);
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $category = 'Maintenance';
-        }
-        $stmt->close();
-    }
+    if ($stmt->execute()) {
+        // Update the budget_allocation table's total_spent field
+        $update_query = "
+            UPDATE budget_allocation 
+            SET total_spent = total_spent + ?
+            WHERE category = ? AND organization_id = ?
+        ";
+        $update_stmt = $conn->prepare($update_query);
 
-    // Handle the case where no category is found
-    if (empty($category)) {
-        $errors['category'] = 'Event title not found in any category.';
-    } else {
-        // Insert the new expense record
-        $query = "INSERT INTO expenses (category, title, amount) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($query);
-        if (!$stmt) {
-            $data['success'] = false;
-            $data['errors'] = ['database' => 'Failed to prepare insert statement.'];
-            echo json_encode($data);
-            exit;
-        }
-        $stmt->bind_param('ssd', $category, $title, $amount);
+        if ($update_stmt) {
+            $update_stmt->bind_param('dsi', $total_amount, $category, $organization_id);
 
-        if ($stmt->execute()) {
-            $data['success'] = true;
-            $data['message'] = 'Expense added successfully!';
+            if ($update_stmt->execute()) {
+                $data['success'] = true;
+                $data['message'] = 'Expense added and budget allocation updated successfully!';
+            } else {
+                $data['success'] = false;
+                $data['errors'] = ['update_error' => $update_stmt->error];
+            }
+
+            $update_stmt->close();
         } else {
             $data['success'] = false;
-            $data['errors'] = ['database' => 'Failed to add the expense to the database.'];
+            $data['errors'] = ['update_prepare_error' => $conn->error];
         }
-        $stmt->close();
+    } else {
+        $data['success'] = false;
+        $data['errors'] = ['execution_error' => $stmt->error];
     }
 
-    // Return the response
+    $stmt->close();
     echo json_encode($data);
+
 }
 ?>

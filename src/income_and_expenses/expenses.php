@@ -12,7 +12,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <title>Expenses Table</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
@@ -273,54 +273,67 @@ $result = $conn->query($sql);
                                     <label for="title">Title</label>
                                     <select name="title" id="title" class="form-control" required>
                                         <option value="">Select Title</option>
-                                        <!-- Fetch titles from events, purchases, and maintenance -->
                                         <?php
+                                        include 'connection.php';
+
                                         // Fetch events
-                                        $event_query = "SELECT title, event_id FROM events where event_type = 'Expense' AND accomplishment_status = 1 AND archived = 0 AND organization_id = $organization_id";
+                                        $event_query = "SELECT title, summary_id, total_amount FROM events_summary WHERE type = 'Expense' AND archived = 0 AND organization_id = $organization_id";
                                         $event_result = mysqli_query($conn, $event_query);
                                         echo "<optgroup label='Events'>";
                                         while ($row = mysqli_fetch_assoc($event_result)) {
                                             echo '<option value="' . htmlspecialchars($row['title']) . '" 
-                                                    data-id="' . htmlspecialchars($row['event_id']) .'">' 
+                                                    data-id="' . htmlspecialchars($row['summary_id']) . '"
+                                                    data-category="Activities" 
+                                                    data-total-amount="' . htmlspecialchars($row['total_amount']) . '">' 
                                                     . htmlspecialchars($row['title']) . '</option>';
                                         }
                                         echo "</optgroup>";
-        
+
                                         // Fetch purchases
-                                        $purchase_query = "SELECT title, purchase_id FROM purchases WHERE completion_status = 1 AND archived = 0 AND organization_id = $organization_id";
+                                        $purchase_query = "SELECT title, summary_id, total_amount FROM purchases_summary WHERE archived = 0 AND organization_id = $organization_id";
                                         $purchase_result = mysqli_query($conn, $purchase_query);
                                         echo "<optgroup label='Purchases'>";
                                         while ($row = mysqli_fetch_assoc($purchase_result)) {
                                             echo '<option value="' . htmlspecialchars($row['title']) . '" 
-                                                    data-id="' . htmlspecialchars($row['purchase_id']) .'">' 
+                                                    data-id="' . htmlspecialchars($row['summary_id']) . '"
+                                                    data-category="Purchase" 
+                                                    data-total-amount="' . htmlspecialchars($row['total_amount']) . '">' 
                                                     . htmlspecialchars($row['title']) . '</option>';
                                         }
                                         echo "</optgroup>";
-        
+
                                         // Fetch maintenance
-                                        $maintenance_query = "SELECT title, maintenance_id FROM maintenance WHERE completion_status = 1 AND archived = 0 AND organization_id = $organization_id";
+                                        $maintenance_query = "SELECT title, summary_id, total_amount FROM maintenance_summary WHERE archived = 0 AND organization_id = $organization_id";
                                         $maintenance_result = mysqli_query($conn, $maintenance_query);
-                                        echo "<optgroup label='Mainteance and Other Expenses'>";
+                                        echo "<optgroup label='Maintenance and Other Expenses'>";
                                         while ($row = mysqli_fetch_assoc($maintenance_result)) {
                                             echo '<option value="' . htmlspecialchars($row['title']) . '" 
-                                                    data-id="' . htmlspecialchars($row['maintenance_id']) .'">' 
+                                                    data-id="' . htmlspecialchars($row['summary_id']) . '"
+                                                    data-category="Maintenance and Other Expenses" 
+                                                    data-total-amount="' . htmlspecialchars($row['total_amount']) . '">' 
                                                     . htmlspecialchars($row['title']) . '</option>';
                                         }
                                         echo "</optgroup>";
                                         ?>
-                                    </select>   
+                                    </select>
+
+
                                 </div>
+                                <!-- Hidden Fields for Expense Details -->
+                                <input type="hidden" id="expense_id" name="expense_id">
+                                <input type="hidden" id="organization_id" name="organization_id" value="<?php echo $organization_id?>">
+
                                 <!-- Category Field -->
                                 <div class="form-group">
                                     <label for="category">Category</label>
-                                    <input type="text" class="form-control" id="title" name="title" readonly>
+                                    <input type="text" class="form-control" id="category" name="category" readonly>
                                 </div>
 
                                 <!-- Amount Field -->
                                 <div class="form-group mt-3">
                                     <label for="amount">Amount</label>
-                                    <input type="number" class="form-control" id="amount" name="amount" step="0.01"
-                                        required>
+                                    <input type="number" class="form-control" id="total_amount" name="total_amount" step="0.01"
+                                        readonly>
                                 </div>
 
                                 <!-- Reference (File Upload) Field -->
