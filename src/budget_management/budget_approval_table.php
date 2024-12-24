@@ -22,7 +22,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'officer') {
 
 <!-- Title and Favicon -->
 <title>Budget Approvals</title>
-<link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png">
+<link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png">
 
 <!-- CSS Files -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
