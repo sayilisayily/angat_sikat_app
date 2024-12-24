@@ -23,12 +23,12 @@ document
       const revenue = selectedOption.getAttribute("data-revenue") || "";
 
       // Populate the modal fields
-      document.getElementById("event_id").value = summaryId;
+      document.getElementById("summary_id").value = summaryId;
       document.getElementById("titleInput").value = title;
       document.getElementById("revenue").value = revenue;
     } else {
       // Clear the fields if no title is selected
-      document.getElementById("event_id").value = "";
+      document.getElementById("summary_id").value = "";
       document.getElementById("titleInput").value = "";
       document.getElementById("revenue").value = "";
     }

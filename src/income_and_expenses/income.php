@@ -297,7 +297,7 @@ $result = $conn->query($sql);
                                 </div>
 
                                 <!-- Hidden Field for Summary ID -->
-                                <input type="hidden" id="event_id" name="summary_id">
+                                <input type="hidden" id="summary_id" name="summary_id">
 
                                 <!-- Revenue Field -->
                                 <div class="form-group mt-3">
