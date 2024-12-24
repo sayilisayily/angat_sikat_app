@@ -268,6 +268,7 @@ $result = $conn->query($sql);
                             </div>
                             <div class="modal-body">
                                 
+
                                 <!-- Title Field -->
                                 <div class="form-group mt-3">
                                     <label for="title">Title</label>
@@ -320,6 +321,7 @@ $result = $conn->query($sql);
 
                                 </div>
                                 <!-- Hidden Fields for Expense Details -->
+                                 <input type="text" name="summary_id" id="summary_id">
                                 <input type="hidden" id="expense_id" name="expense_id">
                                 <input type="hidden" id="organization_id" name="organization_id" value="<?php echo $organization_id?>">
 

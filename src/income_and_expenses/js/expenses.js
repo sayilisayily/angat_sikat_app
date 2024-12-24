@@ -22,11 +22,16 @@ document.addEventListener("DOMContentLoaded", function () {
       const totalAmount =
         selectedOption.getAttribute("data-total-amount") || "";
       const category = selectedOption.getAttribute("data-category") || "";
-
+      const summary_id = selectedOption.getAttribute("data-id") || "";
       // Populate hidden fields
       document.getElementById("total_amount").value = totalAmount;
       document.getElementById("category").value = category;
+      document.getElementById("summary_id").value = summary_id;
 
+      console.log(
+        "Selected Summary ID:",
+        selectedOption.getAttribute("data-id")
+      );
       console.log(`Selected Title: ${selectedOption.value}`);
       console.log(`Total Amount: ${totalAmount}`);
       console.log(`Category: ${category}`);
