@@ -2,7 +2,7 @@
 include '../connection.php';
 include '../session_check.php'; 
 
-$sql = "SELECT * FROM income WHERE organization_id = $organization_id"; // Adjust the organization_id as needed
+$sql = "SELECT * FROM income WHERE organization_id = $organization_id AND archived = 0"; // Adjust the organization_id as needed
 $result = $conn->query($sql);
 ?>
 
@@ -333,49 +333,40 @@ $result = $conn->query($sql);
 
             <!-- Edit Expense Modal -->
             <div class="modal fade" id="editModal" tabindex="-1" role="dialog"
-                aria-labelledby="editExpenseModalLabel" aria-hidden="true">
+                aria-labelledby="editModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <form id="editExpenseForm"
+                        <form id="editForm"
                             enctype="multipart/form-data">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="editExpenseModalLabel">Edit Income</h5>
+                                <h5 class="modal-title" id="editModalLabel">Edit Income</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <input type="hidden" id="editItemId" name="item_id">
+                                <input type="hidden" id="editIncomeId" name="income_id">
 
                                 <div class="form-group">
-                                    <label for="editCategory">Category</label>
-                                    <select class="form-control" id="editCategory" name="category" required>
-                                        <option value="" disabled selected>Select a category</option>
-                                        <option>Membership Fee</option>
-                                        <option>Bank</option>
-                                        <option>Income Generating Project</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
                                     <label for="editTitle">Title</label>
-                                    <input type="text" class="form-control" id="editTitle" name="title" required>
+                                    <input type="text" class="form-control" id="editTitle" name="title" readonly>
                                 </div>
                                 <div class="form-group">
-                                    <label for="editAmount">Amount</label>
-                                    <input type="number" class="form-control" id="editAmount" name="amount" step="0.01"
-                                        required>
+                                    <label for="editRevenue">Revenue</label>
+                                    <input type="number" class="form-control" id="editRevenue" name="revenue" step="0.01"
+                                        readonly>
                                 </div>
                                 <div class="form-group">
-                                    <label for="editReference">Reference (Upload File)</label>
+                                    <label for="editReference">Reference</label>
                                     <input type="file" class="form-control" id="editReference" name="reference">
                                 </div>
 
                                 <!-- Success Message Alert -->
-                                <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
+                                <div id="editSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
                                     Expense updated successfully!
                                 </div>
                                 <!-- Error Message Alert -->
-                                <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                                    <ul id="errorList"></ul>
+                                <div id="editErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                                    <ul id="editErrorList"></ul>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -393,15 +384,15 @@ $result = $conn->query($sql);
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="archiveModalLabel">Archive User</h5>
+                            <h5 class="modal-title" id="archiveModalLabel">Archive Income</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            Are you sure you want to archive this user?
+                            Are you sure you want to archive this income?
                             <input type="hidden" id="archiveId">
                             <!-- Success Message Alert -->
                             <div id="archiveSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
-                                User archived successfully!
+                                Income archived successfully!
                             </div>
                             <!-- Error Message Alert -->
                             <div id="archiveErrorMessage" class="alert alert-danger d-none mt-3" role="alert">

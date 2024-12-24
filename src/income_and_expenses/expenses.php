@@ -2,7 +2,7 @@
 include '../connection.php';
 include '../session_check.php'; 
 
-$sql = "SELECT * FROM expenses WHERE organization_id = $organization_id"; // Adjust the organization_id as needed
+$sql = "SELECT * FROM expenses WHERE organization_id = $organization_id AND archived = 0"; // Adjust the organization_id as needed
 $result = $conn->query($sql);
 ?>
 
@@ -321,7 +321,7 @@ $result = $conn->query($sql);
 
                                 </div>
                                 <!-- Hidden Fields for Expense Details -->
-                                 <input type="text" name="summary_id" id="summary_id">
+                                 <input type="hidden" name="summary_id" id="summary_id">
                                 <input type="hidden" id="expense_id" name="expense_id">
                                 <input type="hidden" id="organization_id" name="organization_id" value="<?php echo $organization_id?>">
 
@@ -378,38 +378,33 @@ $result = $conn->query($sql);
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <input type="hidden" id="editItemId" name="item_id">
-
-                                <div class="form-group">
-                                    <label for="editCategory">Category</label>
-                                    <select class="form-control" id="editCategory" name="category" required>
-                                        <option value="" disabled selected>Select a category</option>
-                                        <option value="activities">Activities</option>
-                                        <option value="purchases">Purchases</option>
-                                        <option value="maintenance">Maintenance</option>
-                                    </select>
-                                </div>
+                                <input type="text" id="editExpenseId" name="expense_id">
+                                
                                 <div class="form-group">
                                     <label for="editTitle">Title</label>
-                                    <input type="text" class="form-control" id="editTitle" name="title" required>
+                                    <input type="text" class="form-control" id="editTitle" name="title" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editCategory">Category</label>
+                                    <input type="text" class="form-control" id="editCategory" name="category" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label for="editAmount">Amount</label>
                                     <input type="number" class="form-control" id="editAmount" name="amount" step="0.01"
-                                        required>
+                                        readonly>
                                 </div>
                                 <div class="form-group">
-                                    <label for="editReference">Reference (Upload File)</label>
+                                    <label for="editReference">Reference</label>
                                     <input type="file" class="form-control" id="editReference" name="reference">
                                 </div>
 
                                 <!-- Success Message Alert -->
-                                <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
+                                <div id="editSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
                                     Expense updated successfully!
                                 </div>
                                 <!-- Error Message Alert -->
-                                <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                                    <ul id="errorList"></ul>
+                                <div id="editErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                                    <ul id="editErrorList"></ul>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -423,17 +418,24 @@ $result = $conn->query($sql);
 
 
             <!-- Archive Confirmation Modal -->
-            <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel"
-                aria-hidden="true">
+            <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="archiveModalLabel">Archive Expense</h5>
+                            <h5 class="modal-title" id="archiveModalLabel">Archive Income</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             Are you sure you want to archive this expense?
-                            <input type="hidden" id="archiveItemId">
+                            <input type="hidden" id="archiveId">
+                            <!-- Success Message Alert -->
+                            <div id="archiveSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                                Expense archived successfully!
+                            </div>
+                            <!-- Error Message Alert -->
+                            <div id="archiveErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                                <ul id="archiveErrorList"></ul> <!-- List for showing validation errors -->
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

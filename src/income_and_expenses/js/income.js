@@ -93,25 +93,32 @@ $("#addForm").on("submit", function (event) {
   });
 });
 
+// Event delegation for dynamically loaded buttons (Archive)
+$(document).on("click", ".edit-btn", function () {
+  var incomeId = $(this).data("id"); // Get income_id from the button
+  $("#editIncomeId").val(incomeId); // Store the event ID in the hidden input field
+  console.log("Selected Income ID: " + incomeId);
+});
+
 $(".edit-btn").on("click", function () {
-  var expenseId = $(this).data("id"); // Get expense_id from the button
-  console.log("Selected Expense ID:", expenseId); // Log the event ID for debugging
+  var incomeId = $(this).data("id"); // Get income_id from the button
+  console.log("Selected Income ID:", incomeId); // Log the event ID for debugging
 
   // Send an AJAX request to fetch the event details using the expense ID
   $.ajax({
-    url: "get_expense_details.php", // PHP file to fetch expense data
+    url: "get_income_details.php", // PHP file to fetch expense data
     type: "POST",
-    data: { expense_id: expenseId },
+    data: { income_id: incomeId },
     dataType: "json",
     success: function (response) {
       if (response.success) {
         // Populate the form with expense data
-        $("#editExpenseId").val(response.data.expense_id); // Hidden field for event ID
+        $("#editIncomeId").val(response.data.income_id); // Hidden field for event ID
         $("#editTitle").val(response.data.title);
-        $("#editAmount").val(response.data.amount);
+        $("#editRevenue").val(response.data.revenue);
         $("#editReference").val(response.data.reference);
         // Show the modal
-        $("#editExpensetModal").modal("show");
+        $("#editIncomeModal").modal("show");
       } else {
         console.log("Error fetching data: ", response.message);
       }
@@ -123,11 +130,11 @@ $(".edit-btn").on("click", function () {
 });
 
 // Handle Edit Event Form Submission
-$("#editExpenseForm").on("submit", function (event) {
+$("#editForm").on("submit", function (event) {
   event.preventDefault();
 
   $.ajax({
-    url: "update_expense.php",
+    url: "update_income.php",
     type: "POST",
     data: $(this).serialize(),
     success: function (response) {
@@ -138,30 +145,30 @@ $("#editExpenseForm").on("submit", function (event) {
 
         if (response.success) {
           // Hide any existing error messages
-          $("#errorMessage").addClass("d-none");
+          $("#editErrorMessage").addClass("d-none");
 
           // Show success message
-          $("#successMessage").removeClass("d-none");
+          $("#editSuccessMessage").removeClass("d-none");
 
           // Close the modal after a short delay
           setTimeout(function () {
-            $("#editExpenseModal").modal("hide");
+            $("#editModal").modal("hide");
 
             // Reset the form and hide the success message
-            $("#editExpenseForm")[0].reset();
-            $("#successMessage").addClass("d-none");
+            $("#editForm")[0].reset();
+            $("#editSuccessMessage").addClass("d-none");
             location.reload();
           }, 2000);
         } else {
           // Show validation errors
-          $("#successMessage").addClass("d-none");
+          $("#editSuccessMessage").addClass("d-none");
 
-          $("#errorMessage").removeClass("d-none");
+          $("#editErrorMessage").removeClass("d-none");
           let errorHtml = "";
           for (let field in response.errors) {
             errorHtml += `<li>${response.errors[field]}</li>`;
           }
-          $("#errorList").html(errorHtml);
+          $("#editErrorList").html(errorHtml);
         }
       } catch (error) {
         console.error("Error parsing JSON:", error);
@@ -169,6 +176,62 @@ $("#editExpenseForm").on("submit", function (event) {
     },
     error: function (xhr, status, error) {
       console.error("Error updating event:", error);
+      console.log(xhr.responseText);
+    },
+  });
+});
+// Event delegation for dynamically loaded buttons (Archive)
+$(document).on("click", ".archive-btn", function () {
+  var incomeId = $(this).data("id"); // Get income_id from the button
+  $("#archiveId").val(incomeId); // Store the event ID in the hidden input field
+  $("#archiveModal").modal("show"); // Show the archive confirmation modal
+  console.log("Selected Event ID: " + incomeId);
+});
+
+// Handle archive confirmation when "Archive" button in modal is clicked
+$("#confirmArchiveBtn").on("click", function () {
+  var incomeId = $("#archiveId").val(); // Get the event ID from the hidden input field
+
+  // Send an AJAX request to archive the event
+  $.ajax({
+    url: "archive_income.php", // PHP file to handle archiving
+    type: "POST",
+    data: { income_id: incomeId },
+    dataType: "json",
+    success: function (response) {
+      try {
+        if (response.success) {
+          // Show success message (optional)
+          console.log(response.message);
+          // Hide any existing error messages
+          $("#archiveErrorMessage").addClass("d-none");
+
+          // Show success message
+          $("#archiveSuccessMessage").removeClass("d-none");
+
+          // Close the modal after a short delay
+          setTimeout(function () {
+            $("#archiveModal").modal("hide");
+            $("#archiveSuccessMessage").addClass("d-none");
+            location.reload();
+          }, 2000);
+        } else {
+          // Show validation errors
+          $("#archiveSuccessMessage").addClass("d-none");
+
+          $("#archiveErrorMessage").removeClass("d-none");
+          let errorHtml = "";
+          for (let field in response.errors) {
+            errorHtml += `<li>${response.errors[field]}</li>`;
+          }
+          $("#archiveErrorList").html(errorHtml);
+        }
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Error archiving event:", error);
       console.log(xhr.responseText);
     },
   });
