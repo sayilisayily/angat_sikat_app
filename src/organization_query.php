@@ -19,6 +19,8 @@ if ($result->num_rows > 0) {
     $cash_on_bank = $organization['cash_on_bank'];
     $cash_on_hand = $organization['cash_on_hand'];
     $balance = $organization['balance']; 
+    $income = $organization['income']; 
+    $expense = $organization['expense']; 
 } else {
     // Default values if organization is not found
     $org_name = "Organization not found";

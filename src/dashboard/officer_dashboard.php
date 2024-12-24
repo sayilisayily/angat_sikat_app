@@ -110,7 +110,7 @@ include '../organization_query.php';
                                 <div class="card financial-card p-3 shadow-sm bg-pink-200 mx-2">
                                     <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Income</h7>
                                     <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">₱59,690</h1>
+                                        <h1 class="fw-bold" style="margin-left: 2px;">₱<?php echo number_format($income, 2); ?></h1>
                                         <i class="bx bx-trending-up"
                                             style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
                                     </div>
@@ -126,7 +126,7 @@ include '../organization_query.php';
                                 <div class="card financial-card p-3 shadow-sm bg-blue-200 mx-2">
                                     <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Expense</h7>
                                     <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">₱59,690</h1>
+                                        <h1 class="fw-bold" style="margin-left: 2px;">₱<?php echo number_format($expense, 2); ?></h1>
                                         <i class="bx bx-trending-up"
                                             style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
                                     </div>
