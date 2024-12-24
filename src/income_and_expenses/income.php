@@ -12,7 +12,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <title>Income Table</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
@@ -206,16 +206,15 @@ $result = $conn->query($sql);
             <!-- Header End -->
 
             <div class="container mt-5 p-5">
-                <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Expenses
-                    <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addExpenseModal"
+                <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Income
+                    <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addModal"
                         style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                        <i class="fa-solid fa-plus"></i> Add Expense
+                        <i class="fa-solid fa-plus"></i> Add Income
                     </button>
                 </h2>
-                <table id="expensesTable" class="table">
+                <table id="incomeTable" class="table">
                     <thead>
                         <tr>
-                            <th>Category</th>
                             <th>Title</th>
                             <th>Amount</th>
                             <th>Reference</th>
@@ -228,7 +227,6 @@ $result = $conn->query($sql);
                 while($row = $result->fetch_assoc()) {
                     
                     echo "<tr>
-                            <td>{$row['category']}</td>
                             <td>{$row['title']}</td>
                             <td>{$row['amount']}</td>
                             <td>{$row['reference']}</td>
@@ -236,12 +234,12 @@ $result = $conn->query($sql);
                             <td>
                                 <button class='btn btn-primary btn-sm edit-btn' 
                                         data-bs-toggle='modal' 
-                                        data-bs-target='#editExpenseModal' 
-                                        data-id='{$row['expense_id']}'>
+                                        data-bs-target='#editModal' 
+                                        data-id='{$row['income_id']}'>
                                     <i class='fa-solid fa-pen'></i> Edit
                                 </button>
                                 <button class='btn btn-danger btn-sm archive-btn' 
-                                        data-id='{$row['expense_id']}'>
+                                        data-id='{$row['income_id']}'>
                                     <i class='fa-solid fa-box-archive'></i> Archive
                                 </button>
                             </td>
@@ -255,47 +253,62 @@ $result = $conn->query($sql);
                 </table>
             </div>
 
-            <!-- Add Expense Modal -->
-            <div class="modal fade" id="addExpenseModal" tabindex="-1" role="dialog" aria-labelledby="addExpenseLabel"
-                aria-hidden="true">
+            <!-- Add Income Modal -->
+            <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addIncomeLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <form id="addExpenseForm" enctype="multipart/form-data">
+                        <form id="addForm" enctype="multipart/form-data">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="addExpenseLabel">Add New Expense</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                <h5 class="modal-title" id="addIncomeLabel">Add New Income</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <!-- Category Field -->
-                                <div class="form-group">
-                                    <label for="category">Category</label>
-                                    <select class="form-control" id="category" name="category" required>
-                                        <option value="">Select Category</option>
-                                        <option>Membership Fee</option>
-                                        <option>Bank</option>
-                                        <option>Income Generating Project</option>
+
+                                <!-- Title Selector -->
+                                <div class="form-group mt-3">
+                                    <label for="titleSelector">Select Event Title</label>
+                                    <select class="form-control" id="titleSelector" name="titleSelector">
+                                    <option value="">Select Event Title</option>
+                                    <?php
+                                    include 'connection.php';
+
+                                    $query = "SELECT summary_id, title, total_profit FROM events_summary WHERE type = 'Income' AND archived = 0 AND organization_id = $organization_id";
+                                    $result = mysqli_query($conn, $query);
+
+                                    if ($result && mysqli_num_rows($result) > 0) {
+                                        while ($row = mysqli_fetch_assoc($result)) {
+                                            echo '<option value="' . htmlspecialchars($row['summary_id']) . '" 
+                                                    data-title="' . htmlspecialchars($row['title']) . '" 
+                                                    data-revenue="' . htmlspecialchars($row['total_profit']) . '">'
+                                                . htmlspecialchars($row['title']) . '</option>';
+                                        }
+                                    } else {
+                                        echo '<option value="">No titles available</option>';
+                                    }
+                                    ?>
                                     </select>
+
                                 </div>
 
-                                <!-- Title Field -->
+                                <!-- Title Input Field -->
                                 <div class="form-group mt-3">
-                                    <label for="title">Title</label>
-                                    <input type="text" class="form-control" id="title" name="title" required>
+                                    <label for="titleInput">Title</label>
+                                    <input type="text" class="form-control" id="titleInput" name="title" required>
                                 </div>
 
-                                <!-- Amount Field -->
+                                <!-- Hidden Field for Summary ID -->
+                                <input type="hidden" id="event_id" name="summary_id">
+
+                                <!-- Revenue Field -->
                                 <div class="form-group mt-3">
-                                    <label for="amount">Amount</label>
-                                    <input type="number" class="form-control" id="amount" name="amount" step="0.01"
-                                        required>
+                                    <label for="revenue">Revenue</label>
+                                    <input type="number" class="form-control" id="revenue" name="revenue" step="0.01" required>
                                 </div>
 
                                 <!-- Reference (File Upload) Field -->
                                 <div class="form-group mt-3">
-                                    <label for="reference">Reference (File Upload)</label>
-                                    <input type="file" class="form-control" id="reference" name="reference"
-                                        accept=".pdf,.jpg,.png,.doc,.docx" required>
+                                    <label for="reference">Reference</label>
+                                    <input type="file" class="form-control" id="reference" name="reference" accept=".pdf,.jpg,.png,.doc,.docx" required>
                                 </div>
 
                                 <!-- Success Message Alert -->
@@ -310,7 +323,7 @@ $result = $conn->query($sql);
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Add Expense</button>
+                                <button type="submit" class="btn btn-primary">Add Income</button>
                             </div>
                         </form>
                     </div>
@@ -319,11 +332,11 @@ $result = $conn->query($sql);
 
 
             <!-- Edit Expense Modal -->
-            <div class="modal fade" id="editExpenseModal" tabindex="-1" role="dialog"
+            <div class="modal fade" id="editModal" tabindex="-1" role="dialog"
                 aria-labelledby="editExpenseModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <form id="editExpenseForm" action="update_expense.php" method="POST"
+                        <form id="editExpenseForm"
                             enctype="multipart/form-data">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="editExpenseModalLabel">Edit Income</h5>
@@ -376,17 +389,24 @@ $result = $conn->query($sql);
 
 
             <!-- Archive Confirmation Modal -->
-            <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel"
-                aria-hidden="true">
+            <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="archiveModalLabel">Archive Expense</h5>
+                            <h5 class="modal-title" id="archiveModalLabel">Archive User</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            Are you sure you want to archive this expense?
-                            <input type="hidden" id="archiveItemId">
+                            Are you sure you want to archive this user?
+                            <input type="hidden" id="archiveId">
+                            <!-- Success Message Alert -->
+                            <div id="archiveSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                                User archived successfully!
+                            </div>
+                            <!-- Error Message Alert -->
+                            <div id="archiveErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                                <ul id="archiveErrorList"></ul> <!-- List for showing validation errors -->
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -402,7 +422,7 @@ $result = $conn->query($sql);
     <!-- End of Overall Body Wrapper -->
 
     <!-- BackEnd -->
-    <script src="js/expenses.js">
+    <script src="js/income.js">
     </script>
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
