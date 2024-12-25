@@ -331,7 +331,7 @@ $result = $conn->query($sql);
             </div>
 
 
-            <!-- Edit Expense Modal -->
+            <!-- Edit Income Modal -->
             <div class="modal fade" id="editModal" tabindex="-1" role="dialog"
                 aria-labelledby="editModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -362,7 +362,7 @@ $result = $conn->query($sql);
 
                                 <!-- Success Message Alert -->
                                 <div id="editSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
-                                    Expense updated successfully!
+                                    Income updated successfully!
                                 </div>
                                 <!-- Error Message Alert -->
                                 <div id="editErrorMessage" class="alert alert-danger d-none mt-3" role="alert">

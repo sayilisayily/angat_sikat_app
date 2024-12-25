@@ -2,7 +2,7 @@
 include '../connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $expense_id = $_POST['expense_id'];
+    $income_id = $_POST['income_id'];
     $reference = $_FILES['reference'];
 
     // File upload handling
@@ -39,14 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Update query
     if (!empty($uploaded_file)) {
-        $query = "UPDATE expenses SET reference = ? WHERE expense_id = ?";
+        $query = "UPDATE income SET reference = ? WHERE income_id = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("si", $uploaded_file, $expense_id);
+        $stmt->bind_param("si", $uploaded_file, $income_id);
 
         if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Expense reference updated successfully.']);
+            echo json_encode(['success' => true, 'message' => 'Income reference updated successfully.']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to update expense reference.']);
+            echo json_encode(['success' => false, 'message' => 'Failed to update income reference.']);
         }
 
         $stmt->close();

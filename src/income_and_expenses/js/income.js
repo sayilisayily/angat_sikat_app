@@ -93,14 +93,7 @@ $("#addForm").on("submit", function (event) {
   });
 });
 
-// Event delegation for dynamically loaded buttons (Archive)
 $(document).on("click", ".edit-btn", function () {
-  var incomeId = $(this).data("id"); // Get income_id from the button
-  $("#editIncomeId").val(incomeId); // Store the event ID in the hidden input field
-  console.log("Selected Income ID: " + incomeId);
-});
-
-$(".edit-btn").on("click", function () {
   var incomeId = $(this).data("id"); // Get income_id from the button
   console.log("Selected Income ID:", incomeId); // Log the event ID for debugging
 
@@ -113,12 +106,11 @@ $(".edit-btn").on("click", function () {
     success: function (response) {
       if (response.success) {
         // Populate the form with expense data
-        $("#editIncomeId").val(response.data.income_id); // Hidden field for event ID
+        $("#editIncomeId").val(incomeId); // Hidden field for event ID
         $("#editTitle").val(response.data.title);
-        $("#editRevenue").val(response.data.revenue);
-        $("#editReference").val(response.data.reference);
+        $("#editRevenue").val(response.data.amount);
         // Show the modal
-        $("#editIncomeModal").modal("show");
+        $("#editModal").modal("show");
       } else {
         console.log("Error fetching data: ", response.message);
       }
@@ -132,11 +124,14 @@ $(".edit-btn").on("click", function () {
 // Handle Edit Event Form Submission
 $("#editForm").on("submit", function (event) {
   event.preventDefault();
+  let formData = new FormData(this);
 
   $.ajax({
     url: "update_income.php",
     type: "POST",
-    data: $(this).serialize(),
+    data: formData,
+    contentType: false, // Important for file upload
+    processData: false, // Important for file upload
     success: function (response) {
       try {
         // Parse the JSON response (ensure it's valid JSON)

@@ -102,7 +102,7 @@ $("#addExpenseForm").on("submit", function (event) {
   });
 });
 
-$(".edit-btn").on("click", function () {
+$(document).on("click", ".edit-btn", function () {
   var expenseId = $(this).data("id"); // Get expense_id from the button
   console.log("Selected Expense ID:", expenseId); // Log the event ID for debugging
 
@@ -115,7 +115,7 @@ $(".edit-btn").on("click", function () {
     success: function (response) {
       if (response.success) {
         // Populate the form with expense data
-        $("#editExpenseId").val(response.data.expense_id); // Populate hidden field
+        $("#editExpenseId").val(expenseId); // Populate hidden field
         $("#editTitle").val(response.data.title);
         $("#editCategory").val(response.data.category);
         $("#editAmount").val(response.data.amount);
@@ -134,11 +134,14 @@ $(".edit-btn").on("click", function () {
 // Handle Edit Event Form Submission
 $("#editExpenseForm").on("submit", function (event) {
   event.preventDefault();
+  let formData = new FormData(this);
 
   $.ajax({
     url: "update_expense.php",
     type: "POST",
-    data: $(this).serialize(),
+    data: formData,
+    contentType: false, // Important for file upload
+    processData: false, // Important for file upload
     success: function (response) {
       try {
         // Parse the JSON response (ensure it's valid JSON)

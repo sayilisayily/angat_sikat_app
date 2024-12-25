@@ -378,7 +378,7 @@ $result = $conn->query($sql);
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <input type="text" id="editExpenseId" name="expense_id">
+                                <input type="hidden" id="editExpenseId" name="expense_id">
                                 
                                 <div class="form-group">
                                     <label for="editTitle">Title</label>
