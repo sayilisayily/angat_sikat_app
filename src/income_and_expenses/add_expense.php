@@ -28,9 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Check for duplicate expense
-    $duplicate_check_query = "SELECT expense_id FROM expenses WHERE summary_id = ? AND organization_id = ?";
+    $duplicate_check_query = "SELECT expense_id FROM expenses WHERE summary_id = ? AND organization_id = ? AND title = ?";
     $duplicate_stmt = $conn->prepare($duplicate_check_query);
-    $duplicate_stmt->bind_param('ii', $summary_id, $organization_id);
+    $duplicate_stmt->bind_param('iis', $summary_id, $organization_id, $title);
 
     if ($duplicate_stmt->execute()) {
         $duplicate_result = $duplicate_stmt->get_result();
@@ -179,12 +179,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $history_stmt->close();
 
+        // Insert a record into the expense_history table
+        $expense_history_query = "INSERT INTO expense_history (organization_id, expense, updated_at) VALUES (?, ?, NOW())";
+        $expense_history_stmt = $conn->prepare($expense_history_query);
+
+        if (!$expense_history_stmt) {
+            throw new Exception("Prepare error for expense history: " . $conn->error);
+        }
+
+        $expense_history_stmt->bind_param('id', $organization_id, $total_amount);
+
+        if (!$expense_history_stmt->execute()) {
+            throw new Exception("Execution error for expense history: " . $expense_history_stmt->error);
+        }
+
+        $expense_history_stmt->close();
+
         // Commit the transaction
         $conn->commit();
 
         // Set success response
         $data['success'] = true;
-        $data['message'] = 'Expense added, organization balance updated, and balance history recorded successfully!';
+        $data['message'] = 'Expense added, organization balance updated, and history records created successfully!';
     } catch (Exception $e) {
         // Rollback the transaction on error
         $conn->rollback();

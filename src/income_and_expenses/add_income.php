@@ -121,6 +121,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Execution error for update: " . $updateStmt->error);
         }
 
+        // Insert a record into the income_history table
+        $incomeHistoryQuery = "INSERT INTO income_history (organization_id, income, updated_at) 
+                               VALUES (?, ?, NOW())";
+        $incomeHistoryStmt = $conn->prepare($incomeHistoryQuery);
+
+        if (!$incomeHistoryStmt) {
+            throw new Exception("Prepare error for income history: " . $conn->error);
+        }
+
+        $incomeHistoryStmt->bind_param('id', $organization_id, $revenue);
+
+        if (!$incomeHistoryStmt->execute()) {
+            throw new Exception("Execution error for income history: " . $incomeHistoryStmt->error);
+        }
+
+        $incomeHistoryStmt->close();
+
         // Get the updated balance for the balance_history table
         $updatedBalanceQuery = "SELECT balance FROM organizations WHERE organization_id = ?";
         $balanceStmt = $conn->prepare($updatedBalanceQuery);

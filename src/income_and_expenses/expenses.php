@@ -297,7 +297,7 @@ $result = $conn->query($sql);
                                         while ($row = mysqli_fetch_assoc($purchase_result)) {
                                             echo '<option value="' . htmlspecialchars($row['title']) . '" 
                                                     data-id="' . htmlspecialchars($row['summary_id']) . '"
-                                                    data-category="Purchase" 
+                                                    data-category="Purchases" 
                                                     data-total-amount="' . htmlspecialchars($row['total_amount']) . '">' 
                                                     . htmlspecialchars($row['title']) . '</option>';
                                         }
