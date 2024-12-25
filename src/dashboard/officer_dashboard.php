@@ -269,45 +269,213 @@ include '../organization_query.php';
                                 </div>
                             </div>
 
+                            <?php
+                            // Query to fetch the first and latest balance for the current month
+                            $query = "
+                                SELECT balance, updated_at 
+                                FROM balance_history 
+                                WHERE organization_id = ? 
+                                AND MONTH(updated_at) = MONTH(CURRENT_DATE()) 
+                                AND YEAR(updated_at) = YEAR(CURRENT_DATE())
+                                ORDER BY updated_at ASC
+                            ";
+
+                            $stmt = $conn->prepare($query);
+                            $stmt->bind_param("i", $organization_id);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+
+                            $first_balance = null;
+                            $latest_balance = null;
+
+                            if ($result->num_rows > 0) {
+                                $rows = $result->fetch_all(MYSQLI_ASSOC);
+                                $first_balance = $rows[0]['balance']; // First balance of the month
+                                $latest_balance = $rows[count($rows) - 1]['balance']; // Latest balance of the month
+                            }
+
+                            // Compute the percentage change
+                            $percentage_change = ($latest_balance && $first_balance) ? 
+                                (($latest_balance - $first_balance) / $first_balance) * 100 : 0;
+
+                            $remaining_balance = $latest_balance ?: 0;
+                            ?>
+
                             <!-- Radial Progress -->
                             <div class="d-flex justify-evenly gap-5 p-4 bg-white rounded mt-4 shadow-sm">
-                                <div class="d-flex align-items-center">
-                                    <div>
-                                        <h1 class="fw-bold fs-7 text-black">Balance</h1>
-                                        <p class="fw-semibold text-black">Total Monthly</p>
-                                        <h1 class="fw-bold h6">₱ 50,000
-                                        </h1>
-                                        <p class="bg-warning text-white rounded-pill mx-auto px-3 py-1">73.4%</p>
-                                    </div>
-                                </div>
-
+                            <div class="d-flex align-items-center">
                                 <div>
-                                    <div class="d-flex flex-column align-items-center">
-                                        <div class="position-relative d-flex align-items-center justify-content-center"
-                                            style="width: 120px; height: 120px;">
-                                            <!-- Circle Background -->
-                                            <div class="position-absolute w-100 h-100 rounded-circle bg-light"></div>
-
-                                            <!-- Radial Progress Circle -->
-                                            <svg class="position-absolute w-100 h-100"
-                                                style="transform: rotate(-90deg);">
-                                                <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="8"
-                                                    class="text-purple-500" fill="none" stroke-dasharray="283"
-                                                    stroke-dashoffset="85">
-                                                </circle>
-                                            </svg>
-
-                                            <!-- Centered Text -->
-                                            <div class="position-absolute text-center">
-                                                <p class="h6 fw-bold text-dark">₱27,500</p>
-                                                <p class="text-sm fw-semibold text-black">Remaining balance</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <h1 class="fw-bold fs-7">Balance</h1>
+                                <p class="fw-semibold text-secondary">Total Monthly</p>
+                                <h1 class="fw-bold h6">₱ <?php echo number_format($latest_balance, 2); ?> 
+                                    <span class="badge bg-warning text-white fw-medium percentage-box"
+                                    style="font-size: 0.75rem; padding: 2px 6px;">
+                                    <?php echo number_format($percentage_change, 1); ?>%
+                                    </span>
+                                </h1>
                                 </div>
                             </div>
+
+                            <div>
+                                <div class="d-flex flex-column align-items-center">
+                                <div class="position-relative d-flex align-items-center justify-content-center"
+                                    style="width: 120px; height: 120px;">
+                                    <!-- Circle Background -->
+                                    <div class="position-absolute w-100 h-100 rounded-circle bg-light"></div>
+
+                                    <!-- Radial Progress Circle -->
+                                    <svg class="position-absolute w-100 h-100" style="transform: rotate(-90deg);">
+                                    <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="10" class="text-purple-500"
+                                        fill="none" stroke-dasharray="283" 
+                                        stroke-dashoffset="<?php echo 283 - (283 * $percentage_change / 100); ?>">
+                                    </circle>
+                                    </svg>
+
+                                    <!-- Centered Text -->
+                                    <div class="position-absolute text-center">
+                                    <p class="h6 fw-bold text-dark">₱ <?php echo number_format($remaining_balance, 2); ?></p>
+                                    <p class="text-sm fw-semibold text-secondary">Remaining balance</p>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+
                         </div>
                     </div>
+                    
+                    <?php
+                    // Fetch income records
+                    $income_query = "
+                        SELECT 
+                            'Income' AS type, 
+                            title AS description, 
+                            amount, 
+                            created_at AS date 
+                        FROM income 
+                        WHERE organization_id = ? AND archived = 0
+                        ORDER BY created_at DESC
+                        LIMIT 5
+                    "; // Fetching latest 5 income records
+
+                    $expenses_query = "
+                        SELECT 
+                            'Expense' AS type, 
+                            title AS description, 
+                            amount, 
+                            created_at AS date 
+                        FROM expenses 
+                        WHERE organization_id = ? AND archived = 0
+                        ORDER BY created_at DESC
+                        LIMIT 5
+                    "; // Fetching latest 5 expense records
+
+                    // Prepare and execute income query
+                    $stmt_income = $conn->prepare($income_query);
+                    $stmt_income->bind_param("i", $organization_id);
+                    $stmt_income->execute();
+                    $income_results = $stmt_income->get_result()->fetch_all(MYSQLI_ASSOC);
+
+                    // Prepare and execute expenses query
+                    $stmt_expenses = $conn->prepare($expenses_query);
+                    $stmt_expenses->bind_param("i", $organization_id);
+                    $stmt_expenses->execute();
+                    $expenses_results = $stmt_expenses->get_result()->fetch_all(MYSQLI_ASSOC);
+
+                    // Combine results
+                    $transactions = array_merge($income_results, $expenses_results);
+
+                    // Sort transactions by date (newest first)
+                    usort($transactions, function ($a, $b) {
+                        return strtotime($b['date']) - strtotime($a['date']);
+                    });
+
+                    // Limit to the latest 10 transactions
+                    $transactions = array_slice($transactions, 0, 10);
+                    ?>
+
+                    <!--Recent Transaction dashboard-->
+                    <div>
+                        <div class="h5 fw-black fs-10 ps-5 mx-xs-5">
+                            <h2 class="mr-5"><span class="text-warning fw-bold me-2 fs-10">|</span>Recent Transactions</h2>
+                        </div>
+                            <div class="container mt-5">
+                                <button id="printButton" class="btn btn-primary mb-3">Print</button>
+                                <button id="pdfButton" class="btn btn-success mb-3">Download PDF</button>
+
+                                <div id="tableContent">
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light fw-bold">
+                                            <tr class="fw-bold fs-4 text-dark">
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                                <th>Amount</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php if (!empty($transactions)): ?>
+                                                <?php foreach ($transactions as $transaction): ?>
+                                                    <tr>
+                                                        <td><?php echo htmlspecialchars($transaction['type']); ?></td>
+                                                        <td><?php echo htmlspecialchars($transaction['description']); ?></td>
+                                                        <td>₱<?php echo number_format($transaction['amount'], 2); ?></td>
+                                                        <td><?php echo htmlspecialchars(date("F j, Y", strtotime($transaction['date']))); ?></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <tr>
+                                                    <td colspan="4" class="text-center">No transactions found for this organization.</td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                    </div>
+                        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+                        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+                        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+                        <script>
+                        // Print function
+                        document.getElementById('printButton').addEventListener('click', function () {
+                            window.print();
+                        });
+
+                        // PDF download function
+                        document.getElementById('pdfButton').addEventListener('click', function () {
+                            const element = document.getElementById('tableContent');
+                            html2pdf()
+                            .from(element)
+                            .save('transaction_report.pdf');
+                        });
+                        </script>
+                    <!--Recent Transaction End-->
+
+
+                    <?php
+                    // Fetch the two nearest upcoming events
+                    $query = "
+                        SELECT e.title, e.event_start_date, e.event_end_date, e.event_venue, o.organization_name
+                        FROM events e
+                        JOIN organizations o ON e.organization_id = o.organization_id
+                        WHERE e.event_start_date > CURDATE() 
+                        ORDER BY e.event_start_date ASC
+                        LIMIT 2
+                    ";
+                    $result = $conn->query($query);
+
+                    // Check if the query was successful and fetch the events
+                    if ($result->num_rows > 0) {
+                        $events = $result->fetch_all(MYSQLI_ASSOC);
+                    } else {
+                        $events = [];
+                    }
+                    ?>
 
                     <!--Upcoming Events-->
                     <div>
@@ -318,51 +486,127 @@ include '../organization_query.php';
                             <!--event boxes-->
                             <div class="container mt-5">
                                 <div class="row">
-                                    <!-- Event Box 1 -->
-                                    <div class="col-md-4">
-                                        <div class="container-white">
-                                            <div class="event-box">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <h6 class="event-title">Beacon of Youth Technology Enthusiasts</h6>
-                                                    <p class="event-duration">3 Hours</p>
-                                                </div>
-                                                <h5>TechFest</h5>
-                                                <div class="event-details">
-                                                    <p class="event-date"><i class="fa-regular fa-calendar"
-                                                            aria-hidden="true"></i> 28 Sep 2024
-                                                    </p>
-                                                    <p class="event-time"><i class="fa-regular fa-clock"
-                                                            aria-hidden="true"></i> 10:00 AM</p>
-                                                </div>
-                                                <div class="text-end mt-auto">
-                                                    <button class="btn btn-warning details-btn">Details</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <?php if (!empty($events)) : ?>
+                                        <?php foreach ($events as $event) : ?>
+                                            <div class="col-md-4">
+                                                <div class="container-white">
+                                                    <div class="event-box">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <h6 class="event-title"><?php echo htmlspecialchars($event['organization_name']); ?></h6>
 
-                                    <!-- Event Box 2 -->
-                                    <div class="col-md-4">
-                                        <div class="container-white">
-                                            <div class="event-box">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <h6 class="event-title">The CvSU-R Nexus</h6>
-                                                    <p class="event-duration">3 Hours</p>
-                                                </div>
-                                                <h5>Schoolwide Press Conference</h5>
-                                                <div class="event-details">
-                                                    <p class="event-date"><i class="fa-regular fa-calendar"
-                                                            aria-hidden="true"></i> 15 Oct 2024
-                                                    </p>
-                                                    <p class="event-time"><i class="fa-regular fa-clock"
-                                                            aria-hidden="true"></i> 10:00 AM</p>
-                                                </div>
-                                                <div class="text-end mt-auto">
-                                                    <button class="btn btn-warning details-btn">Details</button>
+                                                            <?php
+                                                            // Get today's date
+                                                            $today = new DateTime();
+                                                            // Event's start date
+                                                            $eventStartDate = new DateTime($event['event_start_date']);
+                                                            // Calculate the difference between today's date and the event start date
+                                                            $interval = $today->diff($eventStartDate);
+                                                            // Format the number of days left
+                                                            $daysLeft = $interval->format('%r%a'); // %r gives the sign (+ or -) and %a gives the total number of days
+                                                            $daysLeftText = ($daysLeft >= 0) ? $daysLeft . " Days Left" : "Event Passed"; // Show if event has passed
+                                                            ?>
+                                                            <p class="event-duration text-sm"><?php echo $daysLeftText; ?></p>
+                                                        </div>
+                                                        <h5><?php echo htmlspecialchars($event['title']); ?></h5>
+                                                        <div class="event-details">
+                                                            <p class="event-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 
+                                                                <?php echo date("d M Y", strtotime($event['event_start_date'])) . ' - ' . date("d M Y", strtotime($event['event_end_date'])); ?>
+                                                            </p>
+                                                        </div>
+                                                        <div class="text-end mt-auto">
+                                                            <button class="btn btn-warning details-btn">Details</button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        <?php endforeach; ?>
+                                    <?php else : ?>
+                                        <p>No upcoming events.</p>
+                                    <?php endif; ?>
+                                
+                                    <!-- Calendar Box -->
+                                    <div class="col-md-4">
+                                        <div class="calendar">
+                                            <div class="header">
+                                                <!-- Month Dropdown -->
+                                                <div class="dropdown">
+                                                    <button class="btn btn-outline-secondary dropdown-toggle"
+                                                        type="button" id="monthDropdown" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        <i class="fa-regular fa-calendar"></i> <span
+                                                            id="selectedMonth">August</span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="monthDropdown">
+                                                        <!-- Month Options -->
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 0)">January</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 1)">February</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 2)">March</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 3)">April</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 4)">May</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 5)">June</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 6)">July</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 7)">August</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 8)">September</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 9)">October</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 10)">November</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectMonth(event, 11)">December</a></li>
+                                                    </ul>
+                                                </div>
+
+                                                <!-- Year Dropdown -->
+                                                <div class="dropdown">
+                                                    <button class="btn btn-outline-secondary dropdown-toggle"
+                                                        type="button" id="yearDropdown" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        <i class="fa-regular fa-calendar"></i> <span
+                                                            id="selectedYear">2024</span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="yearDropdown">
+                                                        <!-- Year Options -->
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectYear(event, 2023)">2023</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectYear(event, 2024)">2024</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectYear(event, 2025)">2025</a></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="selectYear(event, 2026)">2026</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Days of the Week Headers -->
+                                            <div class="days-of-week">
+                                                <div class="day-header">Sun</div>
+                                                <div class="day-header">Mon</div>
+                                                <div class="day-header">Tue</div>
+                                                <div class="day-header">Wed</div>
+                                                <div class="day-header">Thu</div>
+                                                <div class="day-header">Fri</div>
+                                                <div class="day-header">Sat</div>
+                                            </div>
+
+                                            <!-- Days Container -->
+                                            <div id="days" class="days"></div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                                     <style>
                                         .container-white {
@@ -462,84 +706,7 @@ include '../organization_query.php';
                                         }
                                     </style>
 
-                                    <!-- Calendar Box -->
-                                    <div class="col-md-4">
-                                        <div class="calendar">
-                                            <div class="header">
-                                                <!-- Month Dropdown -->
-                                                <div class="dropdown">
-                                                    <button class="btn btn-outline-secondary dropdown-toggle"
-                                                        type="button" id="monthDropdown" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
-                                                        <i class="fa-regular fa-calendar"></i> <span
-                                                            id="selectedMonth">August</span>
-                                                    </button>
-                                                    <ul class="dropdown-menu" aria-labelledby="monthDropdown">
-                                                        <!-- Month Options -->
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 0)">January</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 1)">February</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 2)">March</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 3)">April</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 4)">May</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 5)">June</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 6)">July</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 7)">August</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 8)">September</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 9)">October</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 10)">November</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectMonth(event, 11)">December</a></li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- Year Dropdown -->
-                                                <div class="dropdown">
-                                                    <button class="btn btn-outline-secondary dropdown-toggle"
-                                                        type="button" id="yearDropdown" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
-                                                        <i class="fa-regular fa-calendar"></i> <span
-                                                            id="selectedYear">2024</span>
-                                                    </button>
-                                                    <ul class="dropdown-menu" aria-labelledby="yearDropdown">
-                                                        <!-- Year Options -->
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectYear(event, 2023)">2023</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectYear(event, 2024)">2024</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectYear(event, 2025)">2025</a></li>
-                                                        <li><a class="dropdown-item" href="#"
-                                                                onclick="selectYear(event, 2026)">2026</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-
-                                            <!-- Days of the Week Headers -->
-                                            <div class="days-of-week">
-                                                <div class="day-header">Sun</div>
-                                                <div class="day-header">Mon</div>
-                                                <div class="day-header">Tue</div>
-                                                <div class="day-header">Wed</div>
-                                                <div class="day-header">Thu</div>
-                                                <div class="day-header">Fri</div>
-                                                <div class="day-header">Sat</div>
-                                            </div>
-
-                                            <!-- Days Container -->
-                                            <div id="days" class="days"></div>
-                                        </div>
-                                    </div>
+                                    
 
                                     <!-- CSS for Scrollable Dropdown -->
                                     <style>
@@ -682,75 +849,71 @@ include '../organization_query.php';
                             </div>
 
                             <div>
-                                <div class="container mt-5">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-8 h5 fw-black fs-10 ps-5">
-                                            <h2 class="mr-5"><span
-                                                    class="text-warning fw-bold me-2 fs-10">|</span>Activities</h2>
-                                        </div>
-
-                                    </div>
+                                <div class="h5 fw-black fs-10 ps-5 mx-xs-5 mt-5">
+                                    <h2 class="mr-5"><span class="text-warning fw-bold me-2 fs-10">|</span>Activities</h2>
                                 </div>
                                 <?php 
                                     $sql = "SELECT * FROM events WHERE archived = 0 AND organization_id = $organization_id ORDER BY event_id DESC LIMIT 5";
                                     $result = $conn->query($sql);
                                 ?>
-                                <div class="container pt-5 mx-auto">
-                                    <div id="tableContent">
-                                        <table class="table table-bordered">
-                                            <thead class="thead-light fw-bold">
-                                                <tr>
-                                                    <th rowspan=2>Title</th>
-                                                    <th rowspan=2>Venue</th>
-                                                    <th colspan=2 style="text-align: center;"> Date </th>
-                                                    <th rowspan=2>Type</th>
-                                                    <th rowspan=2>Status</th>
-                                                    <th rowspan=2>Accomplished</th>
-                                                </tr>
-                                                <tr>
-                                                    <th>Start</th>
-                                                    <th>End</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                if ($result->num_rows > 0) {
-                                                    while ($row = $result->fetch_assoc()) {
-                                                        $checked = $row['accomplishment_status'] ? 'checked' : '';
-                                                        $disabled = ($row['event_status'] !== 'Approved') ? 'disabled' : '';
-                                                        echo "<tr>
-                                                                <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
-                                                                <td>{$row['event_venue']}</td>
-                                                                <td>" . date('F j, Y', strtotime($row['event_start_date'])) . "</td>
-                                                                <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
-                                                                <td>{$row['event_type']}</td>
-                                                                <td>";
-                                                        // Handle event status with badges
-                                                        if ($row['event_status'] == 'Pending') {
-                                                            echo "<span class='badge rounded-pill pending'>Pending</span>";
-                                                        } elseif ($row['event_status'] == 'Approved') {
-                                                            echo "<span class='badge rounded-pill approved'>Approved</span>";
-                                                        } elseif ($row['event_status'] == 'Disapproved') {
-                                                            echo "<span class='badge rounded-pill disapproved'>Disapproved</span>";
+                                    <div class="container mt-5">
+                                        <div id="tableContent">
+                                            <table class="table table-bordered">
+                                                <thead class="thead-light fw-bold">
+                                                    <tr>
+                                                        <th rowspan=2>Title</th>
+                                                        <th rowspan=2>Venue</th>
+                                                        <th colspan=2 style="text-align: center;"> Date </th>
+                                                        <th rowspan=2>Type</th>
+                                                        <th rowspan=2>Status</th>
+                                                        <th rowspan=2>Accomplished</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Start</th>
+                                                        <th>End</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    if ($result->num_rows > 0) {
+                                                        while ($row = $result->fetch_assoc()) {
+                                                            $checked = $row['accomplishment_status'] ? 'checked' : '';
+                                                            $disabled = ($row['event_status'] !== 'Approved') ? 'disabled' : '';
+                                                            echo "<tr>
+                                                                    <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
+                                                                    <td>{$row['event_venue']}</td>
+                                                                    <td>" . date('F j, Y', strtotime($row['event_start_date'])) . "</td>
+                                                                    <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
+                                                                    <td>{$row['event_type']}</td>
+                                                                    <td>";
+                                                            // Handle event status with badges
+                                                            if ($row['event_status'] == 'Pending') {
+                                                                echo "<span class='badge rounded-pill pending'>Pending</span>";
+                                                            } elseif ($row['event_status'] == 'Approved') {
+                                                                echo "<span class='badge rounded-pill approved'>Approved</span>";
+                                                            } elseif ($row['event_status'] == 'Disapproved') {
+                                                                echo "<span class='badge rounded-pill disapproved'>Disapproved</span>";
+                                                            }
+                                                            echo "</td>";
+                                                            // Render accomplishment status
+                                                            echo "<td>";
+                                                            echo ($row['accomplishment_status'] == 1) 
+                                                                ? "Accomplished" 
+                                                                : "Not Accomplished";
+                                                            echo "</td>";
+                                                            echo "</tr>";
                                                         }
-                                                        echo "</td>";
-                                                        // Render accomplishment status
-                                                        echo "<td>";
-                                                        echo ($row['accomplishment_status'] == 1) 
-                                                            ? "Accomplished" 
-                                                            : "Not Accomplished";
-                                                        echo "</td>";
-                                                        echo "</tr>";
+                                                    } else {
+                                                        echo "<tr><td colspan='9' class='text-center'>No events found</td></tr>";
                                                     }
-                                                } else {
-                                                    echo "<tr><td colspan='9' class='text-center'>No events found</td></tr>";
-                                                }
-                                                ?>
-                                            </tbody>
+                                                    ?>
+                                                </tbody>
 
-                                        </table>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
+                                  
+                            </div>
 
                                 <style>
                                     .custom-btn {
