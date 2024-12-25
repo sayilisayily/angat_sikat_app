@@ -11,7 +11,7 @@ include '../organization_query.php';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Profile</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
@@ -225,7 +225,7 @@ include '../organization_query.php';
                     </div>
 
                     <!-- Edit Profile Form -->
-                    <form id="edit-profile-form" class="hidden" action="update_profile.php" method="POST"
+                    <form id="editProfileForm" class="hidden"
                         enctype="multipart/form-data">
                         <div class="profile-upload">
                         <img src="<?php echo !empty($profile_picture) ? 'uploads/' . htmlspecialchars($profile_picture) : 'uploads/default.png'; ?>" 
@@ -286,6 +286,53 @@ include '../organization_query.php';
     </div>
     <!-- End of Overall Body Wrapper -->
 
+    <script>
+        // Handle Edit Organization Form Submission
+        $("#editProfileForm").on("submit", function (event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: "update_profile.php",
+            type: "POST",
+            data: formData,
+            processData: false, // Prevent jQuery from processing the data
+            contentType: false,
+            success: function (response) {
+            try {
+                response = JSON.parse(response);
+                console.log(response);
+
+                if (response.success) {
+                $("#editErrorMessage").addClass("d-none");
+                $("#editSuccessMessage").removeClass("d-none");
+
+                setTimeout(function () {
+                    $("#editProfileForm")[0].reset();
+                    $("#editSuccessMessage").addClass("d-none");
+                    location.reload();
+                }, 2000);
+                } else {
+                $("#editSuccessMessage").addClass("d-none");
+                $("#editErrorMessage").removeClass("d-none");
+                let errorHtml = "";
+                for (let field in response.errors) {
+                    errorHtml += `<li>${response.errors[field]}</li>`;
+                }
+                $("#editErrorList").html(errorHtml);
+                }
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+            }
+            },
+            error: function (xhr, status, error) {
+            console.error("Error updating organization:", error);
+            console.log(xhr.responseText);
+            },
+        });
+        });
+
+    </script>
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/sidebarmenu.js"></script>
