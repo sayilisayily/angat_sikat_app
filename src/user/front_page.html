@@ -1,222 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Angat Sikat Web App</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="../assets/images/logos/angat sikat.png"
+    />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100vh;
-            position: relative;
-            color: #ffffff;
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100vh;
+        position: relative;
+        color: #ffffff;
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("../user/CCAT-Campus-Scaled.jpg");
+        background-size: cover;
+        background-position: center;
+        filter: blur(8px);
+        z-index: 1;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 2;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+        z-index: 3;
+      }
+
+      .logo {
+        height: 60px;
+        width: auto;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        position: relative;
+        z-index: 3;
+        text-align: center;
+        padding: 0 20px;
+        margin-top: -50px;
+      }
+
+      h1 {
+        font-size: 48px;
+        margin: 0;
+        animation: fadeIn 1s ease-in-out, typing 5s steps(30, end) infinite;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 0;
+      }
+
+      h1 span:nth-child(1) {
+        color: #606060;
+      }
+
+      h1 span:nth-child(2) {
+        color: #ffb000;
+      }
+
+      h1 span:nth-child(3) {
+        color: #ffffff;
+      }
+
+      p {
+        font-size: 20px;
+        margin: 20px 0;
+        animation: fadeIn 1.5s ease-in-out;
+      }
+
+      .get-started {
+        padding: 15px 30px;
+        font-size: 18px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #ffb000;
+        animation: fadeIn 2s ease-in-out, pulse 1.5s infinite;
+        transition: background-color 0.3s ease;
+        margin-top: 20px;
+      }
+
+      .get-started:hover {
+        background-color: #ffa300;
+      }
+
+      .sign-up {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #00b415;
+        background-color: transparent;
+        border: 2px solid #00b415;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .sign-up:hover {
+        background-color: white;
+        color: #27ae60;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('../user/CCAT-Campus-Scaled.jpg');
-            background-size: cover;
-            background-position: center;
-            filter: blur(8px);
-            z-index: 1;
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes typing {
+        0% {
+          width: 0;
         }
 
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 2;
+        70% {
+          width: 100%;
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-            z-index: 3;
+        90% {
+          width: 100%;
         }
 
-        .logo {
-            height: 60px;
-            width: auto;
+        100% {
+          width: 0;
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
         }
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            position: relative;
-            z-index: 3;
-            text-align: center;
-            padding: 0 20px;
-            margin-top: -50px;
+        50% {
+          transform: scale(1.05);
         }
 
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @media (max-width: 768px) {
         h1 {
-            font-size: 48px;
-            margin: 0;
-            animation: fadeIn 1s ease-in-out, typing 5s steps(30, end) infinite;
-            white-space: nowrap;
-            overflow: hidden;
-            width: 0;
-        }
-
-        h1 span:nth-child(1) {
-            color: #606060;
-        }
-
-        h1 span:nth-child(2) {
-            color: #FFB000;
-        }
-
-        h1 span:nth-child(3) {
-            color: #ffffff;
+          font-size: 36px;
         }
 
         p {
-            font-size: 20px;
-            margin: 20px 0;
-            animation: fadeIn 1.5s ease-in-out;
+          font-size: 18px;
         }
 
         .get-started {
-            padding: 15px 30px;
-            font-size: 18px;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #FFB000;
-            animation: fadeIn 2s ease-in-out, pulse 1.5s infinite;
-            transition: background-color 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .get-started:hover {
-            background-color: #FFA300;
+          padding: 10px 20px;
         }
 
         .sign-up {
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #00B415;
-            background-color: transparent;
-            border: 2px solid #00B415;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background-color 0.3s ease, color 0.3s ease;
+          padding: 8px 16px;
         }
-
-        .sign-up:hover {
-            background-color: white;
-            color: #27ae60;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes typing {
-            0% {
-                width: 0;
-            }
-
-            70% {
-                width: 100%;
-            }
-
-            90% {
-                width: 100%;
-            }
-
-            100% {
-                width: 0;
-            }
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 36px;
-            }
-
-            p {
-                font-size: 18px;
-            }
-
-            .get-started {
-                padding: 10px 20px;
-            }
-
-            .sign-up {
-                padding: 8px 16px;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="overlay"></div>
     <header>
-        <img src="../user/angat sikat.png" alt="Your Logo" class="logo" />
-        <a href="../user/register.php" class="sign-up">Sign Up</a>
+      <img src="../user/angat sikat.png" alt="Your Logo" class="logo" />
+      <a href="../user/register.php" class="sign-up">Sign Up</a>
     </header>
 
     <div class="container">
-        <h1>
-            <span style="color: #ffffff;">Angat</span>
-            <span style="color: #ff7b00;">Sikat</span>
-            <br>
-            <span style="color: #ffffff;">Web App</span>
-        </h1>
-        <p>Empowering campus organizations with seamless budget management—track, plan, and thrive together.</p>
-        <a href="login.html" class="get-started" onclick="redirectToLogin()">Get Started</a>
+      <h1>
+        <span style="color: #ffffff">Angat</span>
+        <span style="color: #ff7b00">Sikat</span>
+        <br />
+        <span style="color: #ffffff">Web App</span>
+      </h1>
+      <p>
+        Empowering campus organizations with seamless budget management—track,
+        plan, and thrive together.
+      </p>
+      <a href="login.html" class="get-started" onclick="redirectToLogin()"
+        >Get Started</a
+      >
     </div>
 
     <script>
-        function redirectToLogin() {
-            document.body.style.opacity = "0"; // Fade out effect
-            setTimeout(() => {
-                window.location.href = '../user/login.html'; // Redirect after fading out
-            }, 500); // Match the timeout with the CSS transition duration
-        }
+      function redirectToLogin() {
+        document.body.style.opacity = "0"; // Fade out effect
+        setTimeout(() => {
+          window.location.href = "../user/login.html"; // Redirect after fading out
+        }, 500); // Match the timeout with the CSS transition duration
+      }
     </script>
-</body>
-
+  </body>
 </html>
