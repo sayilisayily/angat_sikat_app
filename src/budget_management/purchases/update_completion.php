@@ -1,5 +1,5 @@
 <?php
-include '../connection.php';
+include '../../connection.php';
 
 $response = ['success' => false, 'errors' => [], 'message' => ''];
 

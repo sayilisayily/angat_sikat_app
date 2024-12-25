@@ -77,8 +77,8 @@ if (isset($_GET['purchase_id']) && !empty($_GET['purchase_id'])) {
 <html lang="en">
 
 <head>
-    <title>Maintenance Details</title>
-    <link rel="shortcut icon" type="image/png" href="../../assets/images/logos/favicon.png" />
+    <title>Purchase Details</title>
+    <link rel="shortcut icon" type="image/png" href="../../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../../html/sidebar.css" />
