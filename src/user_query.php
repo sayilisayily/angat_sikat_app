@@ -14,6 +14,7 @@ if ($user_result && mysqli_num_rows($user_result) > 0) {
     $fullname = $firstname . ' ' . $lastname;
     $email = $user['email'];
     $role = $user['role'];
+    $profile_picture = $user['profile_picture'];
 
 } else {
     echo "Error fetching user data: " . mysqli_error($conn);
