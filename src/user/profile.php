@@ -25,6 +25,8 @@ include '../organization_query.php';
     <script src="https://cdn.lordicon.com/lordicon.js"></script>
     <!--Calendar JS-->
     <script src="path/to/calendar.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 
     <script>
@@ -167,7 +169,7 @@ include '../organization_query.php';
                     <div class="dropdown">
                         <a href="#" class="dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown"
                             aria-expanded="false" style="text-decoration: none;">
-                            <img class="border border-dark rounded-circle" src="<?php echo !empty($profile_picture) ? '../user/uploads/' . htmlspecialchars($profile_picture) : '../user/uploads/default.png'; ?>" alt="Profile"
+                            <img class="border border-dark rounded-circle" src="<?php echo !empty($profile_picture) ? '../user/' . htmlspecialchars($profile_picture) : '../user/uploads/default.png'; ?>" alt="Profile"
                                         style="width: 40px; height: 40px; margin-left: 10px;">
                             <div class="d-flex flex-column align-items-start ms-2">
                                 <span style="font-weight: bold; color: #004024; text-decoration: none;"><?php echo htmlspecialchars($fullname); ?></span>
@@ -196,7 +198,7 @@ include '../organization_query.php';
                     <!-- Display Profile Information -->
                     <div id="profile-info">
                         <div style="text-align: center;">
-                        <img src="<?php echo !empty($profile_picture) ? 'uploads/' . htmlspecialchars($profile_picture) : 'uploads/default.png'; ?>" 
+                        <img src="<?php echo !empty($profile_picture) ? htmlspecialchars($profile_picture) : 'uploads/default.png'; ?>" 
                             alt="Profile Image" 
                              
                             class="profile-img">
@@ -225,10 +227,10 @@ include '../organization_query.php';
                     </div>
 
                     <!-- Edit Profile Form -->
-                    <form id="editProfileForm" class="hidden"
+                    <form id="edit-profile-form" class="hidden"
                         enctype="multipart/form-data">
                         <div class="profile-upload">
-                        <img src="<?php echo !empty($profile_picture) ? 'uploads/' . htmlspecialchars($profile_picture) : 'uploads/default.png'; ?>" 
+                        <img src="<?php echo !empty($profile_picture) ? htmlspecialchars($profile_picture) : 'uploads/default.png'; ?>" 
                             alt="Profile Image" 
                             id="profilePreview" 
                             class="profile-img">
@@ -287,50 +289,52 @@ include '../organization_query.php';
     <!-- End of Overall Body Wrapper -->
 
     <script>
-        // Handle Edit Organization Form Submission
-        $("#editProfileForm").on("submit", function (event) {
-        event.preventDefault();
-        var formData = new FormData(this);
+        $(document).ready(function () {
+            $("#edit-profile-form").on("submit", function (event) {
+                event.preventDefault();
+                var formData = new FormData(this);
 
-        $.ajax({
-            url: "update_profile.php",
-            type: "POST",
-            data: formData,
-            processData: false, // Prevent jQuery from processing the data
-            contentType: false,
-            success: function (response) {
-            try {
-                response = JSON.parse(response);
-                console.log(response);
+                $.ajax({
+                    url: "update_profile.php",
+                    type: "POST",
+                    data: formData,
+                    processData: false, 
+                    contentType: false,
+                    success: function (response) {
+                        try {
+                            response = JSON.parse(response);
+                            console.log(response);
 
-                if (response.success) {
-                $("#editErrorMessage").addClass("d-none");
-                $("#editSuccessMessage").removeClass("d-none");
+                            if (response.success) {
+                                $("#editErrorMessage").addClass("d-none");
+                                $("#editSuccessMessage").removeClass("d-none");
 
-                setTimeout(function () {
-                    $("#editProfileForm")[0].reset();
-                    $("#editSuccessMessage").addClass("d-none");
-                    location.reload();
-                }, 2000);
-                } else {
-                $("#editSuccessMessage").addClass("d-none");
-                $("#editErrorMessage").removeClass("d-none");
-                let errorHtml = "";
-                for (let field in response.errors) {
-                    errorHtml += `<li>${response.errors[field]}</li>`;
-                }
-                $("#editErrorList").html(errorHtml);
-                }
-            } catch (error) {
-                console.error("Error parsing JSON:", error);
-            }
-            },
-            error: function (xhr, status, error) {
-            console.error("Error updating organization:", error);
-            console.log(xhr.responseText);
-            },
+                                setTimeout(function () {
+                                    $("#edit-profile-form")[0].reset();
+                                    $("#editSuccessMessage").addClass("d-none");
+                                    location.reload();
+                                }, 2000);
+                            } else {
+                                $("#editSuccessMessage").addClass("d-none");
+                                $("#editErrorMessage").removeClass("d-none");
+                                let errorHtml = "";
+                                for (let field in response.errors) {
+                                    errorHtml += `<li>${response.errors[field]}</li>`;
+                                }
+                                $("#editErrorList").html(errorHtml);
+                            }
+                        } catch (error) {
+                            console.error("Error parsing JSON:", error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error updating organization:", error);
+                        console.log(xhr.responseText);
+                    },
+                });
+            });
         });
-        });
+
 
     </script>
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>

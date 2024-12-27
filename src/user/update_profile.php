@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $file_tmp = $_FILES['profile_picture']['tmp_name'];
         $file_name = basename($_FILES['profile_picture']['name']);
-        $file_path = $upload_dir . $user_id . "_" . $file_name;
+        $file_path = $upload_dir . $file_name;
 
         if (move_uploaded_file($file_tmp, $file_path)) {
             $profile_picture = $file_path;
@@ -58,8 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Update profile if no errors
     if (empty($errors)) {
-        $query = "UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ?";
-        $params = [$first_name, $last_name, $email, $hashed_password];
+        $query = "UPDATE users SET first_name = ?, last_name = ?, email = ?";
+        $params = [$first_name, $last_name, $email];
 
         if (!empty($profile_picture)) {
             $query .= ", profile_picture = ?";
@@ -69,7 +69,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $query .= " WHERE user_id = ?";
         $params[] = $user_id;
 
+        // Debug query
+        echo $query;
+        print_r($params);
+
         $stmt = $conn->prepare($query);
+        if (!$stmt) {
+            die("Query preparation failed: " . $conn->error);
+        }
+
         $stmt->bind_param(str_repeat("s", count($params) - 1) . "i", ...$params);
 
         if ($stmt->execute()) {
@@ -85,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['success'] = false;
         $data['errors'] = $errors;
     }
+
 }
 
 echo json_encode($data);
