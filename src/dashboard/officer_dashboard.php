@@ -87,52 +87,144 @@ include '../organization_query.php';
 
                         <!-- Financial Summary Cards Row -->
                         <div class="row">
+                            <?php
+                            // Fetch the latest two balance records from the balance_history table
+                            $query_balance = "SELECT balance, updated_at FROM balance_history 
+                                            WHERE organization_id = ? 
+                                            ORDER BY updated_at DESC 
+                                            LIMIT 2";
+
+                            $stmt_balance = $conn->prepare($query_balance);
+                            $stmt_balance->bind_param("i", $organization_id);
+                            $stmt_balance->execute();
+                            $result_balance = $stmt_balance->get_result();
+
+                            $latest_balances = [];
+                            while ($row = $result_balance->fetch_assoc()) {
+                                $latest_balances[] = $row['balance'];
+                            }
+
+                            // Calculate percentage difference for balance
+                            $balance_percentage_change = 0;
+                            if (count($latest_balances) === 2) {
+                                $latest_balance = $latest_balances[0];
+                                $previous_balance = $latest_balances[1];
+                                
+                                if ($previous_balance > 0) {
+                                    $balance_percentage_change = (($latest_balance - $previous_balance) / $previous_balance) * 100;
+                                }
+                            }
+
+                            $stmt_balance->close();
+                            ?>
+
                             <!-- Balance Card -->
                             <div class="col-md-4 mb-3">
-                                <div class="card financial-card p-3 shadow-sm bg-purple-200 mx-2">
-                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Balance</h7>
+                                <div class="card gradient-card-2 p-3 shadow-sm mx-2">
+                                    <h7 class="text-white text-start d-block" style="margin-left: 2px;">Balance</h7>
                                     <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">
-                                            <?php echo number_format($balance, 2); ?>
+                                        <h1 class="fw-bold text-white" style="margin-left: 2px;">
+                                            ₱<?php echo number_format($balance); ?>
                                         </h1>
-                                        <i class="bx bx-trending-up"
-                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <div class="badge bg-warning text-white fw-medium percentage-box"
-                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
+                                            style="font-size: 0.75rem; padding: 2px 6px;"><?php echo number_format(abs($balance_percentage_change), 1); ?>% 
+                                            <?php echo $balance_percentage_change >= 0 ? '▲' : '▼'; ?></div>
                                     </div>
                                 </div>
                             </div>
+
+                            <?php
+                            // Fetch the latest two income records from the income_history table
+                            $query_income = "SELECT income, updated_at FROM income_history 
+                                            WHERE organization_id = ? 
+                                            ORDER BY updated_at DESC 
+                                            LIMIT 2";
+
+                            $stmt_income = $conn->prepare($query_income);
+                            $stmt_income->bind_param("i", $organization_id);
+                            $stmt_income->execute();
+                            $result_income = $stmt_income->get_result();
+
+                            $latest_incomes = [];
+                            while ($row = $result_income->fetch_assoc()) {
+                                $latest_incomes[] = $row['income'];
+                            }
+
+                            // Calculate percentage difference for income
+                            $income_percentage_change = 0;
+                            if (count($latest_incomes) === 2) {
+                                $latest_income = $latest_incomes[0];
+                                $previous_income = $latest_incomes[1];
+                                
+                                if ($previous_income > 0) {
+                                    $income_percentage_change = (($latest_income - $previous_income) / $previous_income) * 100;
+                                }
+                            }
+
+                            $stmt_income->close();
+                            ?>
 
                             <!-- Income Card -->
                             <div class="col-md-4 mb-3">
-                                <div class="card financial-card p-3 shadow-sm bg-pink-200 mx-2">
-                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Income</h7>
+                                <div class="card gradient-card-1 p-3 shadow-sm mx-2">
+                                    <h7 class="text-white text-start d-block" style="margin-left: 2px;">Income</h7>
                                     <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">₱<?php echo number_format($income, 2); ?></h1>
-                                        <i class="bx bx-trending-up"
-                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
+                                        <h1 class="fw-bold text-white" style="margin-left: 2px;">₱<?php echo number_format($income); ?></h1>
+                                        
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <div class="badge bg-warning text-white fw-medium percentage-box"
-                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
+                                            style="font-size: 0.75rem; padding: 2px 6px;"><?php echo number_format(abs($income_percentage_change), 1); ?>% 
+                                            <?php echo $income_percentage_change >= 0 ? '▲' : '▼'; ?></div>
                                     </div>
                                 </div>
                             </div>
 
+                            <?php
+                            // Fetch the latest two expense records from the expense_history table
+                            $query = "SELECT expense, updated_at FROM expense_history 
+                                    WHERE organization_id = ? 
+                                    ORDER BY updated_at DESC 
+                                    LIMIT 2";
+
+                            $stmt = $conn->prepare($query);
+                            $stmt->bind_param("i", $organization_id);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+
+                            $latest_expenses = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $latest_expenses[] = $row['expense'];
+                            }
+
+                            // Calculate percentage difference
+                            $percentage_change = 0;
+                            if (count($latest_expenses) === 2) {
+                                $latest = $latest_expenses[0];
+                                $previous = $latest_expenses[1];
+                                
+                                if ($previous > 0) {
+                                    $percentage_change = (($latest - $previous) / $previous) * 100;
+                                }
+                            }
+
+                            $stmt->close();
+                            ?>
+
                             <!-- Expense Card -->
                             <div class="col-md-4 mb-3">
-                                <div class="card financial-card p-3 shadow-sm bg-blue-200 mx-2">
-                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Expense</h7>
+                                <div class="card gradient-card-3 p-3 shadow-sm mx-2">
+                                    <h7 class="text-white text-start d-block" style="margin-left: 2px;">Expense</h7>
                                     <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">₱<?php echo number_format($expense, 2); ?></h1>
-                                        <i class="bx bx-trending-up"
-                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
+                                        <h1 class="fw-bold text-white" style="margin-left: 2px;">₱<?php echo number_format($expense); ?></h1>
+                                        
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <div class="badge bg-warning text-white fw-medium percentage-box"
-                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
+                                            style="font-size: 0.75rem; padding: 2px 6px;"><?php echo number_format(abs($percentage_change), 1); ?>% 
+                                            <?php echo $percentage_change >= 0 ? '▲' : '▼'; ?></div>
                                     </div>
                                 </div>
                             </div>
