@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 25, 2024 at 07:36 PM
+-- Generation Time: Dec 27, 2024 at 04:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -702,6 +702,28 @@ INSERT INTO `purchase_summary_items` (`summary_item_id`, `purchase_id`, `descrip
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `reports`
+--
+
+CREATE TABLE `reports` (
+  `report_id` int(11) NOT NULL,
+  `organization_id` int(11) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `report_type` enum('Budget Request','Project Proposal','Liquidation','Accomplishment') NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `reports`
+--
+
+INSERT INTO `reports` (`report_id`, `organization_id`, `file_name`, `report_type`, `created_at`, `updated_at`) VALUES
+(1, 1, 'report.pdf', 'Budget Request', '2024-12-27 10:26:05', '2024-12-27 10:26:05');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -709,6 +731,7 @@ CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
   `username` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `profile_picture` varchar(255) NOT NULL,
   `first_name` varchar(255) NOT NULL,
   `last_name` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
@@ -722,12 +745,12 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `password`, `first_name`, `last_name`, `email`, `role`, `organization_id`, `archived`, `created_at`) VALUES
-(1, 'sayilisayily', '1234', 'Zylei', 'Sugue', 'zylei.sugue@cvsu.edu.ph', 'officer', 1, 1, '2024-12-23 16:21:49'),
-(2, 'JerichoPao', '$2y$10$ppHUUKHxwQYNGTLdedFzg.0XpCbrIwcw7ShYBQ.E5yIDnzlyqQhrO', 'Jericho', 'Pao', 'jerichopao@gmail.com', 'officer', 1, 0, '2024-12-23 16:21:49'),
-(3, 'admin', '$2y$10$ZhjHxFaq77LMDZK1WSfss.w6QvlSROnTpjIE9Gov/wb7soNaNY/f6', 'Admin', '', 'admin@mail.com', 'admin', 1, 0, '2024-12-23 16:21:49'),
-(5, 'irhyll', '$2y$10$.g2up32AHDND7JWmDtrDpuqa4srZUD.3OoEj8sSTsoSsbWqaY9jJC', 'James Irhyll', 'Dela Cruz', 'irhyll@cvsu.edu.ph', 'officer', 3, 0, '2024-12-23 16:21:49'),
-(6, 'Marielle', '$2y$10$HL2yGbXp1gekNXSixvR0Ae4uh/l6AvDS/G4S/CEEKozFQ1Si0x6la', 'Marielle', 'Martires', 'marielle@cvsu.edu.ph', 'officer', 4, 0, '2024-12-23 16:21:49');
+INSERT INTO `users` (`user_id`, `username`, `password`, `profile_picture`, `first_name`, `last_name`, `email`, `role`, `organization_id`, `archived`, `created_at`) VALUES
+(1, 'sayilisayily', '1234', '', 'Zylei', 'Sugue', 'zylei.sugue@cvsu.edu.ph', 'officer', 1, 1, '2024-12-23 16:21:49'),
+(2, 'JerichoPao', '$2y$10$5AiK4xtJNnJkqY4z6kt1R.Ek6JBPkd3RpzbNFktCqcAMZureVKqH.', 'uploads/2_468012212_122192717414243019_6538985762148459099_n.jpg', 'Maphil Grace', 'Alquizola', 'maphil.grace.alquizola@cvsu.edu.ph', 'officer', 1, 0, '2024-12-23 16:21:49'),
+(3, 'admin', '$2y$10$ZhjHxFaq77LMDZK1WSfss.w6QvlSROnTpjIE9Gov/wb7soNaNY/f6', '', 'Admin', '', 'admin@mail.com', 'admin', 1, 0, '2024-12-23 16:21:49'),
+(5, 'irhyll', '$2y$10$.g2up32AHDND7JWmDtrDpuqa4srZUD.3OoEj8sSTsoSsbWqaY9jJC', '', 'James Irhyll', 'Dela Cruz', 'irhyll@cvsu.edu.ph', 'officer', 3, 0, '2024-12-23 16:21:49'),
+(6, 'Marielle', '$2y$10$HL2yGbXp1gekNXSixvR0Ae4uh/l6AvDS/G4S/CEEKozFQ1Si0x6la', '', 'Marielle', 'Martires', 'marielle@cvsu.edu.ph', 'officer', 4, 0, '2024-12-23 16:21:49');
 
 --
 -- Indexes for dumped tables
@@ -906,6 +929,13 @@ ALTER TABLE `purchase_summary_items`
   ADD KEY `purchase_id` (`purchase_id`);
 
 --
+-- Indexes for table `reports`
+--
+ALTER TABLE `reports`
+  ADD PRIMARY KEY (`report_id`),
+  ADD KEY `organization_id` (`organization_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -1063,6 +1093,12 @@ ALTER TABLE `purchase_summary_items`
   MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `reports`
+--
+ALTER TABLE `reports`
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -1204,6 +1240,12 @@ ALTER TABLE `purchase_items`
 --
 ALTER TABLE `purchase_summary_items`
   ADD CONSTRAINT `purchase_summary_items_ibfk_1` FOREIGN KEY (`purchase_id`) REFERENCES `purchases` (`purchase_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `reports`
+--
+ALTER TABLE `reports`
+  ADD CONSTRAINT `reports_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`organization_id`);
 
 --
 -- Constraints for table `users`
