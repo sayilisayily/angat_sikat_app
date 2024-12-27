@@ -294,17 +294,29 @@ include '../organization_query.php';
                                         echo "
                                         <div class='col-1'>
                                             <div class='d-flex flex-column-reverse align-items-center' style='height: 100px;'>
-                                                <div class='w-100 bg-success' style='height: {$height}px;'></div>
+                                                <div class='w-100 bg-success' style='height: {$height}px;' 
+                                                    data-bs-toggle='tooltip' 
+                                                    title='₱" . number_format($month_balance, 2) . "'></div>
                                             </div>
                                             <p class='mt-1 text-sm font-medium text-center'>{$month}</p>
                                         </div>";
                                     }
                                     ?>
                                 </div>
+
                             </div>
                         </div>
                         <!-- Balance Report End -->
                     </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                                new bootstrap.Tooltip(tooltipTriggerEl);
+                            });
+                        });
+                    </script>
 
                     <!-- Right Column for Advisers and Financial Deadlines (Third Container) -->
                     <div class="col-md-4">
