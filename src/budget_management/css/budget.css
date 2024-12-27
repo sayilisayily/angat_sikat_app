@@ -24,6 +24,11 @@ h1 {
 .gradient-card-3 {
   background: linear-gradient(135deg, #6a82fb, #fc5c7d);
 }
+
+.gradient-card-4 {
+  background: linear-gradient(135deg, #34a853, #b4ec51); /* Green tones */
+}
+
 .card-title {
   color: white;
 }
