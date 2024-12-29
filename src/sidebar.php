@@ -22,13 +22,7 @@
                         <i class="bx bxs-dashboard"></i>
                         <span class="hide-menu">Dashboard</span>
                     </a>
-                </li>
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false" data-tooltip="Manage Events">
-                        <i class="bx bx-calendar"></i>
-                        <span class="hide-menu">Manage Events</span>
-                    </a>
-                </li>
+                </li>             
                 <li class="sidebar-item">
                     <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget">
                         <i class="bx bx-wallet"></i>
@@ -41,6 +35,12 @@
                         <a href="../budget_management/maintenance/maintenance.php"> MOE</a>
                         <a href="../budget_management/budget_approval_table.php"> Approval</a>
                     </div>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false" data-tooltip="Manage Events">
+                        <i class="bx bx-calendar"></i>
+                        <span class="hide-menu">Activities</span>
+                    </a>
                 </li>
                 <li class="sidebar-item">
                     <a class="sidebar-link" href="#transactions" aria-expanded="false" data-tooltip="Transactions">
@@ -59,15 +59,15 @@
                     </div>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#reports.php" aria-expanded="false" data-tooltip="Reports">
+                    <a class="sidebar-link" href="../reports/reports.php" aria-expanded="false" data-tooltip="Reports">
                         <i class="bx bx-file"></i>
                         <span class="hide-menu">Reports</span>
                     </a>
                 </li>
                 <li class="sidebar-item profile-container">
-                    <a class="sidebar-link" href="../user/profile.html" aria-expanded="false" data-tooltip="Profile">
+                    <a class="sidebar-link" href="../user/profile.php" aria-expanded="false" data-tooltip="Profile">
                         <div class="profile-pic-border">
-                            <img src="<?php echo !empty($profile_picture) ? '../user/uploads/' . htmlspecialchars($profile_picture) : '../user/uploads/default.png'; ?>" alt="Profile Picture" class="profile-pic" />
+                            <img src="<?php echo !empty($profile_picture) ? '../user/' . htmlspecialchars($profile_picture) : '../user/uploads/default.png'; ?>" alt="Organization Logo" class="profile-pic" />
                         </div>
                         <span class="profile-name"><?php echo htmlspecialchars($user['first_name']) . ' ' . htmlspecialchars($user['last_name']); ?></span>
                     </a>
