@@ -2,7 +2,7 @@
 include '../connection.php';
 include '../session_check.php'; 
 
-$sql = "SELECT * FROM expenses WHERE organization_id = $organization_id AND archived = 0"; // Adjust the organization_id as needed
+$sql = "SELECT * FROM archive_legend"; // Adjust the organization_id as needed
 $result = $conn->query($sql);
 ?>
 
@@ -11,13 +11,13 @@ $result = $conn->query($sql);
 
 <head>
     <meta charset="UTF-8">
-    <title>Expenses Table</title>
+    <title>Archive Legend Table</title>
     <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Custom CSS for Budget Overview-->
-    <link rel="stylesheet" href="../budget_management/css/budget.css" />
+    <link rel="stylesheet" href="../activity_management/css/activities.css" />
     <!--Boxicon-->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <!--Font Awesome-->
@@ -206,158 +206,246 @@ $result = $conn->query($sql);
             <!-- Header End -->
 
             <div class="container mt-5 p-5">
-                <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Expenses
-                    <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addExpenseModal"
-                        style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                        <i class="fa-solid fa-plus"></i> Add Expense
-                    </button>
-                </h2>
-                <table id="expensesTable" class="table">
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Title</th>
-                            <th>Amount</th>
-                            <th>Reference</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    
-                    echo "<tr>
-                            <td>{$row['category']}</td>
-                            <td>{$row['title']}</td>
-                            <td>{$row['amount']}</td>
-                            <td>{$row['reference']}</td>
-                            
-                            <td>
-                                <button class='btn btn-primary btn-sm edit-btn' 
-                                        data-bs-toggle='modal' 
-                                        data-bs-target='#editExpenseModal' 
-                                        data-id='{$row['expense_id']}'>
-                                    <i class='fa-solid fa-pen'></i> Edit
-                                </button>
-                                <button class='btn btn-danger btn-sm archive-btn' 
-                                        data-id='{$row['expense_id']}'>
-                                    <i class='fa-solid fa-box-archive'></i> Archive
-                                </button>
-                            </td>
-                        </tr>";
-                }
-            } else {
-                echo "<tr><td colspan='7' class='text-center'>No expenses found</td></tr>";
-            }
-            ?>
-                    </tbody>
-                </table>
+                <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Archive Legend</h2>
+
+                <!-- Years Table -->
+                <div class="mb-5">
+                    <h3>Years
+                        <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addYearModal"
+                            style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                            <i class="fa-solid fa-plus"></i> Add Year
+                        </button>
+                    </h3>
+                    <table id="yearsTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $years_query = "SELECT * FROM years";
+                            $years_result = $conn->query($years_query);
+
+                            if ($years_result->num_rows > 0) {
+                                while ($year = $years_result->fetch_assoc()) {
+                                    $status_class = $year['status'] === 'Active' ? 'approved' : 'disapproved';
+
+                                    echo "<tr>
+                                        <td>{$year['name']}</td>
+                                        <td>" . date('F d, Y', strtotime($year['start_date'])) . "</td>
+                                        <td>" . date('F d, Y', strtotime($year['end_date'])) . "</td>
+                                        <td><span class='badge rounded-pill {$status_class}'>{$year['status']}</span></td>
+                                        <td>
+                                            <button class='btn btn-primary btn-sm edit-year-btn mb-3' 
+                                                    data-bs-toggle='modal' 
+                                                    data-bs-target='#editYearModal' 
+                                                    data-id='{$year['year_id']}'>
+                                                <i class='fa-solid fa-pen'></i> Edit
+                                            </button>
+                                            <button class='btn btn-danger btn-sm delete-year-btn mb-3' 
+                                                    data-id='{$year['year_id']}'>
+                                                <i class='fa-solid fa-trash'></i> Delete
+                                            </button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo "<tr><td colspan='5' class='text-center'>No years found</td></tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Semesters Table -->
+                <div>
+                    <h3>Semesters
+                        <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addSemesterModal"
+                            style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                            <i class="fa-solid fa-plus"></i> Add Semester
+                        </button>
+                    </h3>
+                    <table id="semestersTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Year</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $semesters_query = "SELECT s.*, y.name AS year_name FROM semesters s JOIN years y ON s.year_id = y.year_id";
+                            $semesters_result = $conn->query($semesters_query);
+
+                            if ($semesters_result->num_rows > 0) {
+                                while ($semester = $semesters_result->fetch_assoc()) {
+                                    $status_class = $semester['status'] === 'Active' ? 'approved' : 'disapproved';
+
+                                    echo "<tr>
+                                        <td>{$semester['name']}</td>
+                                        <td>{$semester['year_name']}</td>
+                                        <td>" . date('F d, Y', strtotime($semester['start_date'])) . "</td>
+                                        <td>" . date('F d, Y', strtotime($semester['end_date'])) . "</td>
+                                        <td><span class='badge rounded-pill {$status_class}'>{$semester['status']}</span></td>
+                                        <td>
+                                            <button class='btn btn-primary btn-sm edit-semester-btn mb-3' 
+                                                    data-bs-toggle='modal' 
+                                                    data-bs-target='#editSemesterModal' 
+                                                    data-id='{$semester['semester_id']}'>
+                                                <i class='fa-solid fa-pen'></i> Edit
+                                            </button>
+                                            <button class='btn btn-danger btn-sm delete-semester-btn mb-3' 
+                                                    data-id='{$semester['semester_id']}'>
+                                                <i class='fa-solid fa-trash'></i> Delete
+                                            </button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo "<tr><td colspan='6' class='text-center'>No semesters found</td></tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- Add Expense Modal -->
-            <div class="modal fade" id="addExpenseModal" tabindex="-1" role="dialog" aria-labelledby="addExpenseLabel"
-                aria-hidden="true">
+
+
+            <!-- Add Year Modal -->
+            <div class="modal fade" id="addYearModal" tabindex="-1" role="dialog" aria-labelledby="addYearLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <form id="addExpenseForm" enctype="multipart/form-data">
+                        <form id="addYearForm" enctype="multipart/form-data">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="addExpenseLabel">Add New Expense</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                <h5 class="modal-title" id="addYearLabel">Add New Year</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                
 
-                                <!-- Title Field -->
+                                <!-- Start Date Field -->
                                 <div class="form-group mt-3">
-                                    <label for="title">Title</label>
-                                    <select name="title" id="title" class="form-control" required>
-                                        <option value="">Select Title</option>
-                                        <?php
-                                        include 'connection.php';
+                                    <label for="year_start_date">Start Date</label>
+                                    <input type="date" class="form-control" id="year_start_date" name="year_start_date" required>
+                                </div>
 
-                                        // Fetch events
-                                        $event_query = "SELECT title, summary_id, total_amount FROM events_summary WHERE type = 'Expense' AND archived = 0 AND organization_id = $organization_id";
-                                        $event_result = mysqli_query($conn, $event_query);
-                                        echo "<optgroup label='Events'>";
-                                        while ($row = mysqli_fetch_assoc($event_result)) {
-                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
-                                                    data-id="' . htmlspecialchars($row['summary_id']) . '"
-                                                    data-category="Activities" 
-                                                    data-total-amount="' . htmlspecialchars($row['total_amount']) . '">' 
-                                                    . htmlspecialchars($row['title']) . '</option>';
-                                        }
-                                        echo "</optgroup>";
+                                <!-- End Date Field -->
+                                <div class="form-group mt-3">
+                                    <label for="year_end_date">End Date</label>
+                                    <input type="date" class="form-control" id="year_end_date" name="year_end_date" required>
+                                </div>
 
-                                        // Fetch purchases
-                                        $purchase_query = "SELECT title, summary_id, total_amount FROM purchases_summary WHERE archived = 0 AND organization_id = $organization_id";
-                                        $purchase_result = mysqli_query($conn, $purchase_query);
-                                        echo "<optgroup label='Purchases'>";
-                                        while ($row = mysqli_fetch_assoc($purchase_result)) {
-                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
-                                                    data-id="' . htmlspecialchars($row['summary_id']) . '"
-                                                    data-category="Purchase" 
-                                                    data-total-amount="' . htmlspecialchars($row['total_amount']) . '">' 
-                                                    . htmlspecialchars($row['title']) . '</option>';
-                                        }
-                                        echo "</optgroup>";
-
-                                        // Fetch maintenance
-                                        $maintenance_query = "SELECT title, summary_id, total_amount FROM maintenance_summary WHERE archived = 0 AND organization_id = $organization_id";
-                                        $maintenance_result = mysqli_query($conn, $maintenance_query);
-                                        echo "<optgroup label='Maintenance and Other Expenses'>";
-                                        while ($row = mysqli_fetch_assoc($maintenance_result)) {
-                                            echo '<option value="' . htmlspecialchars($row['title']) . '" 
-                                                    data-id="' . htmlspecialchars($row['summary_id']) . '"
-                                                    data-category="Maintenance and Other Expenses" 
-                                                    data-total-amount="' . htmlspecialchars($row['total_amount']) . '">' 
-                                                    . htmlspecialchars($row['title']) . '</option>';
-                                        }
-                                        echo "</optgroup>";
-                                        ?>
+                                <!-- Status Field -->
+                                <div class="form-group mt-3">
+                                    <label for="year_status">Status</label>
+                                    <select name="year_status" id="year_status" class="form-control" required>
+                                        <option value="">Select Status</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
                                     </select>
-
-
-                                </div>
-                                <!-- Hidden Fields for Expense Details -->
-                                 <input type="hidden" name="summary_id" id="summary_id">
-                                <input type="hidden" id="expense_id" name="expense_id">
-                                <input type="hidden" id="organization_id" name="organization_id" value="<?php echo $organization_id?>">
-
-                                <!-- Category Field -->
-                                <div class="form-group">
-                                    <label for="category">Category</label>
-                                    <input type="text" class="form-control" id="category" name="category" readonly>
-                                </div>
-
-                                <!-- Amount Field -->
-                                <div class="form-group mt-3">
-                                    <label for="amount">Amount</label>
-                                    <input type="number" class="form-control" id="total_amount" name="total_amount" step="0.01"
-                                        readonly>
-                                </div>
-
-                                <!-- Reference (File Upload) Field -->
-                                <div class="form-group mt-3">
-                                    <label for="reference">Reference</label>
-                                    <input type="file" class="form-control" id="reference" name="reference"
-                                        accept=".pdf,.jpg,.png,.doc,.docx" required>
                                 </div>
 
                                 <!-- Success Message Alert -->
-                                <div id="successMessage" class="alert alert-success d-none mt-3" role="alert">
-                                    Expense added successfully!
+                                <div id="yearSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                                    Year added successfully!
                                 </div>
 
                                 <!-- Error Message Alert -->
-                                <div id="errorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                                    <ul id="errorList"></ul>
+                                <div id="yearErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                                    <ul id="yearErrorList"></ul>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Add Expense</button>
+                                <button type="submit" class="btn btn-primary">Add Year</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Semester Modal -->
+            <div class="modal fade" id="addSemesterModal" tabindex="-1" role="dialog" aria-labelledby="addSemesterLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form id="addSemesterForm" enctype="multipart/form-data">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addSemesterLabel">Add New Semester</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                                <!-- Year Dropdown Field -->
+                                <div class="form-group mt-3">
+                                    <label for="semester_year">Year</label>
+                                    <select name="semester_year" id="semester_year" class="form-control" required>
+                                        <option value="">Select Year</option>
+                                        <?php
+                                        $years_query = "SELECT year_id, name FROM years";
+                                        $years_result = $conn->query($years_query);
+                                        if ($years_result->num_rows > 0) {
+                                            while ($year = $years_result->fetch_assoc()) {
+                                                echo "<option value='{$year['year_id']}'>{$year['name']}</option>";
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+                                <!-- Type Field -->
+                                <div class="form-group mt-3">
+                                    <label for="type">Type</label>
+                                    <select name="type" id="type" class="form-control" required>
+                                        <option value="">Select Type</option>
+                                        <option value="First">First</option>
+                                        <option value="Second">Second</option>
+                                    </select>
+                                </div>
+
+                                <!-- Start Date Field -->
+                                <div class="form-group mt-3">
+                                    <label for="semester_start_date">Start Date</label>
+                                    <input type="date" class="form-control" id="semester_start_date" name="semester_start_date" required>
+                                </div>
+
+                                <!-- End Date Field -->
+                                <div class="form-group mt-3">
+                                    <label for="semester_end_date">End Date</label>
+                                    <input type="date" class="form-control" id="semester_end_date" name="semester_end_date" required>
+                                </div>
+
+                                <!-- Status Field -->
+                                <div class="form-group mt-3">
+                                    <label for="semester_status">Status</label>
+                                    <select name="semester_status" id="semester_status" class="form-control" required>
+                                        <option value="">Select Status</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+
+                                <!-- Success Message Alert -->
+                                <div id="semesterSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                                    Semester added successfully!
+                                </div>
+
+                                <!-- Error Message Alert -->
+                                <div id="semesterErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                                    <ul id="semesterErrorList"></ul>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Add Semester</button>
                             </div>
                         </form>
                     </div>
@@ -365,46 +453,134 @@ $result = $conn->query($sql);
             </div>
 
 
-            <!-- Edit Expense Modal -->
-            <div class="modal fade" id="editExpenseModal" tabindex="-1" role="dialog"
-                aria-labelledby="editExpenseModalLabel" aria-hidden="true">
+
+            <!-- Edit Semester Modal -->
+            <div class="modal fade" id="editSemesterModal" tabindex="-1" role="dialog" aria-labelledby="editSemesterLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <form id="editExpenseForm" action="update_expense.php" method="POST"
-                            enctype="multipart/form-data">
+                        <form id="editSemesterForm" enctype="multipart/form-data">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="editExpenseModalLabel">Edit Expense</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                <h5 class="modal-title" id="editSemesterLabel">Edit Semester</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <input type="text" id="editExpenseId" name="expense_id">
-                                
-                                <div class="form-group">
-                                    <label for="editTitle">Title</label>
-                                    <input type="text" class="form-control" id="editTitle" name="title" readonly>
+
+                                <!-- Hidden input to store the semester ID -->
+                                <input type="hidden" id="editSemesterId" name="semester_id">
+
+                                <!-- Year Dropdown Field -->
+                                <div class="form-group mt-3">
+                                    <label for="editSemesterYear">Year</label>
+                                    <select name="semester_year" id="editSemesterYear" class="form-control" required>
+                                        <option value="">Select Year</option>
+                                        <?php
+                                        $years_query = "SELECT year_id, name FROM years";
+                                        $years_result = $conn->query($years_query);
+                                        if ($years_result->num_rows > 0) {
+                                            while ($year = $years_result->fetch_assoc()) {
+                                                echo "<option value='{$year['year_id']}'>{$year['name']}</option>";
+                                            }
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <label for="editCategory">Category</label>
-                                    <input type="text" class="form-control" id="editCategory" name="category" readonly>
+
+                                <!-- Type Field -->
+                                <div class="form-group mt-3">
+                                    <label for="editType">Type</label>
+                                    <select name="type" id="editType" class="form-control" required>
+                                        <option value="">Select Type</option>
+                                        <option value="First">First</option>
+                                        <option value="Second">Second</option>
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <label for="editAmount">Amount</label>
-                                    <input type="number" class="form-control" id="editAmount" name="amount" step="0.01"
-                                        readonly>
+
+                                <!-- Start Date Field -->
+                                <div class="form-group mt-3">
+                                    <label for="editStartDate">Start Date</label>
+                                    <input type="date" class="form-control" id="editStartDate" name="semester_start_date" required>
                                 </div>
-                                <div class="form-group">
-                                    <label for="editReference">Reference</label>
-                                    <input type="file" class="form-control" id="editReference" name="reference">
+
+                                <!-- End Date Field -->
+                                <div class="form-group mt-3">
+                                    <label for="editEndDate">End Date</label>
+                                    <input type="date" class="form-control" id="editEndDate" name="semester_end_date" required>
+                                </div>
+
+                                <!-- Status Field -->
+                                <div class="form-group mt-3">
+                                    <label for="editStatus">Status</label>
+                                    <select name="semester_status" id="editStatus" class="form-control" required>
+                                        <option value="">Select Status</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
                                 </div>
 
                                 <!-- Success Message Alert -->
-                                <div id="editSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
-                                    Expense updated successfully!
+                                <div id="semesterEditSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                                    Semester updated successfully!
                                 </div>
+
                                 <!-- Error Message Alert -->
-                                <div id="editErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                                    <ul id="editErrorList"></ul>
+                                <div id="semesterEditErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                                    <ul id="semesterEditErrorList"></ul>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Edit Year Modal -->
+            <div class="modal fade" id="editYearModal" tabindex="-1" role="dialog" aria-labelledby="editYearLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form id="editYearForm" enctype="multipart/form-data">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editYearLabel">Edit Year</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                                <!-- Hidden input to store the year ID -->
+                                <input type="hidden" id="editYearId" name="year_id">
+
+                                <!-- Start Date Field -->
+                                <div class="form-group mt-3">
+                                    <label for="editYearStartDate">Start Date</label>
+                                    <input type="date" class="form-control" id="editYearStartDate" name="year_start_date" required>
+                                </div>
+
+                                <!-- End Date Field -->
+                                <div class="form-group mt-3">
+                                    <label for="editYearEndDate">End Date</label>
+                                    <input type="date" class="form-control" id="editYearEndDate" name="year_end_date" required>
+                                </div>
+
+                                <!-- Status Field -->
+                                <div class="form-group mt-3">
+                                    <label for="editYearStatus">Status</label>
+                                    <select name="year_status" id="editYearStatus" class="form-control" required>
+                                        <option value="">Select Status</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+
+                                <!-- Success Message Alert -->
+                                <div id="yearEditSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                                    Year updated successfully!
+                                </div>
+
+                                <!-- Error Message Alert -->
+                                <div id="yearEditErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                                    <ul id="yearEditErrorList"></ul>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -451,7 +627,7 @@ $result = $conn->query($sql);
     <!-- End of Overall Body Wrapper -->
 
     <!-- BackEnd -->
-    <script src="js/expenses.js">
+    <script src="js/archive_legend.js">
     </script>
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
