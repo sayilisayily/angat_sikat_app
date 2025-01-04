@@ -232,84 +232,149 @@ include '../organization_query.php';
                         <!-- End of Financial Summary Cards Row -->
 
                         <!-- Balance Report Section -->
-                        <?php 
-                        $query = "SELECT MONTH(updated_at) AS month, YEAR(updated_at) AS year, balance 
-                                FROM balance_history 
-                                WHERE organization_id = ? 
-                                ORDER BY year ASC, month ASC";
-                        $stmt = $conn->prepare($query);
-                        $stmt->bind_param('i', $organization_id);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
+                            <!-- Fetch Data for Monthly Graph -->
+                            <?php 
+                            $query_monthly = "SELECT MONTH(updated_at) AS month, YEAR(updated_at) AS year, balance 
+                                            FROM balance_history 
+                                            WHERE organization_id = ? 
+                                            ORDER BY year ASC, month ASC";
+                            $stmt_monthly = $conn->prepare($query_monthly);
+                            $stmt_monthly->bind_param('i', $organization_id);
+                            $stmt_monthly->execute();
+                            $result_monthly = $stmt_monthly->get_result();
 
-                        $balances = [];
-                        while ($row = $result->fetch_assoc()) {
-                            $balances[] = $row; // Store all rows for rendering in the graph
-                        }
-                        $stmt->close();
+                            $monthly_balances = array_fill(1, 12, 0); // Initialize balances for all months
+                            while ($row = $result_monthly->fetch_assoc()) {
+                                $monthly_balances[(int)$row['month']] = $row['balance'];
+                            }
+                            $stmt_monthly->close();
 
-                        // Prepare data for visualization
-                        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        $monthly_balances = array_fill(1, 12, 0); // Initialize balances for all months
-                        $max_balance = 0;
+                            $max_monthly_balance = max($monthly_balances); // Max balance for scaling
 
-                        foreach ($balances as $balance) {
-                            $monthly_balances[(int)$balance['month']] = $balance['balance'];
-                            $max_balance = max($max_balance, $balance['balance']); // Determine max balance
-                        }
-                        ?>
+                            // Fetch Data for Semester Graph
+                            $query_semesters = "SELECT name, start_date, end_date FROM semesters ORDER BY start_date ASC";
+                            $stmt_semesters = $conn->prepare($query_semesters);
+                            $stmt_semesters->execute();
+                            $result_semesters = $stmt_semesters->get_result();
 
-                        <!-- Balance Report Section -->
-                        <div class="p-4 bg-white mx-auto rounded border shadow-md justify-center balance-report"
-                            style="width: 725px; margin: 20px;">
-                            <div class="d-flex justify-content-start gap-5">
-                                <h2 class="text-lg fw-bold">Balance Report</h2>
-                                <div class="d-flex gap-3">
-                                    <button class="btn btn-secondary btn-sm" onclick="switchView('monthly')">Monthly</button>
-                                    <button class="btn btn-secondary btn-sm" onclick="switchView('quarterly')">Quarterly</button>
-                                    <button class="btn btn-secondary btn-sm" onclick="switchView('yearly')">Yearly</button>
+                            $semester_data = [];
+                            while ($row = $result_semesters->fetch_assoc()) {
+                                $semester_data[] = $row;
+                            }
+                            $stmt_semesters->close();
+
+                            $semester_balances = [];
+                            foreach ($semester_data as $semester) {
+                                $query = "SELECT AVG(balance) AS total_balance 
+                                        FROM balance_history 
+                                        WHERE organization_id = ? AND updated_at BETWEEN ? AND ?";
+                                $stmt = $conn->prepare($query);
+                                $stmt->bind_param('iss', $organization_id, $semester['start_date'], $semester['end_date']);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $balance_row = $result->fetch_assoc();
+                                $semester_balances[] = [
+                                    'name' => $semester['name'],
+                                    'balance' => $balance_row['total_balance'] ?? 0
+                                ];
+                                $stmt->close();
+                            }
+
+                            $max_semester_balance = max(array_column($semester_balances, 'balance')); // Max balance for scaling
+                            ?>
+
+                            <!-- Balance Report Section -->
+                            <div class="p-4 bg-white mx-auto rounded border shadow-md justify-center balance-report" style="width: 725px; margin: 20px;">
+                                <div class="d-flex justify-content-start gap-5">
+                                    <h2 class="text-lg fw-bold">Balance Report</h2>
+                                    <div class="d-flex gap-3">
+                                        <button class="btn btn-secondary btn-sm" onclick="switchView('monthly')">Monthly</button>
+                                        <button class="btn btn-secondary btn-sm" onclick="switchView('semester')">Semester</button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mt-2">
-                                <p class="fw-semibold">Average per month</p>
-                                <?php
-                                if (count($balances) > 0) {
-                                    $total_balance = array_sum($monthly_balances);
-                                    $average_balance = $total_balance / count($balances);
-                                    echo "<h1 class='fw-bold h5 text-success'>₱" . number_format($average_balance, 2) . "</h1>";
-                                } else {
-                                    echo "<h1 class='fw-bold h5 text-muted'>No data available</h1>";
-                                }
-                                ?>
-                            </div>
 
-                            <div class="container mx-auto mt-3">
-                                <!-- Bar Graph Container -->
-                                <div class="row g-3">
+                                <!-- Dynamic Average Section -->
+                                <div class="mt-2" id="average-section">
+                                    <p class="fw-semibold">Average per month</p>
                                     <?php
-                                    foreach ($months as $index => $month) {
-                                        $month_number = $index + 1;
-                                        $month_balance = $monthly_balances[$month_number];
-                                        $height = $max_balance > 0 ? ($month_balance / $max_balance) * 100 : 0; // Scale height
-                                        echo "
-                                        <div class='col-1'>
-                                            <div class='d-flex flex-column-reverse align-items-center' style='height: 100px;'>
-                                                <div class='w-100 bg-success' style='height: {$height}px;' 
-                                                    data-bs-toggle='tooltip' 
-                                                    title='₱" . number_format($month_balance, 2) . "'></div>
-                                            </div>
-                                            <p class='mt-1 text-sm font-medium text-center'>{$month}</p>
-                                        </div>";
+                                    if (count($monthly_balances) > 0) {
+                                        $total_balance = array_sum($monthly_balances);
+                                        $average_balance = $total_balance / count(array_filter($monthly_balances));
+                                        echo "<h1 class='fw-bold h5 text-success' id='average-value'>₱" . number_format($average_balance, 2) . "</h1>";
+                                    } else {
+                                        echo "<h1 class='fw-bold h5 text-muted' id='average-value'>No data available</h1>";
                                     }
                                     ?>
                                 </div>
 
-                            </div>
-                        </div>
-                        <!-- Balance Report End -->
-                    </div>
+                                <div class="container mx-auto mt-3">
+                                    <!-- Toggle Views -->
+                                    <div id="report-views">
+                                        <!-- Monthly Report -->
+                                        <div id="monthly-view" class="report-view">
+                                            <div class="row g-3">
+                                                <?php
+                                                foreach (range(1, 12) as $month_number) {
+                                                    $month_balance = $monthly_balances[$month_number];
+                                                    $height = $max_monthly_balance > 0 ? ($month_balance / $max_monthly_balance) * 100 : 0; // Scale height
+                                                    echo "
+                                                    <div class='col-1'>
+                                                        <div class='d-flex flex-column-reverse align-items-center' style='height: 100px;'>
+                                                            <div class='w-100 bg-success' style='height: {$height}px;' 
+                                                                data-bs-toggle='tooltip' 
+                                                                title='₱" . number_format($month_balance, 2) . "'></div>
+                                                        </div>
+                                                        <p class='mt-1 text-sm font-medium text-center'>" . date('M', mktime(0, 0, 0, $month_number, 10)) . "</p>
+                                                    </div>";
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
 
-                    <script>
+                                        <!-- Semester Report -->
+                                        <div id="semester-view" class="report-view d-none">
+                                            <div class="row g-1">
+                                                <?php
+                                                foreach ($semester_balances as $semester) {
+                                                    $height = $max_semester_balance > 0 
+                                                        ? ($semester['balance'] / $max_semester_balance) * 100 
+                                                        : 0; // Scale height
+                                                    echo "
+                                                    <div class='col-2'>
+                                                        <div class='d-flex flex-column-reverse align-items-center' style='height: 150px;'>
+                                                            <div class='w-75 bg-success' style='height: {$height}px;' 
+                                                                data-bs-toggle='tooltip' 
+                                                                title='₱" . number_format($semester['balance'], 2) . "'></div>
+                                                        </div>
+                                                        <p class='mt-1 text-sm font-medium text-center'>{$semester['name']}</p>
+                                                    </div>";
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- JavaScript to Toggle Views and Average -->
+                            <script>
+                            function switchView(view) {
+                                document.querySelectorAll('.report-view').forEach(el => el.classList.add('d-none'));
+                                document.getElementById(`${view}-view`).classList.remove('d-none');
+                                
+                                const averageSection = document.getElementById('average-section');
+                                const averageValue = document.getElementById('average-value');
+
+                                if (view === 'monthly') {
+                                    averageSection.querySelector('p').innerText = 'Average per month';
+                                    averageValue.innerText = '₱<?= number_format($average_balance, 2); ?>';
+                                } else if (view === 'semester') {
+                                    const totalSemesterBalance = <?= array_sum(array_column($semester_balances, 'balance')) ?>;
+                                    const averageSemester = totalSemesterBalance / <?= count($semester_balances) ?>;
+                                    averageSection.querySelector('p').innerText = 'Average per semester';
+                                    averageValue.innerText = '₱' + parseFloat(averageSemester).toLocaleString('en-US', { minimumFractionDigits: 2 });
+                                }
+                            }
                         document.addEventListener('DOMContentLoaded', function () {
                             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                             tooltipTriggerList.forEach(function (tooltipTriggerEl) {
@@ -317,12 +382,6 @@ include '../organization_query.php';
                             });
                         });
                     </script>
-
-                    <?php
-                    // Query to fetch advisers for the current user's organization
-                    $advisersQuery = "SELECT * FROM advisers WHERE organization_id = '$organization_id'";
-                    $advisersResult = mysqli_query($conn, $advisersQuery);
-                    ?>
 
                     <!-- Right Column for Advisers and Financial Deadlines (Third Container) -->
                     <div class="col-md-4">
@@ -336,28 +395,21 @@ include '../organization_query.php';
                                 </div>
 
                                 <div class="d-flex justify-content-evenly mt-3">
-                                    <?php
-                                    // Check if there are advisers to display
-                                    if (mysqli_num_rows($advisersResult) > 0) {
-                                        while ($adviser = mysqli_fetch_assoc($advisersResult)) {
-                                            // Check if a picture is available, else set a default
-                                            $picture = !empty($adviser['picture']) ? $adviser['picture'] : 'default.jpg';
-                                            ?>
-                                            <div class="text-center">
-                                                <img class="rounded-circle border border-dark h-20" src="../adviser_management/uploads/<?php echo $picture; ?>" alt="<?php echo $adviser['first_name']; ?>" style="width: 40px; height: 40px;" />
-                                                <p class="fw-semibold text-sm text-black"><?php echo $adviser['first_name'] . ' ' . $adviser['last_name']; ?></p>
-                                                <p class="text-xs text-gray"><?php echo $adviser['position']; ?></p>
-                                            </div>
-                                            <?php
-                                        }
-                                    } else {
-                                        echo "<p class='text-center'>No advisers found.</p>";
-                                    }
-                                    ?>
+                                    <div class="text-center">
+                                        <img class="rounded-circle border border-dark h-20" src="Sir Renato.jpg" alt=""
+                                            style="width: 40px; height: 40px;" />
+                                        <p class="fw-semibold text-sm text-black">Renato Bautista</p>
+                                        <p class="text-xs text-gray">Instructor, DCS</p>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <img class="rounded-circle border border-dark h-20" src="Maam Janessa.jpg"
+                                            alt="" style="width: 40px; height: 40px;" />
+                                        <p class="fw-semibold text-sm text-black">Janessa Dela Cruz</p>
+                                        <p class="text-xs text-gray">Instructor, DCS</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
                             <!-- Fourth Container -->
                             <div class="p-4 bg-white rounded mt-4 shadow-sm">
