@@ -10,7 +10,7 @@
     <div>
         <!-- Brand Logo -->
         <div class="brand-logo logo-container">
-            <a href="../html/officer_dashboard.php" class="logo-img">
+            <a href="../html/officer_dashboard.html" class="logo-img">
                 <img src="angat sikat.png" alt="Angat Sikat Logo" class="sidebar-logo">
             </a>
             <span class="logo-text">ANGATSIKAT</span>

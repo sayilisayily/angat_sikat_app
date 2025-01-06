@@ -142,7 +142,7 @@ include '../organization_query.php';
                                 </div>
                             </div>
 
-                            <?php
+                        <?php
                             // Fetch the latest two income records from the income_history table
                             $query_income = "SELECT income, updated_at FROM income_history 
                                             WHERE organization_id = ? 
@@ -337,7 +337,7 @@ include '../organization_query.php';
                                 }
                             }
                         </style>
-                    </div>
+                    
 
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {

@@ -1,0 +1,218 @@
+/* Sidebar styling */
+#sidebar {
+    width: 290px;
+    background-color: #00542f;
+    transition: width 0.3s, border-radius 0.3s; /* Add transition for border-radius */
+    display: flex;
+    flex-direction: column; /* Arrange items vertically */
+    height: 100vh; /* Make sidebar full height */
+    border-radius: 0; /* Remove radius for expanded state */
+  }
+  
+  #sidebar.collapsed {
+    width: 90px;
+    border-radius: 0; /* Remove radius for collapsed state */
+    margin-top: 20px; /* Adjust as needed to add space above */
+    margin-bottom: 20px; /* Adjust as needed to add space below */
+    height: calc(
+      100vh - 40px
+    ); /* Adjust height to account for the top and bottom margin */
+  }
+  
+  /* Logo container styling */
+  .logo-container {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    margin-bottom: 5px;
+  }
+  
+  .sidebar-logo {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .logo-text {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #fff;
+    margin-left: 0.5rem;
+  }
+  
+  /* Sidebar styling */
+  #sidebar {
+    overflow-y: auto; /* Enables vertical scrolling */
+    overflow-x: hidden; /* Hides horizontal scroll */
+    max-height: 100vh; /* Sidebar height limited to viewport */
+    background-color: #00542f;
+  }
+  
+  /* Collapsed logo styling */
+  #sidebar.collapsed .logo-text {
+    display: none;
+  }
+  
+  /* Sidebar navigation styling */
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    padding-left: 1rem;
+    flex-grow: 1; /* Allow sidebar-nav to grow and fill space */
+  }
+  
+  #sidebar.collapsed .sidebar-nav {
+    align-items: center; /* Center align items in collapsed state */
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  /* Sidebar link styling */
+  .sidebar-nav .sidebar-link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s, background-color 0.3s;
+    border: none;
+    outline: none;
+    justify-content: flex-start;
+  }
+  
+  #sidebar.collapsed .sidebar-link {
+    justify-content: center;
+  }
+  
+  /* Hover effect for links */
+  .sidebar-nav .sidebar-link:hover,
+  .sidebar-nav .sidebar-link:focus {
+    background-color: #ffb000;
+    color: #fff;
+  }
+  
+  .sidebar-nav .sidebar-link i {
+    font-size: 1.8rem;
+    margin-right: 0.5rem;
+    color: #fff;
+    transition: color 0.3s;
+  }
+  
+  .sidebar-nav .sidebar-link:hover i {
+    color: #fff;
+  }
+  
+  .sidebar-nav .sidebar-link span {
+    color: #fff;
+  }
+  
+  .sidebar-nav .sidebar-link:hover span {
+    color: #fff;
+  }
+  
+  #sidebar.collapsed .sidebar-link i {
+    margin-right: 0;
+  }
+  
+  #sidebar.collapsed .sidebar-link:hover span {
+    display: block;
+    position: absolute;
+    left: 80px;
+    background-color: #333;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    transform: translateY(-50%);
+  }
+  
+  /* Submenu styling */
+  .submenu {
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    margin-left: 20px;
+    font-size: 0.85rem;
+  }
+  
+  .submenu a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 1px 0;
+    line-height: 1;
+  }
+  
+  .submenu a:hover {
+    color: #ffa500;
+  }
+  
+  /* Show submenu */
+  .show-submenu .submenu {
+    display: flex; /* Show submenu on click */
+  }
+  
+  /* Profile container styling */
+  .profile-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-top: 90px;
+    position: relative; /* Maintain relative positioning */
+    flex-shrink: 0; /* Prevent shrinking */
+    /* Removed background color */
+  }
+  
+  /* Ensure profile picture is aligned with text */
+  .profile-pic-border {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #ffb000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .profile-pic {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+  }
+  
+  .profile-name {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #fff;
+  }
+  
+  /* Footer positioning */
+  #sidebar.collapsed .profile-name {
+    display: flex; /* Keep name visible even when collapsed */
+    align-items: center;
+    justify-content: center; /* Center name in collapsed state */
+  }
+  
+  /* Menu burger icon adjustments */
+  .burger-icon {
+    font-size: 2rem;
+    color: #fff;
+    /* Burger menu color is white */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1rem;
+    margin-top: 15px;
+  }
+  
+  #sidebar.collapsed .burger-icon {
+    justify-content: center;
+  }
+  
+  /* Hover effect for the menu burger icon */
+  .burger-icon:hover {
+    color: #ffb000; /* Yellow color on hover */
+  }
