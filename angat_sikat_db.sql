@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 08, 2024 at 01:17 PM
+-- Generation Time: Dec 27, 2024 at 04:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -20,6 +20,45 @@ SET time_zone = "+00:00";
 --
 -- Database: `angat_sikat_db`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `archive_legend`
+--
+
+CREATE TABLE `archive_legend` (
+  `legend_id` int(11) NOT NULL,
+  `period` enum('first_semester','second_semester','school_year') NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `status` enum('active','inactive') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `balance_history`
+--
+
+CREATE TABLE `balance_history` (
+  `history_id` int(11) NOT NULL,
+  `organization_id` int(11) NOT NULL,
+  `balance` decimal(15,2) NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `balance_history`
+--
+
+INSERT INTO `balance_history` (`history_id`, `organization_id`, `balance`, `updated_at`) VALUES
+(10, 1, 75000.00, '2024-12-24 20:17:01'),
+(11, 1, 100500.00, '2024-12-24 20:41:33'),
+(12, 1, 85500.00, '2024-12-25 15:07:15'),
+(14, 1, 85000.00, '2024-12-25 15:43:38'),
+(15, 1, 83999.00, '2024-12-25 15:46:58'),
+(16, 1, 106499.00, '2024-12-25 16:00:39');
 
 -- --------------------------------------------------------
 
@@ -42,9 +81,11 @@ CREATE TABLE `budget_allocation` (
 --
 
 INSERT INTO `budget_allocation` (`allocation_id`, `organization_id`, `category`, `allocated_budget`, `total_spent`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Activities', 50000.00, 2500.00, '2024-09-22 17:46:30', '2024-12-03 16:54:12'),
-(2, 1, 'Purchases', 6500.00, 1200.00, '2024-09-22 17:46:30', '2024-10-08 17:26:50'),
-(3, 1, 'Maintenance and Other Expenses', 28000.00, 800.00, '2024-09-22 17:46:30', '2024-10-08 17:26:33');
+(1, 1, 'Activities', 50000.00, 40000.00, '2024-09-22 17:46:30', '2024-12-25 15:07:15'),
+(2, 1, 'Purchases', 6500.00, 0.00, '2024-09-22 17:46:30', '2024-12-24 19:53:45'),
+(3, 1, 'Maintenance and Other Expenses', 28000.00, 500.00, '2024-09-22 17:46:30', '2024-12-25 15:43:38'),
+(4, 3, 'Activities', 60000.00, 0.00, '2024-12-23 14:12:49', '2024-12-23 14:12:49'),
+(6, 4, 'Activities', 25000.00, 0.00, '2024-12-23 14:27:01', '2024-12-23 14:27:01');
 
 -- --------------------------------------------------------
 
@@ -71,8 +112,13 @@ INSERT INTO `budget_approvals` (`approval_id`, `title`, `category`, `attachment`
 (23, 'Test MOE', 'Maintenance', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:20:20', 0),
 (24, 'Test Purchase', 'Purchases', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:20:50', 0),
 (25, 'Test Event', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:25:28', 0),
-(26, 'Test Expense Event ', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:25:43', 0),
-(30, 'Test Expense Event 2', 'Activities', 'coin_sorter_code_2.ino', 'Pending', 1, '2024-12-08 12:09:23', 0);
+(26, 'Test Expense Event ', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:25:43', 1),
+(34, 'Test Event 3', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-10 15:09:28', 0),
+(35, 'Test Expense Event 2', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-10 18:14:56', 0),
+(36, 'Merchandise Sale', 'Activities', 'Lecture-2-ITEC-100.docx', 'Approved', 1, '2024-12-22 17:10:16', 0),
+(37, 'Eduk Week', 'Activities', 'byte.png', 'Approved', 3, '2024-12-23 14:20:00', 0),
+(38, 'TechFusion', 'Activities', 'lesson-1.pdf', 'Approved', 4, '2024-12-23 16:54:14', 0),
+(39, 'Film Festival', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-25 15:54:57', 0);
 
 -- --------------------------------------------------------
 
@@ -123,9 +169,14 @@ CREATE TABLE `events` (
 --
 
 INSERT INTO `events` (`event_id`, `plan_id`, `title`, `event_venue`, `event_start_date`, `event_end_date`, `event_type`, `event_status`, `accomplishment_status`, `total_amount`, `total_profit`, `organization_id`, `created_by`, `created_at`, `archived`) VALUES
-(21, 1, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 'Approved', 0, 2.00, 1.00, 1, NULL, '2024-12-03 10:01:13', 0),
+(21, 1, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 'Approved', 1, 2.00, 1.00, 1, NULL, '2024-12-03 10:01:13', 1),
 (22, 4, 'Test Expense Event ', 'Court I', '2024-12-03', '2024-12-04', 'Expense', 'Approved', 0, 0.00, 0.00, 1, NULL, '2024-12-03 12:51:09', 0),
-(23, 5, 'Test Expense Event 2', 'Court I', '2024-12-07', '2024-12-07', 'Expense', 'Pending', 0, 0.00, 0.00, 1, NULL, '2024-12-03 16:54:48', 0);
+(23, 5, 'Seminar', 'Tagaytay Room, Technovation Building', '2024-12-07', '2024-12-07', 'Expense', 'Approved', 1, 0.00, 0.00, 1, NULL, '2024-12-03 16:54:48', 0),
+(24, 6, 'TechFusion', 'Court I', '2024-12-09', '2024-12-10', 'Expense', 'Approved', 1, 25000.00, 0.00, 1, NULL, '2024-12-09 08:40:53', 0),
+(25, 1, 'Merchandise Sale', 'DCS', '2024-12-06', '2024-12-25', 'Income', 'Approved', 1, 0.00, 0.00, 1, NULL, '2024-12-22 16:53:24', 0),
+(26, 7, 'Eduk Week', 'DTE', '2024-12-23', '2024-12-27', 'Expense', 'Approved', 0, 0.00, 0.00, 3, NULL, '2024-12-23 14:19:41', 0),
+(27, 8, 'TechFusion', 'DCS', '2024-12-31', '2025-01-04', 'Income', 'Approved', 0, 0.00, 0.00, 4, NULL, '2024-12-23 16:36:09', 0),
+(28, 9, 'Film Festival', 'Tagaytay Room, Technovation Building', '2024-12-27', '2024-12-28', 'Income', 'Approved', 1, 15300.00, 15000.00, 1, NULL, '2024-12-25 15:52:45', 0);
 
 -- --------------------------------------------------------
 
@@ -146,6 +197,7 @@ CREATE TABLE `events_summary` (
   `total_profit` decimal(15,2) NOT NULL,
   `status` enum('Pending','Approved','Disapproved') NOT NULL,
   `accomplishment_status` tinyint(4) DEFAULT NULL,
+  `archived` tinyint(4) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -154,8 +206,17 @@ CREATE TABLE `events_summary` (
 -- Dumping data for table `events_summary`
 --
 
-INSERT INTO `events_summary` (`summary_id`, `event_id`, `title`, `venue`, `start_date`, `end_date`, `type`, `organization_id`, `total_amount`, `total_profit`, `status`, `accomplishment_status`, `created_at`, `updated_at`) VALUES
-(1, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 0.00, 0.00, 'Approved', NULL, '2024-12-03 16:44:19', '2024-12-03 16:44:19');
+INSERT INTO `events_summary` (`summary_id`, `event_id`, `title`, `venue`, `start_date`, `end_date`, `type`, `organization_id`, `total_amount`, `total_profit`, `status`, `accomplishment_status`, `archived`, `created_at`, `updated_at`) VALUES
+(1, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 2.00, 1.00, 'Approved', NULL, 0, '2024-12-03 16:44:19', '2024-12-09 08:42:45'),
+(2, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 2.00, 1.00, 'Approved', NULL, 0, '2024-12-09 08:25:18', '2024-12-09 08:42:45'),
+(3, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 2.00, 1.00, 'Approved', NULL, 0, '2024-12-09 08:25:39', '2024-12-09 08:42:45'),
+(4, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 2.00, 1.00, 'Approved', NULL, 0, '2024-12-09 08:26:06', '2024-12-09 08:42:45'),
+(5, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 0.00, 0.00, 'Approved', NULL, 0, '2024-12-22 16:23:14', '2024-12-22 16:23:14'),
+(6, 25, 'Merchandise Sale', 'DCS', '2024-12-06', '2024-12-25', 'Income', 1, 73500.00, 25500.00, 'Approved', NULL, 0, '2024-12-23 18:49:30', '2024-12-23 19:34:32'),
+(7, 24, 'TechFusion', 'Court I', '2024-12-09', '2024-12-10', 'Expense', 1, 25000.00, 0.00, 'Approved', NULL, 0, '2024-12-23 19:45:15', '2024-12-24 06:11:23'),
+(8, 23, 'Seminar', 'Tagaytay Room, Technovation Building', '2024-12-07', '2024-12-07', 'Expense', 1, 15000.00, 0.00, 'Approved', NULL, 0, '2024-12-25 15:04:42', '2024-12-25 15:06:38'),
+(9, 28, 'Film Festival', 'Tagaytay Room, Technovation Building', '2024-12-27', '2024-12-28', 'Income', 1, 22800.00, 22500.00, 'Approved', NULL, 0, '2024-12-25 15:56:36', '2024-12-25 16:00:01'),
+(10, 28, 'Film Festival', 'Tagaytay Room, Technovation Building', '2024-12-27', '2024-12-28', 'Income', 1, 22800.00, 22500.00, 'Approved', NULL, 0, '2024-12-25 15:59:30', '2024-12-25 16:00:01');
 
 -- --------------------------------------------------------
 
@@ -192,7 +253,9 @@ INSERT INTO `event_items` (`item_id`, `event_id`, `description`, `quantity`, `un
 (15, 8, 'BYTE Lanyard', 300, '1', 80.00, 24000.00, 0.00, 0.00),
 (16, 8, 'BYTE Shirt', 300, '1', 400.00, 120000.00, 0.00, 0.00),
 (17, 20, 'Multimedia Fees', 1, '1', 1000.00, 1000.00, 0.00, 0.00),
-(23, 21, 'Test', 1, '1', 1.00, 2.00, 1.00, 1.00);
+(23, 21, 'Test', 1, '1', 1.00, 2.00, 1.00, 1.00),
+(24, 24, 'Test', 1, '1', 25000.00, 25000.00, 0.00, 0.00),
+(25, 28, 'Tickets', 300, '1', 1.00, 15300.00, 50.00, 15000.00);
 
 -- --------------------------------------------------------
 
@@ -213,6 +276,19 @@ CREATE TABLE `event_summary_items` (
   `reference` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `event_summary_items`
+--
+
+INSERT INTO `event_summary_items` (`summary_item_id`, `event_id`, `description`, `quantity`, `unit`, `amount`, `profit`, `total_amount`, `total_profit`, `reference`) VALUES
+(1, 21, 'Test', 1, 1, 1.00, 1.00, 2.00, 1.00, 'lesson-1.pdf'),
+(2, 25, 'BYTE Shirt', 100, 1, 400.00, 225.00, 62500.00, 22500.00, 'lesson-1.pdf'),
+(3, 25, 'BYTE Lanyard', 100, 1, 80.00, 30.00, 11000.00, 3000.00, 'lesson-1.pdf'),
+(4, 24, 'Test', 1, 1, 25000.00, 0.00, 25000.00, 0.00, 'lesson-1.pdf'),
+(5, 23, 'Food Allowance (Breakfast)', 100, 1, 75.00, 0.00, 7500.00, 0.00, 'lesson-1.pdf'),
+(6, 23, 'Food Allowance (Lunch)', 100, 1, 75.00, 0.00, 7500.00, 0.00, 'lesson-1.pdf'),
+(7, 28, 'Tickets', 300, 1, 1.00, 75.00, 22800.00, 22500.00, 'lesson-1.pdf');
+
 -- --------------------------------------------------------
 
 --
@@ -222,24 +298,45 @@ CREATE TABLE `event_summary_items` (
 CREATE TABLE `expenses` (
   `expense_id` int(11) NOT NULL,
   `organization_id` int(11) NOT NULL,
-  `category` enum('Activities','Purchases','Maintenance') NOT NULL,
+  `summary_id` int(11) NOT NULL,
+  `category` enum('Activities','Purchases','Maintenance and Other Expenses') NOT NULL,
   `title` varchar(255) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
   `reference` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `archived` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `expenses`
 --
 
-INSERT INTO `expenses` (`expense_id`, `organization_id`, `category`, `title`, `amount`, `reference`, `created_at`) VALUES
-(1, 1, 'Activities', 'Sports Day Supplies', 1200.00, 'sports_day_supplies.pdf', '2024-10-04 15:38:44'),
-(2, 1, 'Purchases', 'Office Stationery', 850.00, 'office_stationery.pdf', '2024-10-04 15:38:44'),
-(3, 1, 'Maintenance', 'Building Repair', 4500.00, 'building_repair.pdf', '2024-10-04 15:38:44'),
-(4, 1, 'Activities', 'End of Year Party', 1500.00, 'year_end_party.pdf', '2024-10-04 15:38:44'),
-(5, 1, 'Purchases', 'Food for Meeting', 700.00, 'meeting_food.pdf', '2024-10-04 15:38:44'),
-(6, 1, 'Activities', 'Workshop', 18750.00, 'LR 001', '2024-10-04 16:05:14');
+INSERT INTO `expenses` (`expense_id`, `organization_id`, `summary_id`, `category`, `title`, `amount`, `reference`, `created_at`, `archived`) VALUES
+(17, 1, 7, 'Activities', 'TechFusion', 25000.00, 'lesson-1.pdf', '2024-12-24 20:17:01', 0),
+(18, 1, 8, 'Activities', 'Seminar', 15000.00, 'lesson-1.pdf', '2024-12-25 15:07:15', 0),
+(20, 1, 1, '', 'Test MOE', 500.00, 'lesson-1.pdf', '2024-12-25 15:43:38', 1),
+(21, 1, 1, '', 'Test Purchase', 1001.00, 'lesson-1.pdf', '2024-12-25 15:46:58', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `expense_history`
+--
+
+CREATE TABLE `expense_history` (
+  `history_id` int(11) NOT NULL,
+  `organization_id` int(11) NOT NULL,
+  `expense` decimal(10,2) NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `expense_history`
+--
+
+INSERT INTO `expense_history` (`history_id`, `organization_id`, `expense`, `updated_at`) VALUES
+(1, 1, 500.00, '2024-12-25 15:43:38'),
+(2, 1, 1001.00, '2024-12-25 15:46:58');
 
 -- --------------------------------------------------------
 
@@ -262,11 +359,61 @@ CREATE TABLE `financial_plan` (
 --
 
 INSERT INTO `financial_plan` (`plan_id`, `title`, `category`, `organization_id`, `type`, `date`, `amount`) VALUES
-(1, 'Test Income Event', '', 1, 'Income', '2024-12-06', 100000.00),
+(1, 'Merchandise Sale', '', 1, 'Income', '2024-12-06', 100000.00),
 (2, 'Test MOE', 'Maintenance and Other Expenses', 1, 'Expense', '0000-00-00', 5000.00),
 (3, 'Test Purchase', 'Purchases', 1, 'Expense', '0000-00-00', 5000.00),
 (4, 'Test Expense Event ', 'Activities', 1, 'Expense', '2024-12-03', 15000.00),
-(5, 'Test Expense Event 2', 'Activities', 1, 'Expense', '2024-12-07', 10000.00);
+(5, 'Test Expense Event 2', 'Activities', 1, 'Expense', '2024-12-07', 10000.00),
+(6, 'TechFusion', 'Activities', 1, 'Expense', '2024-12-09', 25000.00),
+(7, 'Eduk Week', 'Activities', 3, 'Expense', '2024-12-23', 50000.00),
+(8, 'TechFusion', '', 4, 'Income', '2024-12-31', 100000.00),
+(9, 'Film Festival', '', 1, 'Income', '2024-12-27', 15000.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `income`
+--
+
+CREATE TABLE `income` (
+  `income_id` int(11) NOT NULL,
+  `organization_id` int(11) NOT NULL,
+  `summary_id` int(11) NOT NULL,
+  `category` varchar(255) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `reference` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `archived` tinyint(4) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `income`
+--
+
+INSERT INTO `income` (`income_id`, `organization_id`, `summary_id`, `category`, `title`, `amount`, `reference`, `created_at`, `archived`) VALUES
+(4, 1, 6, '', 'Merchandise Sale', 25500.00, 'lesson-1.pdf', '2024-12-24 20:41:33', 0),
+(5, 1, 10, '', 'Film Festival', 22500.00, 'lesson-1.pdf', '2024-12-25 16:00:39', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `income_history`
+--
+
+CREATE TABLE `income_history` (
+  `history_id` int(11) NOT NULL,
+  `organization_id` int(11) NOT NULL,
+  `income` decimal(10,2) NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `income_history`
+--
+
+INSERT INTO `income_history` (`history_id`, `organization_id`, `income`, `updated_at`) VALUES
+(1, 1, 22500.00, '2024-12-25 16:00:39');
 
 -- --------------------------------------------------------
 
@@ -292,7 +439,7 @@ CREATE TABLE `maintenance` (
 --
 
 INSERT INTO `maintenance` (`maintenance_id`, `plan_id`, `title`, `total_amount`, `maintenance_status`, `completion_status`, `organization_id`, `archived`, `created_at`, `updated_at`) VALUES
-(3, 2, 'Test MOE', 500.00, 'Approved', 0, 1, 0, '2024-12-03 12:44:50', '2024-12-03 14:28:43');
+(3, 2, 'Test MOE', 500.00, 'Approved', 1, 1, 0, '2024-12-03 12:44:50', '2024-12-25 15:25:45');
 
 -- --------------------------------------------------------
 
@@ -329,11 +476,19 @@ CREATE TABLE `maintenance_summary` (
   `title` varchar(255) NOT NULL,
   `organization_id` int(11) NOT NULL,
   `total_amount` decimal(15,2) NOT NULL,
-  `status` enum('Pending','Approved','Disapproved') NOT NULL,
+  `maintenance_status` enum('Pending','Approved','Disapproved') NOT NULL,
   `completion_status` tinyint(4) DEFAULT 0,
+  `archived` tinyint(4) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `maintenance_summary`
+--
+
+INSERT INTO `maintenance_summary` (`summary_id`, `maintenance_id`, `title`, `organization_id`, `total_amount`, `maintenance_status`, `completion_status`, `archived`, `created_at`, `updated_at`) VALUES
+(1, 3, 'Test MOE', 1, 500.00, 'Approved', 1, 0, '2024-12-25 15:25:45', '2024-12-25 15:27:11');
 
 -- --------------------------------------------------------
 
@@ -352,6 +507,13 @@ CREATE TABLE `maintenance_summary_items` (
   `reference` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `maintenance_summary_items`
+--
+
+INSERT INTO `maintenance_summary_items` (`summary_item_id`, `maintenance_id`, `description`, `quantity`, `unit`, `amount`, `total_amount`, `reference`) VALUES
+(1, 3, 'Test MOE Item', 10, 1, 50.00, 500.00, 'lesson-1.pdf');
+
 -- --------------------------------------------------------
 
 --
@@ -361,10 +523,50 @@ CREATE TABLE `maintenance_summary_items` (
 CREATE TABLE `notifications` (
   `id` int(11) NOT NULL,
   `recipient_id` int(11) NOT NULL,
+  `organization_id` int(11) NOT NULL,
   `message` varchar(255) NOT NULL,
   `is_read` tinyint(1) DEFAULT 0,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `recipient_id`, `organization_id`, `message`, `is_read`, `created_at`) VALUES
+(1, 3, 0, 'A new budget approval request titled \'Test Expense Event 2\' has been submitted.', 1, '2024-12-09 00:48:27'),
+(2, 3, 0, 'A new budget approval request for \'Test Expense Event 2\' has been submitted.', 1, '2024-12-09 01:36:28'),
+(3, 1, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-09 04:00:10'),
+(4, 2, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-09 04:00:10'),
+(5, 3, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-09 04:00:10'),
+(6, 1, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-09 16:34:24'),
+(7, 2, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-09 16:34:24'),
+(8, 3, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-09 16:34:24'),
+(9, 3, 0, 'A new budget approval request for \'Test Expense Event 2\' has been submitted.', 0, '2024-12-10 23:06:22'),
+(10, 1, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-10 23:06:51'),
+(11, 2, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-10 23:06:51'),
+(12, 3, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-10 23:06:51'),
+(13, 3, 0, 'A new budget approval request for \'Test Event 3\' has been submitted.', 0, '2024-12-10 23:09:28'),
+(14, 1, 1, 'Your budget request for \'Test Event 3\' has been approved.', 0, '2024-12-10 23:10:21'),
+(15, 2, 1, 'Your budget request for \'Test Event 3\' has been approved.', 0, '2024-12-10 23:10:21'),
+(16, 3, 1, 'Your budget request for \'Test Event 3\' has been approved.', 0, '2024-12-10 23:10:21'),
+(17, 3, 0, 'A new budget approval request for \'Test Expense Event 2\' has been submitted.', 0, '2024-12-11 02:14:56'),
+(18, 1, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-11 02:15:36'),
+(19, 2, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-11 02:15:36'),
+(20, 3, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-11 02:15:36'),
+(21, 3, 0, 'A new budget approval request for \'Merchandise Sale\' has been submitted.', 0, '2024-12-23 01:10:16'),
+(22, 3, 0, 'A new budget approval request for \'Eduk Week\' has been submitted.', 0, '2024-12-23 22:20:00'),
+(23, 5, 3, 'Your budget request for \'Eduk Week\' has been approved.', 0, '2024-12-23 22:21:25'),
+(24, 3, 0, 'A new budget approval request for \'TechFusion\' has been submitted.', 0, '2024-12-24 00:54:14'),
+(25, 6, 4, 'Your budget request for \'TechFusion\' has been approved.', 0, '2024-12-24 01:00:31'),
+(26, 1, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2024-12-24 02:48:34'),
+(27, 2, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2024-12-24 02:48:34'),
+(28, 3, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2024-12-24 02:48:34'),
+(29, 3, 0, 'A new budget approval request for \'Film Festival\' has been submitted.', 0, '2024-12-25 23:54:57'),
+(30, 6, 4, 'Your budget request for \'TechFusion\' has been approved.', 0, '2024-12-25 23:55:09'),
+(31, 1, 1, 'Your budget request for \'Film Festival\' has been approved.', 0, '2024-12-25 23:55:45'),
+(32, 2, 1, 'Your budget request for \'Film Festival\' has been approved.', 0, '2024-12-25 23:55:45'),
+(33, 3, 1, 'Your budget request for \'Film Festival\' has been approved.', 0, '2024-12-25 23:55:45');
 
 -- --------------------------------------------------------
 
@@ -379,9 +581,12 @@ CREATE TABLE `organizations` (
   `organization_members` int(11) NOT NULL DEFAULT 0,
   `organization_status` enum('Probationary','Level I','Level II') NOT NULL DEFAULT 'Probationary',
   `organization_color` varchar(7) DEFAULT NULL,
+  `archived` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `balance` decimal(15,2) DEFAULT 0.00,
   `beginning_balance` decimal(15,2) DEFAULT 0.00,
+  `income` decimal(15,2) DEFAULT 0.00,
+  `expense` decimal(15,2) DEFAULT 0.00,
   `cash_on_bank` decimal(15,2) DEFAULT 0.00,
   `cash_on_hand` decimal(15,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -390,9 +595,11 @@ CREATE TABLE `organizations` (
 -- Dumping data for table `organizations`
 --
 
-INSERT INTO `organizations` (`organization_id`, `organization_name`, `organization_logo`, `organization_members`, `organization_status`, `organization_color`, `created_at`, `balance`, `beginning_balance`, `cash_on_bank`, `cash_on_hand`) VALUES
-(1, 'Beacon of Youth Technology Enthusiasts', NULL, 500, 'Level I', NULL, '2024-09-22 12:16:55', 72500.00, 100000.00, 22000.00, 500.00),
-(2, 'The CvSU-R Nexus', NULL, 20, 'Level I', NULL, '2024-09-22 12:17:31', 110000.00, 120000.00, 100000.00, 0.00);
+INSERT INTO `organizations` (`organization_id`, `organization_name`, `organization_logo`, `organization_members`, `organization_status`, `organization_color`, `archived`, `created_at`, `balance`, `beginning_balance`, `income`, `expense`, `cash_on_bank`, `cash_on_hand`) VALUES
+(1, 'Beacon of Youth Technology Enthusiasts', 'byte.png', 500, 'Level I', '#1c7d60', 0, '2024-09-22 12:16:55', 106499.00, 100000.00, 48000.00, 41501.00, 22000.00, 500.00),
+(3, 'Future Educators Organization', 'feo.png', 400, 'Level I', '#3193b4', 0, '2024-12-22 17:13:27', 100000.00, 100000.00, 0.00, 0.00, 0.00, 0.00),
+(4, 'Computer Scientists and Developers Society', 'code.png', 400, 'Level I', '#3f99ee', 0, '2024-12-22 17:50:51', 125000.00, 125000.00, 0.00, 0.00, 125000.00, 0.00),
+(5, 'Artrads Dance Crew', 'logo_67695ef3d92895.89449814.png', 35, 'Level I', '#f9db1a', 0, '2024-12-23 13:00:35', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -417,7 +624,7 @@ CREATE TABLE `purchases` (
 --
 
 INSERT INTO `purchases` (`purchase_id`, `plan_id`, `title`, `total_amount`, `purchase_status`, `completion_status`, `archived`, `created_at`, `organization_id`) VALUES
-(3, 3, 'Test Purchase', 1001.00, 'Approved', 0, 0, '2024-12-03 11:40:19', 1);
+(3, 3, 'Test Purchase', 1001.00, 'Approved', 1, 0, '2024-12-03 11:40:19', 1);
 
 -- --------------------------------------------------------
 
@@ -431,11 +638,19 @@ CREATE TABLE `purchases_summary` (
   `title` varchar(255) NOT NULL,
   `organization_id` int(11) NOT NULL,
   `total_amount` decimal(15,2) NOT NULL,
-  `status` enum('Pending','Approved','Disapproved') NOT NULL,
+  `purchase_status` enum('Pending','Approved','Disapproved') NOT NULL,
   `completion_status` tinyint(4) DEFAULT 0,
+  `archived` tinyint(4) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `purchases_summary`
+--
+
+INSERT INTO `purchases_summary` (`summary_id`, `purchase_id`, `title`, `organization_id`, `total_amount`, `purchase_status`, `completion_status`, `archived`, `created_at`, `updated_at`) VALUES
+(1, 3, 'Test Purchase', 1, 1001.00, 'Approved', 1, 0, '2024-12-25 15:26:08', '2024-12-25 15:27:43');
 
 -- --------------------------------------------------------
 
@@ -477,6 +692,35 @@ CREATE TABLE `purchase_summary_items` (
   `reference` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `purchase_summary_items`
+--
+
+INSERT INTO `purchase_summary_items` (`summary_item_id`, `purchase_id`, `description`, `quantity`, `unit`, `amount`, `total_amount`, `reference`) VALUES
+(1, 3, 'Test', 1, 1, 1001.00, 1001.00, 'lesson-1.pdf');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reports`
+--
+
+CREATE TABLE `reports` (
+  `report_id` int(11) NOT NULL,
+  `organization_id` int(11) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `report_type` enum('Budget Request','Project Proposal','Liquidation','Accomplishment') NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `reports`
+--
+
+INSERT INTO `reports` (`report_id`, `organization_id`, `file_name`, `report_type`, `created_at`, `updated_at`) VALUES
+(1, 1, 'report.pdf', 'Budget Request', '2024-12-27 10:26:05', '2024-12-27 10:26:05');
+
 -- --------------------------------------------------------
 
 --
@@ -487,25 +731,43 @@ CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
   `username` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `profile_picture` varchar(255) NOT NULL,
   `first_name` varchar(255) NOT NULL,
   `last_name` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
   `role` enum('admin','officer','member') NOT NULL,
-  `organization_id` int(11) DEFAULT NULL
+  `organization_id` int(11) DEFAULT NULL,
+  `archived` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `password`, `first_name`, `last_name`, `email`, `role`, `organization_id`) VALUES
-(1, 'sayilisayily', '1234', 'Zylei', 'Sugue', 'zylei.sugue@cvsu.edu.ph', 'officer', 1),
-(2, 'JerichoPao', '$2y$10$ppHUUKHxwQYNGTLdedFzg.0XpCbrIwcw7ShYBQ.E5yIDnzlyqQhrO', 'Jericho', 'Pao', 'jerichopao@gmail.com', 'officer', 1),
-(3, 'admin', '$2y$10$ZhjHxFaq77LMDZK1WSfss.w6QvlSROnTpjIE9Gov/wb7soNaNY/f6', 'Admin', '', 'admin@mail.com', 'admin', 1);
+INSERT INTO `users` (`user_id`, `username`, `password`, `profile_picture`, `first_name`, `last_name`, `email`, `role`, `organization_id`, `archived`, `created_at`) VALUES
+(1, 'sayilisayily', '1234', '', 'Zylei', 'Sugue', 'zylei.sugue@cvsu.edu.ph', 'officer', 1, 1, '2024-12-23 16:21:49'),
+(2, 'JerichoPao', '$2y$10$5AiK4xtJNnJkqY4z6kt1R.Ek6JBPkd3RpzbNFktCqcAMZureVKqH.', 'uploads/2_468012212_122192717414243019_6538985762148459099_n.jpg', 'Maphil Grace', 'Alquizola', 'maphil.grace.alquizola@cvsu.edu.ph', 'officer', 1, 0, '2024-12-23 16:21:49'),
+(3, 'admin', '$2y$10$ZhjHxFaq77LMDZK1WSfss.w6QvlSROnTpjIE9Gov/wb7soNaNY/f6', '', 'Admin', '', 'admin@mail.com', 'admin', 1, 0, '2024-12-23 16:21:49'),
+(5, 'irhyll', '$2y$10$.g2up32AHDND7JWmDtrDpuqa4srZUD.3OoEj8sSTsoSsbWqaY9jJC', '', 'James Irhyll', 'Dela Cruz', 'irhyll@cvsu.edu.ph', 'officer', 3, 0, '2024-12-23 16:21:49'),
+(6, 'Marielle', '$2y$10$HL2yGbXp1gekNXSixvR0Ae4uh/l6AvDS/G4S/CEEKozFQ1Si0x6la', '', 'Marielle', 'Martires', 'marielle@cvsu.edu.ph', 'officer', 4, 0, '2024-12-23 16:21:49');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `archive_legend`
+--
+ALTER TABLE `archive_legend`
+  ADD PRIMARY KEY (`legend_id`);
+
+--
+-- Indexes for table `balance_history`
+--
+ALTER TABLE `balance_history`
+  ADD PRIMARY KEY (`history_id`),
+  ADD KEY `organization_id` (`organization_id`);
 
 --
 -- Indexes for table `budget_allocation`
@@ -566,10 +828,31 @@ ALTER TABLE `expenses`
   ADD KEY `organization_id` (`organization_id`);
 
 --
+-- Indexes for table `expense_history`
+--
+ALTER TABLE `expense_history`
+  ADD PRIMARY KEY (`history_id`),
+  ADD KEY `organization_id` (`organization_id`);
+
+--
 -- Indexes for table `financial_plan`
 --
 ALTER TABLE `financial_plan`
   ADD PRIMARY KEY (`plan_id`),
+  ADD KEY `organization_id` (`organization_id`);
+
+--
+-- Indexes for table `income`
+--
+ALTER TABLE `income`
+  ADD PRIMARY KEY (`income_id`),
+  ADD KEY `organization_id` (`organization_id`);
+
+--
+-- Indexes for table `income_history`
+--
+ALTER TABLE `income_history`
+  ADD PRIMARY KEY (`history_id`),
   ADD KEY `organization_id` (`organization_id`);
 
 --
@@ -646,6 +929,13 @@ ALTER TABLE `purchase_summary_items`
   ADD KEY `purchase_id` (`purchase_id`);
 
 --
+-- Indexes for table `reports`
+--
+ALTER TABLE `reports`
+  ADD PRIMARY KEY (`report_id`),
+  ADD KEY `organization_id` (`organization_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -659,16 +949,28 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `archive_legend`
+--
+ALTER TABLE `archive_legend`
+  MODIFY `legend_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `balance_history`
+--
+ALTER TABLE `balance_history`
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
 -- AUTO_INCREMENT for table `budget_allocation`
 --
 ALTER TABLE `budget_allocation`
-  MODIFY `allocation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `allocation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `budget_approvals`
 --
 ALTER TABLE `budget_approvals`
-  MODIFY `approval_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `approval_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -680,37 +982,55 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `events_summary`
 --
 ALTER TABLE `events_summary`
-  MODIFY `summary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `summary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `event_items`
 --
 ALTER TABLE `event_items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `event_summary_items`
 --
 ALTER TABLE `event_summary_items`
-  MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `expense_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `expense_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `expense_history`
+--
+ALTER TABLE `expense_history`
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `financial_plan`
 --
 ALTER TABLE `financial_plan`
-  MODIFY `plan_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `plan_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `income`
+--
+ALTER TABLE `income`
+  MODIFY `income_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `income_history`
+--
+ALTER TABLE `income_history`
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `maintenance`
@@ -728,25 +1048,25 @@ ALTER TABLE `maintenance_items`
 -- AUTO_INCREMENT for table `maintenance_summary`
 --
 ALTER TABLE `maintenance_summary`
-  MODIFY `summary_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `summary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `maintenance_summary_items`
 --
 ALTER TABLE `maintenance_summary_items`
-  MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `organizations`
 --
 ALTER TABLE `organizations`
-  MODIFY `organization_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `organization_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `purchases`
@@ -758,7 +1078,7 @@ ALTER TABLE `purchases`
 -- AUTO_INCREMENT for table `purchases_summary`
 --
 ALTER TABLE `purchases_summary`
-  MODIFY `summary_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `summary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `purchase_items`
@@ -770,17 +1090,29 @@ ALTER TABLE `purchase_items`
 -- AUTO_INCREMENT for table `purchase_summary_items`
 --
 ALTER TABLE `purchase_summary_items`
-  MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `reports`
+--
+ALTER TABLE `reports`
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `balance_history`
+--
+ALTER TABLE `balance_history`
+  ADD CONSTRAINT `balance_history_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`organization_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `budget_allocation`
@@ -828,10 +1160,28 @@ ALTER TABLE `expenses`
   ADD CONSTRAINT `expenses_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`organization_id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `expense_history`
+--
+ALTER TABLE `expense_history`
+  ADD CONSTRAINT `expense_history_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`organization_id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `financial_plan`
 --
 ALTER TABLE `financial_plan`
   ADD CONSTRAINT `financial_plan_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`organization_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `income`
+--
+ALTER TABLE `income`
+  ADD CONSTRAINT `income_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`organization_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `income_history`
+--
+ALTER TABLE `income_history`
+  ADD CONSTRAINT `income_history_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`organization_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `maintenance`
@@ -890,6 +1240,12 @@ ALTER TABLE `purchase_items`
 --
 ALTER TABLE `purchase_summary_items`
   ADD CONSTRAINT `purchase_summary_items_ibfk_1` FOREIGN KEY (`purchase_id`) REFERENCES `purchases` (`purchase_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `reports`
+--
+ALTER TABLE `reports`
+  ADD CONSTRAINT `reports_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`organization_id`);
 
 --
 -- Constraints for table `users`

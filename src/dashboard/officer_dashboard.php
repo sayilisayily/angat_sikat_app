@@ -12,15 +12,17 @@ include '../user_query.php';
 include '../organization_query.php';
 ?>
 
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" class="h-100">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
+    <!--Custom CSS for Activities-->
+    <link rel="stylesheet" href="../activity_management/css/activities.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Boxicon-->
@@ -31,14 +33,16 @@ include '../organization_query.php';
     <script src="https://cdn.lordicon.com/lordicon.js"></script>
     <!--Calendar JS-->
     <script src="path/to/calendar.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
     <!-- Overall Body Wrapper -->
     <?php include '../navbar.php';?>
-    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    <div class="page-wrapper d-flex flex-column h-100" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
         data-sidebar-position="fixed" data-header-position="fixed">
       <?php include '../sidebar.php'; ?>
+      
 
         <!--  2nd Body wrapper -->
         <div class="body-wrapper">
@@ -46,7 +50,7 @@ include '../organization_query.php';
             <div class="container-fluid">
                 <div class="row">
                     <!-- Left Column for Welcome Message and Organization Info Box -->
-                    <div class="col-md-8">
+                        <div class="col-md-8 flex-grow-1">
                         <!-- Welcome Message with adjusted left margin -->
                         <h1 class="welcome-message h5 fw-bold mb-4">
                             <span class="text-warning fw-bold me-2">|</span>Welcome,
@@ -54,28 +58,32 @@ include '../organization_query.php';
                         </h1>
 
                         <!-- Organization Info Box -->
-                        <div class="organization-card p-4 ps- rounded shadow-sm bg-white border mb-4">
+                        <div class="organization-card p-4 rounded shadow-sm bg-white border mb-4">
                             <!-- Display organization logo, fallback to a default image if empty -->
-                            <img class="organization-logo me-3"
-                                src="<?= !empty($org_logo) ? '../organization_management/uploads/' . $org_logo : '../organization_management/uploads/default_logo.png' ?>"
-                                alt="<?= $org_name ?> Logo" />
-                            <div class="organization-details">
-                                <p class="text-muted small-text mb-1">Name of Student Organization</p>
-                                <h1 class="fw-semibold h5 mb-2">
-                                    <?= htmlspecialchars($org_name) ?>
-                                </h1>
-                                <div class="d-flex gap-5">
-                                    <div>
-                                        <p class="text-muted small-text mb-1">No. of Members</p>
-                                        <h1 class="fw-semibold h6">
-                                            <?= htmlspecialchars($org_members) ?>
-                                        </h1>
-                                    </div>
-                                    <div>
-                                        <p class="text-muted small-text mb-1">Status</p>
-                                        <h1 class="fw-semibold h6">
-                                            <?= htmlspecialchars($org_status) ?>
-                                        </h1>
+                            <div class="d-flex align-items-start">
+                                <img class="organization-logo me-3"
+                                    src="<?= !empty($org_logo) ? '../organization_management/uploads/' . $org_logo : '../organization_management/uploads/default_logo.png' ?>"
+                                    alt="<?= $org_name ?> Logo" 
+                                    style="max-width: 100%; height: auto; max-height: 125px; object-fit: contain;"
+                                    class="img-fluid" /> <!-- Ensure logo is responsive -->
+                                <div class="organization-details">
+                                    <p class="text-muted small-text mb-1">Name of Student Organization</p>
+                                    <h1 class="fw-semibold h5 mb-2">
+                                        <?= htmlspecialchars($org_name) ?>
+                                    </h1>
+                                    <div class="d-flex gap-5">
+                                        <div>
+                                            <p class="text-muted small-text mb-1">No. of Members</p>
+                                            <h1 class="fw-semibold h6">
+                                                <?= htmlspecialchars($org_members) ?>
+                                            </h1>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted small-text mb-1">Status</p>
+                                            <h1 class="fw-semibold h6">
+                                                <?= htmlspecialchars($org_status) ?>
+                                            </h1>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -84,192 +92,261 @@ include '../organization_query.php';
                         <!-- End of Organization Info Box -->
 
                         <!-- Financial Summary Cards Row -->
-                        <div class="row">
+                        <div class="row justify-content-center mx-1">
+
+                        <?php
+                            // Fetch the latest two balance records from the balance_history table
+                            $query_balance = "SELECT balance, updated_at FROM balance_history 
+                                            WHERE organization_id = ? 
+                                            ORDER BY updated_at DESC 
+                                            LIMIT 2";
+
+                            $stmt_balance = $conn->prepare($query_balance);
+                            $stmt_balance->bind_param("i", $organization_id);
+                            $stmt_balance->execute();
+                            $result_balance = $stmt_balance->get_result();
+
+                            $latest_balances = [];
+                            while ($row = $result_balance->fetch_assoc()) {
+                                $latest_balances[] = $row['balance'];
+                            }
+
+                            // Calculate percentage difference for balance
+                            $balance_percentage_change = 0;
+                            if (count($latest_balances) === 2) {
+                                $latest_balance = $latest_balances[0];
+                                $previous_balance = $latest_balances[1];
+                                
+                                if ($previous_balance > 0) {
+                                    $balance_percentage_change = (($latest_balance - $previous_balance) / $previous_balance) * 100;
+                                }
+                            }
+
+                            $stmt_balance->close();
+                            ?>
+
                             <!-- Balance Card -->
                             <div class="col-md-4 mb-3">
-                                <div class="card financial-card p-3 shadow-sm bg-purple-200 mx-2">
-                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Balance</h7>
+                                <div class="card gradient-card-2 p-3 shadow-sm mx-2">
+                                    <h7 class="text-white text-start d-block" style="margin-left: 2px;">Balance</h7>
                                     <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">
-                                            <?php echo number_format($balance, 2); ?>
+                                        <h1 class="fw-bold text-white" style="margin-left: 2px;">
+                                            ₱<?php echo number_format($balance); ?>
                                         </h1>
-                                        <i class="bx bx-trending-up"
-                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <div class="badge bg-warning text-white fw-medium percentage-box"
-                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
+                                            style="font-size: 0.75rem; padding: 2px 6px;"><?php echo number_format(abs($balance_percentage_change), 1); ?>% 
+                                            <?php echo $balance_percentage_change >= 0 ? '▲' : '▼'; ?></div>
                                     </div>
                                 </div>
                             </div>
+
+                            <?php
+                            // Fetch the latest two income records from the income_history table
+                            $query_income = "SELECT income, updated_at FROM income_history 
+                                            WHERE organization_id = ? 
+                                            ORDER BY updated_at DESC 
+                                            LIMIT 2";
+
+                            $stmt_income = $conn->prepare($query_income);
+                            $stmt_income->bind_param("i", $organization_id);
+                            $stmt_income->execute();
+                            $result_income = $stmt_income->get_result();
+
+                            $latest_incomes = [];
+                            while ($row = $result_income->fetch_assoc()) {
+                                $latest_incomes[] = $row['income'];
+                            }
+
+                            // Calculate percentage difference for income
+                            $income_percentage_change = 0;
+                            $income = 0; // Initialize $income
+
+                            if (count($latest_incomes) === 2) {
+                                $latest_income = $latest_incomes[0];
+                                $previous_income = $latest_incomes[1];
+                                
+                                $income = $latest_income; // Assign latest income to $income
+                                
+                                if ($previous_income > 0) {
+                                    $income_percentage_change = (($latest_income - $previous_income) / $previous_income) * 100;
+                                }
+                            } elseif (count($latest_incomes) === 1) {
+                                $income = $latest_incomes[0]; // If only one record, assign it to $income
+                            }
+
+                            $stmt_income->close();
+                            ?>
 
                             <!-- Income Card -->
                             <div class="col-md-4 mb-3">
-                                <div class="card financial-card p-3 shadow-sm bg-pink-200 mx-2">
-                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Income</h7>
+                                <div class="card gradient-card-1 p-3 shadow-sm mx-2">
+                                    <h7 class="text-white text-start d-block" style="margin-left: 2px;">Income</h7>
                                     <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">₱59,690</h1>
-                                        <i class="bx bx-trending-up"
-                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
+                                        <h1 class="fw-bold text-white" style="margin-left: 2px;">₱ <?php echo number_format($income); ?></h1>
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <div class="badge bg-warning text-white fw-medium percentage-box"
-                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
+                                            style="font-size: 0.75rem; padding: 2px 6px;"><?php echo number_format(abs($income_percentage_change), 1); ?>% 
+                                            <?php echo $income_percentage_change >= 0 ? '▲' : '▼'; ?></div>
                                     </div>
                                 </div>
                             </div>
 
+                            <?php
+                            // Fetch the latest two expense records from the expense_history table
+                            $query = "SELECT expense, updated_at FROM expense_history 
+                                    WHERE organization_id = ? 
+                                    ORDER BY updated_at DESC 
+                                    LIMIT 2";
+
+                            $stmt = $conn->prepare($query);
+                            $stmt->bind_param("i", $organization_id);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+
+                            $latest_expenses = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $latest_expenses[] = $row['expense'];
+                            }
+
+                            // Calculate percentage difference
+                            $percentage_change = 0;
+                            $expense = 0; // Initialize $expense
+
+                            if (count($latest_expenses) === 2) {
+                                $latest = $latest_expenses[0];
+                                $previous = $latest_expenses[1];
+                                
+                                $expense = $latest; // Assign latest expense to $expense
+                                
+                                if ($previous > 0) {
+                                    $percentage_change = (($latest - $previous) / $previous) * 100;
+                                }
+                            } elseif (count($latest_expenses) === 1) {
+                                $expense = $latest_expenses[0]; // If only one record, assign it to $expense
+                            }
+
+                            $stmt->close();
+                            ?>
+
                             <!-- Expense Card -->
                             <div class="col-md-4 mb-3">
-                                <div class="card financial-card p-3 shadow-sm bg-blue-200 mx-2">
-                                    <h7 class="text-gray-500 text-start d-block" style="margin-left: 2px;">Expense</h7>
+                                <div class="card gradient-card-3 p-3 shadow-sm mx-2">
+                                    <h7 class="text-white text-start d-block" style="margin-left: 2px;">Expense</h7>
                                     <div class="d-flex align-items-center">
-                                        <h1 class="fw-bold" style="margin-left: 2px;">₱59,690</h1>
-                                        <i class="bx bx-trending-up"
-                                            style="color: green; font-size: 3.5rem; margin-left: 5px;"></i>
+                                        <h1 class="fw-bold text-white" style="margin-left: 2px;">₱<?php echo number_format($expense); ?></h1>
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <div class="badge bg-warning text-white fw-medium percentage-box"
-                                            style="font-size: 0.75rem; padding: 2px 6px;">13.4% *</div>
+                                            style="font-size: 0.75rem; padding: 2px 6px;"><?php echo number_format(abs($percentage_change), 1); ?>% 
+                                            <?php echo $percentage_change >= 0 ? '▲' : '▼'; ?></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!-- End of Financial Summary Cards Row -->
+                        
+                        <!-- Balance Report Section -->
+                        <?php 
+                        $query = "SELECT MONTH(updated_at) AS month, YEAR(updated_at) AS year, balance 
+                                FROM balance_history 
+                                WHERE organization_id = ? 
+                                ORDER BY year ASC, month ASC";
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param('i', $organization_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        $balances = [];
+                        while ($row = $result->fetch_assoc()) {
+                            $balances[] = $row; // Store all rows for rendering in the graph
+                        }
+                        $stmt->close();
+
+                        // Prepare data for visualization
+                        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        $monthly_balances = array_fill(1, 12, 0); // Initialize balances for all months
+                        $max_balance = 0;
+
+                        foreach ($balances as $balance) {
+                            $monthly_balances[(int)$balance['month']] = $balance['balance'];
+                            $max_balance = max($max_balance, $balance['balance']); // Determine max balance
+                        }
+                        ?>
 
                         <!-- Balance Report Section -->
-                        <div class="p-4 bg-white mx-auto rounded border shadow-md justify-center balance-report"
-                            style="width: 725px; margin: 20px;">
-                            <div class="d-flex justify-content-start gap-5">
-                                <h2 class="text-lg fw-bold">Balance Report</h2>
-                                <div class="d-flex gap-3">
-                                    <button class="btn btn-secondary btn-sm">Monthly</button>
-                                    <button class="btn btn-secondary btn-sm">Quarterly</button>
-                                    <button class="btn btn-secondary btn-sm">Yearly</button>
+                        <div class="responsive-container" style="margin: 20px; margin-left: 5px; margin-right: 65px;">
+                            <div class="p-4 bg-white rounded border shadow-md justify-center mx-2 balance-report"
+                                style="max-width: 700px; width: 111%;">
+                                <div class="d-flex justify-content-start gap-5">
+                                    <h2 class="text-lg fw-bold">Balance Report</h2>
+                                    <div class="d-flex gap-3">
+                                        <button class="btn btn-secondary btn-sm" onclick="switchView('monthly')">Monthly</button>
+                                        <button class="btn btn-secondary btn-sm" onclick="switchView('quarterly')">Quarterly</button>
+                                        <button class="btn btn-secondary btn-sm" onclick="switchView('yearly')">Yearly</button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mt-2">
-                                <p class="fw-semibold">Average per month</p>
-                                <h1 class="fw-bold h5 text-success">₱5,500</h1>
-                                <p class="fw-medium mt-1" style="color: #5C5C5C;">Median ₱45,000</p>
-                            </div>
+                                <div class="mt-2">
+                                    <p class="fw-semibold">Average per month</p>
+                                    <?php
+                                        if (count($balances) > 0) {
+                                            $total_balance = array_sum($monthly_balances);
+                                            $average_balance = $total_balance / count($balances);
+                                            echo "<h1 class='fw-bold h5 text-success'>₱" . number_format($average_balance, 2) . "</h1>";
+                                        } else {
+                                            echo "<h1 class='fw-bold h5 text-muted'>No data available</h1>";
+                                        }
+                                    ?>
+                                </div>
 
-                            <div class="container mx-auto mt-3">
-                                <!-- Bar Graph Container -->
-                                <div class="row g-3">
-                                    <!-- Bar for January-->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 90px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Jan</p>
+                                <div class="container mx-auto mt-3">
+                                    <!-- Bar Graph Container -->
+                                    <div class="row g-3">
+                                        <?php
+                                            foreach ($months as $index => $month) {
+                                                $month_number = $index + 1;
+                                                $month_balance = $monthly_balances[$month_number];
+                                                $height = $max_balance > 0 ? ($month_balance / $max_balance) * 100 : 0; // Scale height
+                                                echo "
+                                                <div class='col-1'>
+                                                    <div class='d-flex flex-column-reverse align-items-center' style='height: 100px;'>
+                                                        <div class='w-100 bg-success' style='height: {$height}px;' 
+                                                            data-bs-toggle='tooltip' 
+                                                            title='₱" . number_format($month_balance, 2) . "'></div>
+                                                    </div>
+                                                    <p class='mt-1 text-sm font-medium text-center'>{$month}</p>
+                                                </div>";
+                                            }
+                                        ?>
                                     </div>
-
-                                    <!-- Bar for February -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 70px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Feb</p>
-                                    </div>
-
-                                    <!-- Bar for March -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 50px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Mar</p>
-                                    </div>
-
-                                    <!-- Bar for April -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 30px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Apr</p>
-                                    </div>
-
-                                    <!-- Bar for May -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 10px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">May</p>
-                                    </div>
-
-                                    <!-- Bar for June -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 20px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Jun</p>
-                                    </div>
-
-                                    <!-- Bar for July -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 40px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Jul</p>
-                                    </div>
-
-                                    <!-- Bar for August -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 30px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Aug</p>
-                                    </div>
-
-                                    <!-- Bar for September -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 40px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Sep</p>
-                                    </div>
-
-                                    <!-- Bar for October -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 50px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Oct</p>
-                                    </div>
-
-                                    <!-- Bar for November -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 60px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Nov</p>
-                                    </div>
-
-                                    <!-- Bar for December -->
-                                    <div class="col-1">
-                                        <div class="d-flex flex-column-reverse align-items-center"
-                                            style="height: 100px;">
-                                            <div class="w-100 bg-success" style="height: 70px;"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm font-medium text-center">Dec</p>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
                         <!-- Balance Report End -->
+
+                        <style>
+                            @media (max-width: 768px) {
+                                .responsive-container {
+                                    overflow-x: auto; /* Enable horizontal scrolling */
+                                    width: 100%; /* Full width on smaller screens */
+                                }
+                                .balance-report {
+                                    width: 725px; /* Maintain original width on larger screens */
+                                }
+                            }
+                        </style>
                     </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                                new bootstrap.Tooltip(tooltipTriggerEl);
+                            });
+                        });
+                    </script>
 
                     <!-- Right Column for Advisers and Financial Deadlines (Third Container) -->
                     <div class="col-md-4">
@@ -283,19 +360,19 @@ include '../organization_query.php';
                                 </div>
 
                                 <div class="d-flex justify-content-evenly mt-3">
-                                    <div class="text-center">
-                                        <img class="rounded-circle border border-dark h-20" src="Sir Renato.jpg" alt=""
-                                            style="width: 40px; height: 40px;" />
-                                        <p class="fw-semibold text-sm text-black">Renato Bautista</p>
-                                        <p class="text-xs text-gray">Instructor, DCS</p>
-                                    </div>
+                                <div class="text-center">
+                                    <img class="rounded-circle mb-3 border border-dark d-block mx-auto" src="Sir Renato.jpg" alt=""
+                                        style="width: 40px; height: 40px;" />
+                                    <p class="fw-semibold text-sm text-black">Renato Bautista</p>
+                                    <p class="text-xs text-gray">Instructor, DCS</p>
+                                </div>
 
-                                    <div class="text-center">
-                                        <img class="rounded-circle border border-dark h-20" src="Maam Janessa.jpg"
-                                            alt="" style="width: 40px; height: 40px;" />
-                                        <p class="fw-semibold text-sm text-black">Janessa Dela Cruz</p>
-                                        <p class="text-xs text-gray">Instructor, DCS</p>
-                                    </div>
+                                <div class="text-center">
+                                    <img class="rounded-circle mb-3 border border-dark d-block mx-auto" src="Maam Janessa.jpg" alt=""
+                                        style="width: 40px; height: 40px;" />
+                                    <p class="fw-semibold text-sm text-black">Janessa Dela Cruz</p>
+                                    <p class="text-xs text-gray">Instructor, DCS</p>
+                                </div>
                                 </div>
                             </div>
 
@@ -311,32 +388,68 @@ include '../organization_query.php';
                                 <div class="ms-2 mt-3">
                                     <div class="mt-1">
                                         <h1 class="fw-bold text-xs fs-5 text-black">Office Supplies</h1>
-                                        <p class="text-gray fw-semibold text-xs">October 12, 2024</p>
+                                        <p class="text-gray fw-semibold text-xs mb-3">October 12, 2024</p>
                                     </div>
 
                                     <div class="mt-1">
                                         <h1 class="fw-bold text-xs fs-5 text-black">Transportation</h1>
-                                        <p class="text-gray fw-semibold text-xs">L-300</p>
+                                        <p class="text-gray fw-semibold text-xs mb-3">L-300</p>
                                     </div>
 
                                     <div class="mt-1">
                                         <h1 class="fw-bold text-xs fs-5 text-black">Speakers</h1>
-                                        <p class="text-gray fw-semibold text-xs">November 11, 2024</p>
+                                        <p class="text-gray fw-semibold text-xs mb-3">November 11, 2024</p>
                                     </div>
                                 </div>
                             </div>
 
+                            <?php
+                            // Query to fetch the first and latest balance for the current month
+                            $query = "
+                                SELECT balance, updated_at 
+                                FROM balance_history 
+                                WHERE organization_id = ? 
+                                AND MONTH(updated_at) = MONTH(CURRENT_DATE()) 
+                                AND YEAR(updated_at) = YEAR(CURRENT_DATE())
+                                ORDER BY updated_at ASC
+                            ";
+
+                            $stmt = $conn->prepare($query);
+                            $stmt->bind_param("i", $organization_id);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+
+                            $first_balance = null;
+                            $latest_balance = null;
+
+                            if ($result->num_rows > 0) {
+                                $rows = $result->fetch_all(MYSQLI_ASSOC);
+                                $first_balance = $rows[0]['balance']; // First balance of the month
+                                $latest_balance = $rows[count($rows) - 1]['balance']; // Latest balance of the month
+                            }
+
+                            // Compute the percentage change
+                            $percentage_change = ($latest_balance && $first_balance) ? 
+                                (($latest_balance - $first_balance) / $first_balance) * 100 : 0;
+
+                            $remaining_balance = $latest_balance ?: 0;
+                            ?>
+
                             <!-- Radial Progress -->
-                            <div class="d-flex justify-evenly gap-5 p-4 bg-white rounded mt-4 shadow-sm">
+                            <div class="d-flex justify-evenly gap-7 p-6 bg-white rounded mt-4 shadow-sm">
                                 <div class="d-flex align-items-center">
                                     <div>
-                                        <h1 class="fw-bold fs-7 text-black">Balance</h1>
-                                        <p class="fw-semibold text-black">Total Monthly</p>
-                                        <h1 class="fw-bold h6">₱ 50,000
+                                        <h1 class="fw-bold fs-7">Balance</h1>
+                                        <p class="fw-semibold text-secondary">Total Monthly</p>
+                                        <h1 class="fw-bold h6">₱ <?php echo number_format($latest_balance, 2); ?> 
+                                            <span class="badge bg-warning text-white fw-medium percentage-box"
+                                            style="font-size: 0.75rem; padding: 2px 6px;">
+                                            <?php echo number_format($percentage_change, 1); ?>%
+                                            </span>
                                         </h1>
-                                        <p class="bg-warning text-white rounded-pill mx-auto px-3 py-1">73.4%</p>
                                     </div>
                                 </div>
+
 
                                 <div>
                                     <div class="d-flex flex-column align-items-center">
@@ -348,16 +461,16 @@ include '../organization_query.php';
                                             <!-- Radial Progress Circle -->
                                             <svg class="position-absolute w-100 h-100"
                                                 style="transform: rotate(-90deg);">
-                                                <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="8"
+                                                <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="10"
                                                     class="text-purple-500" fill="none" stroke-dasharray="283"
-                                                    stroke-dashoffset="85">
+                                                    stroke-dashoffset="<?php echo 283 - (283 * $percentage_change / 100); ?>">
                                                 </circle>
                                             </svg>
 
                                             <!-- Centered Text -->
                                             <div class="position-absolute text-center">
-                                                <p class="h6 fw-bold text-dark">₱27,500</p>
-                                                <p class="text-sm fw-semibold text-black">Remaining balance</p>
+                                                <p class="h6 fw-bold text-dark">₱ <?php echo number_format($remaining_balance, 2); ?></p>
+                                                <p class="text-sm fw-semibold text-secondary">Remaining balance</p>
                                             </div>
                                         </div>
                                     </div>
@@ -367,165 +480,180 @@ include '../organization_query.php';
                     </div>
 
 
-
                     <!-- Transaction Chart -->
-                    <div class="container-fluid">
-                        <div class="h5 fw-black fs-10 ps-5 mx-xs-5">
-                            <h2 class="mr-5"><span class="text-warning fw-bold me-2 fs-10">|</span>Transactions</h2>
-                        </div>
+                    <?php
+                    // Fetch income records
+                    $income_query = "
+                        SELECT 
+                            'Income' AS type, 
+                            title AS description, 
+                            amount, 
+                            created_at AS date 
+                        FROM income 
+                        WHERE organization_id = ? AND archived = 0
+                        ORDER BY created_at DESC
+                        LIMIT 5
+                    "; // Fetching latest 5 income records
 
-                        <div class="p-4 bg-white rounded border shadow-md justify-center card"
-                            style="height: 450px; width: 1150px; margin: 1px 200px 5px 0;">
-                            <div class="card-body">
-                                <div class="d-sm-flex d-block align-items-center justify-content-between mb-4">
-                                    <h5 class="card-title fw-semibold mb-0">This Month 53 | P350</h5>
-                                    <div>
-                                        <select class="form-select">
-                                            <option value="1">March 2024</option>
-                                            <option value="2">April 2024</option>
-                                            <option value="3">May 2024</option>
-                                            <option value="4">June 2024</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div id="sales-profit" style="height: 300px;"></div> <!-- Placeholder for chart -->
-                            </div>
-                        </div>
-                    </div>
+                    $expenses_query = "
+                        SELECT 
+                            'Expense' AS type, 
+                            title AS description, 
+                            amount, 
+                            created_at AS date 
+                        FROM expenses 
+                        WHERE organization_id = ? AND archived = 0
+                        ORDER BY created_at DESC
+                        LIMIT 5
+                    "; // Fetching latest 5 expense records
+
+                    // Prepare and execute income query
+                    $stmt_income = $conn->prepare($income_query);
+                    $stmt_income->bind_param("i", $organization_id);
+                    $stmt_income->execute();
+                    $income_results = $stmt_income->get_result()->fetch_all(MYSQLI_ASSOC);
+
+                    // Prepare and execute expenses query
+                    $stmt_expenses = $conn->prepare($expenses_query);
+                    $stmt_expenses->bind_param("i", $organization_id);
+                    $stmt_expenses->execute();
+                    $expenses_results = $stmt_expenses->get_result()->fetch_all(MYSQLI_ASSOC);
+
+                    // Combine results
+                    $transactions = array_merge($income_results, $expenses_results);
+
+                    // Sort transactions by date (newest first)
+                    usort($transactions, function ($a, $b) {
+                        return strtotime($b['date']) - strtotime($a['date']);
+                    });
+
+                    // Limit to the latest 10 transactions
+                    $transactions = array_slice($transactions, 0, 10);
+                    ?>
                     <!-- End of Transaction Chart -->
 
                     <!--Recent Transaction dashboard-->
-                    <div>
-                        <div class="h5 fw-black fs-10 ps-5 mx-xs-5">
-                            <h2 class="mr-5"><span class="text-warning fw-bold me-2 fs-10">|</span>Recent Transactions
-                            </h2>
-                        </div>
+                    <div class="container">
+                        <h3 class="welcome-message h5 fw-bold mb-4 mt-5">
+                            <span class="text-warning fw-bold me-2">|</span>Recent Transactions
+                        </h3>
                         <div class="container mt-5">
-                            <button id="printButton" class="btn btn-primary mb-3">Print</button>
-                            <button id="pdfButton" class="btn btn-success mb-3">Download PDF</button>
+                            <button id="pdfButton" class="btn btn-success mb-3"><i class="fas fa-download"></i> Download PDF</button>
 
                             <div id="tableContent">
                                 <table class="table table-bordered">
                                     <thead class="thead-light fw-bold">
                                         <tr class="fw-bold fs-4 text-dark">
                                             <th>Type</th>
-                                            <th>Due Date</th>
                                             <th>Description</th>
                                             <th>Amount</th>
-                                            <th>Payer</th>
-                                            <th>Reference</th>
-                                            <th>Status</th>
+                                            <th>Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Invoice</td>
-                                            <td>2023-10-20</td>
-                                            <td>Payment for services rendered</td>
-                                            <td>$1,000.00</td>
-                                            <td>Company A</td>
-                                            <td>INV-001</td>
-                                            <td>Paid</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Expense</td>
-                                            <td>2023-10-22</td>
-                                            <td>Office supplies purchase</td>
-                                            <td>$250.00</td>
-                                            <td>Tom</td>
-                                            <td>EXP-002</td>
-                                            <td>Pending</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Invoice</td>
-                                            <td>2023-10-25</td>
-                                            <td>Consultation services</td>
-                                            <td>$500.00</td>
-                                            <td>Company B</td>
-                                            <td>INV-003</td>
-                                            <td>Paid</td>
-                                        </tr>
+                                        <?php if (!empty($transactions)): ?>
+                                            <?php foreach ($transactions as $transaction): ?>
+                                                <tr>
+                                                    <td><?php echo htmlspecialchars($transaction['type']); ?></td>
+                                                    <td><?php echo htmlspecialchars($transaction['description']); ?></td>
+                                                    <td>₱<?php echo number_format($transaction['amount'], 2); ?></td>
+                                                    <td><?php echo htmlspecialchars(date("F j, Y", strtotime($transaction['date']))); ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="4" class="text-center">No transactions found for this organization.</td>
+                                            </tr>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-                        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-                        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-                        <script
-                            src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-                        <script>
-                            // Print function
-                            document.getElementById('printButton').addEventListener('click', function () {
-                                window.print();
-                            });
-
-                            // PDF download function
-                            document.getElementById('pdfButton').addEventListener('click', function () {
-                                const element = document.getElementById('tableContent');
-                                html2pdf()
-                                    .from(element)
-                                    .save('transaction_report.pdf');
-                            });
-                        </script>
                     </div>
-                    <!--Recent Transaction End-->
+
+                    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+                    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+                    <script>
+
+                        // PDF download function
+                        document.getElementById('pdfButton').addEventListener('click', function () {
+                            const element = document.getElementById('tableContent');
+                            html2pdf()
+                                .from(element)
+                                .save('recent_transact.pdf'); // PDF named as "liquidation_report.pdf"
+                        });
+                    </script>
+                    <!--Recent Transaction dashboard end-->
+
+                    <?php
+                    // Fetch the two nearest upcoming events
+                    $query = "
+                        SELECT e.title, e.event_start_date, e.event_end_date, e.event_venue, o.organization_name
+                        FROM events e
+                        JOIN organizations o ON e.organization_id = o.organization_id
+                        WHERE e.event_start_date > CURDATE() 
+                        ORDER BY e.event_start_date ASC
+                        LIMIT 2
+                    ";
+                    $result = $conn->query($query);
+
+                    // Check if the query was successful and fetch the events
+                    if ($result->num_rows > 0) {
+                        $events = $result->fetch_all(MYSQLI_ASSOC);
+                    } else {
+                        $events = [];
+                    }
+                    ?>
 
                     <!--Upcoming Events-->
                     <div>
-                        <div class="h5 fw-black fs-10 ps-5 mx-xs-5 mt-5">
-                            <h2><span class="text-warning fw-bold me-2 fs-10">|</span>Upcoming Events</h2>
-                        </div>
+                        <h3 class="welcome-message h5 fw-bold mb-4 mt-5">
+                            <span class="text-warning fw-bold me-2">|</span>Upcoming Events
+                        </h3>
                         <div class="mx-auto">
                             <!--event boxes-->
                             <div class="container mt-5">
                                 <div class="row">
-                                    <!-- Event Box 1 -->
-                                    <div class="col-md-4">
-                                        <div class="container-white">
-                                            <div class="event-box">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <h6 class="event-title">Beacon of Youth Technology Enthusiasts</h6>
-                                                    <p class="event-duration">3 Hours</p>
-                                                </div>
-                                                <h5>TechFest</h5>
-                                                <div class="event-details">
-                                                    <p class="event-date"><i class="fa-regular fa-calendar"
-                                                            aria-hidden="true"></i> 28 Sep 2024
-                                                    </p>
-                                                    <p class="event-time"><i class="fa-regular fa-clock"
-                                                            aria-hidden="true"></i> 10:00 AM</p>
-                                                </div>
-                                                <div class="text-end mt-auto">
-                                                    <button class="btn btn-warning details-btn">Details</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <?php if (!empty($events)) : ?>
+                                        <?php foreach ($events as $event) : ?>
+                                            <div class="col-md-4">
+                                                <div class="container-white">
+                                                    <div class="event-box">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <h6 class="event-title"><?php echo htmlspecialchars($event['organization_name']); ?></h6>
 
-                                    <!-- Event Box 2 -->
-                                    <div class="col-md-4">
-                                        <div class="container-white">
-                                            <div class="event-box">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <h6 class="event-title">The CvSU-R Nexus</h6>
-                                                    <p class="event-duration">3 Hours</p>
-                                                </div>
-                                                <h5>Schoolwide Press Conference</h5>
-                                                <div class="event-details">
-                                                    <p class="event-date"><i class="fa-regular fa-calendar"
-                                                            aria-hidden="true"></i> 15 Oct 2024
-                                                    </p>
-                                                    <p class="event-time"><i class="fa-regular fa-clock"
-                                                            aria-hidden="true"></i> 10:00 AM</p>
-                                                </div>
-                                                <div class="text-end mt-auto">
-                                                    <button class="btn btn-warning details-btn">Details</button>
+                                                            <?php
+                                                            // Get today's date
+                                                            $today = new DateTime();
+                                                            // Event's start date
+                                                            $eventStartDate = new DateTime($event['event_start_date']);
+                                                            // Calculate the difference between today's date and the event start date
+                                                            $interval = $today->diff($eventStartDate);
+                                                            // Format the number of days left
+                                                            $daysLeft = $interval->format('%r%a'); // %r gives the sign (+ or -) and %a gives the total number of days
+                                                            $daysLeftText = ($daysLeft >= 0) ? $daysLeft . " Days Left" : "Event Passed"; // Show if event has passed
+                                                            ?>
+                                                            <p class="event-duration text-sm"><?php echo $daysLeftText; ?></p>
+                                                        </div>
+                                                        <h5><?php echo htmlspecialchars($event['title']); ?></h5>
+                                                        <div class="event-details">
+                                                            <p class="event-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 
+                                                                <?php echo date("d M Y", strtotime($event['event_start_date'])) . ' - ' . date("d M Y", strtotime($event['event_end_date'])); ?>
+                                                            </p>
+                                                        </div>
+                                                        <div class="text-end mt-auto">
+                                                            <button class="btn btn-warning details-btn">Details</button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
+                                        <?php endforeach; ?>
+                                    <?php else : ?>
+                                        <p>No upcoming events.</p>
+                                    <?php endif; ?>
 
                                     <style>
                                         .container-white {
@@ -843,68 +971,76 @@ include '../organization_query.php';
 
                                 </div>
                             </div>
+                             <!--Upcoming Events end-->
 
+                            <!--Activities start-->
                             <div>
-                                <div class="container mt-5">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-8 h5 fw-black fs-10 ps-5">
-                                            <h2 class="mr-5"><span
-                                                    class="text-warning fw-bold me-2 fs-10">|</span>Activities</h2>
-                                        </div>
-                                        <div class="col-md-4 d-flex justify-content-end">
-                                            <button class="btn btn-primary custom-btn mx-2">Beacon of Youth Technology
-                                                Enthusiast</button>
-                                        </div>
+                                <h3 class="welcome-message h5 fw-bold mb-4 mt-5">
+                                    <span class="text-warning fw-bold me-2">|</span>Activities
+                                </h3>
 
-                                    </div>
-                                </div>
+                                <?php 
+                                    $sql = "SELECT * FROM events WHERE archived = 0 AND organization_id = $organization_id ORDER BY event_id DESC LIMIT 5";
+                                    $result = $conn->query($sql);
+                                ?>
+                                    <div class="container">
+                                        <div id="tableContent">
+                                            <table class="table table-bordered">
+                                                <thead class="thead-light fw-bold">
+                                                    <tr>
+                                                        <th rowspan=2>Title</th>
+                                                        <th rowspan=2>Venue</th>
+                                                        <th colspan=2 style="text-align: center;"> Date </th>
+                                                        <th rowspan=2>Type</th>
+                                                        <th rowspan=2>Status</th>
+                                                        <th rowspan=2>Accomplished</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Start</th>
+                                                        <th>End</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    if ($result->num_rows > 0) {
+                                                        while ($row = $result->fetch_assoc()) {
+                                                            $checked = $row['accomplishment_status'] ? 'checked' : '';
+                                                            $disabled = ($row['event_status'] !== 'Approved') ? 'disabled' : '';
+                                                            echo "<tr>
+                                                                    <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
+                                                                    <td>{$row['event_venue']}</td>
+                                                                    <td>" . date('F j, Y', strtotime($row['event_start_date'])) . "</td>
+                                                                    <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
+                                                                    <td>{$row['event_type']}</td>
+                                                                    <td>";
+                                                            // Handle event status with badges
+                                                            if ($row['event_status'] == 'Pending') {
+                                                                echo "<span class='badge rounded-pill pending'>Pending</span>";
+                                                            } elseif ($row['event_status'] == 'Approved') {
+                                                                echo "<span class='badge rounded-pill approved'>Approved</span>";
+                                                            } elseif ($row['event_status'] == 'Disapproved') {
+                                                                echo "<span class='badge rounded-pill disapproved'>Disapproved</span>";
+                                                            }
+                                                            echo "</td>";
+                                                            // Render accomplishment status
+                                                            echo "<td>";
+                                                            echo ($row['accomplishment_status'] == 1) 
+                                                                ? "Accomplished" 
+                                                                : "Not Accomplished";
+                                                            echo "</td>";
+                                                            echo "</tr>";
+                                                        }
+                                                    } else {
+                                                        echo "<tr><td colspan='9' class='text-center'>No events found</td></tr>";
+                                                    }
+                                                    ?>
+                                                </tbody>
 
-                                <div class="container pt-5 mx-auto">
-                                    <div id="tableContent">
-                                        <table class="table table-bordered">
-                                            <thead class="thead-light fw-bold">
-                                                <tr class="fw-bold fs-4 text-dark">
-                                                    <th>Title</th>
-                                                    <th>from</th>
-                                                    <th>to</th>
-                                                    <th>Type</th>
-                                                    <th>Venue</th>
-                                                    <th>Status</th>
-                                                    <th>Accomplishment Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>TechFest</td>
-                                                    <td>03-21</td>
-                                                    <td>03-22</td>
-                                                    <td>Co-Curricular</td>
-                                                    <td>Court 1</td>
-                                                    <td>Approved</td>
-                                                    <td>Accomplished</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>TechFest</td>
-                                                    <td>03-21</td>
-                                                    <td>03-22</td>
-                                                    <td>Co-Curricular</td>
-                                                    <td>Court 1</td>
-                                                    <td>Approved</td>
-                                                    <td>Accomplished</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>TechFest</td>
-                                                    <td>03-21</td>
-                                                    <td>03-22</td>
-                                                    <td>Co-Curricular</td>
-                                                    <td>Court 1</td>
-                                                    <td>Approved</td>
-                                                    <td>Accomplished</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
+                                  
+                            </div>
 
                                 <style>
                                     .custom-btn {
@@ -930,11 +1066,6 @@ include '../organization_query.php';
                                     src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
                                 <script>
-                                    // Print function
-                                    document.getElementById('printButton').addEventListener('click', function () {
-                                        window.print();
-                                    });
-
                                     // PDF download function
                                     document.getElementById('pdfButton').addEventListener('click', function () {
                                         const element = document.getElementById('tableContent');
@@ -953,7 +1084,7 @@ include '../organization_query.php';
 
                         </div>
                     </div>
-                    <!--Upcoming Events end-->
+                    <!--Activities end-->
                 </div>
             </div>
             <!-- End of First Main Wrap -->

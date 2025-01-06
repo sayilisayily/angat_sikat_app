@@ -56,8 +56,8 @@
                     <div class="dropdown">
                         <a href="#" class="dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown"
                             aria-expanded="false" style="text-decoration: none;">
-                            <img class="border border-dark rounded-circle" src="<?php echo !empty($profile_picture) ? '../user/uploads/' . htmlspecialchars($profile_picture) : '../user/uploads/default.png'; ?>" alt="Profile"
-                                style="width: 40px; height: 40px; margin-left: 10px;">
+                            <img class="border border-dark rounded-circle" src="<?php echo !empty($profile_picture) ? '../user/' . $profile_picture : '../user/uploads/default.png'; ?>" alt="Profile"
+                            style="width: 40px; height: 40px; margin-left: 10px;">
                             <span class="visually-hidden"><?php echo htmlspecialchars($user['username']); ?></span>
                             <div class="d-flex flex-column align-items-start ms-2">
                                 <span style="font-weight: bold; color: #004024;"><?php echo htmlspecialchars($fullname); ?></span>
@@ -65,7 +65,7 @@
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="../user/profile.html"><i class="bx bx-user"></i> My Profile</a></li>
+                            <li><a class="dropdown-item" href="../user/profile.php"><i class="bx bx-user"></i> My Profile</a></li>
                             <li><a class="dropdown-item" href="../user/logout.php"><i class="bx bx-log-out"></i> Logout</a></li>
                         </ul>
                     </div>

@@ -20,10 +20,8 @@ $result = $conn->query($sql);
 
 <head>
     <title>Activities Table</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
-    <!--Custom CSS for Sidebar-->
-    <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Custom CSS for Activities-->
     <link rel="stylesheet" href="css/activities.css" />
     <!--Boxicon-->
@@ -59,80 +57,80 @@ $result = $conn->query($sql);
         data-sidebar-position="fixed" data-header-position="fixed">
         <?php include '../sidebar.php'; ?>
         
-    <div class="container mt-5 p-5">
-        <h2 class="mb-4"><span class="text-warning fw-bold me-2">|</span> Activities
-            <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addEventModal"
-             style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                <i class="fa-solid fa-plus"></i> Add Activity
-            </button>
-        </h2>
-        <table id="eventsTable" class="table">
-            <thead>
-                <tr>
-                    <th rowspan=2>Title</th>
-                    <th rowspan=2>Venue</th>
-                    <th colspan=2 style="text-align: center;"> Date </th>
-                    <th rowspan=2>Type</th>
-                    <th rowspan=2>Status</th>
-                    <th rowspan=2>Accomplished</th>
-                    <th rowspan=2>Actions</th>
-                </tr>
-                <tr>
-                    <th>Start</th>
-                    <th>End</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        $checked = $row['accomplishment_status'] ? 'checked' : '';
-                        $disabled = ($row['event_status'] !== 'Approved') ? 'disabled' : '';
-                        echo "<tr>
-                                <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
-                                <td>{$row['event_venue']}</td>
-                                <td>" . date('F j, Y', strtotime($row['event_start_date'])) . "</td>
-                                <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
-                                <td>{$row['event_type']}</td>
-                                <td>";
-                                  if ($row['event_status'] == 'Pending') {
-                                    echo " <span class='badge rounded-pill pending'> ";
-                                } elseif ($row['event_status'] == 'Approved') {
-                                    echo " <span class='badge rounded-pill approved'> ";
-                                } elseif ($row['event_status'] == 'Disapproved') {
-                                    echo " <span class='badge rounded-pill disapproved'> ";
+        <div class="container mt-5 p-5">
+        <h2 class="mb-4">
+            <span class="text-warning fw-bold me-2 d-none d-sm-inline">|</span> Activities
+                </h2>
+                <div class="d-flex justify-content-start">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal" style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                        <i class="fa-solid fa-plus"></i> Add Activity
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table id="eventsTable" class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Venue</th>
+                                <th>Date Start</th>
+                                <th>Date End</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Accomplished</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if ($result->num_rows > 0) {
+                                while($row = $result->fetch_assoc()) {
+                                    $checked = $row['accomplishment_status'] ? 'checked' : '';
+                                    $disabled = ($row['event_status'] !== 'Approved') ? 'disabled' : '';
+                                    echo "<tr>
+                                            <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='event_details.php?event_id={$row['event_id']}'>{$row['title']}</a></td>
+                                            <td>{$row['event_venue']}</td>
+                                            <td>" . date('F j, Y', strtotime($row['event_start_date'])) . "</td>
+                                            <td>" . date('F j, Y', strtotime($row['event_end_date'])) . "</td>
+                                            <td>{$row['event_type']}</td>
+                                            <td>";
+                                            if ($row['event_status'] == 'Pending') {
+                                                echo "<span class='badge rounded-pill pending'>{$row['event_status']}</span>";
+                                            } elseif ($row['event_status'] == 'Approved') {
+                                                echo "<span class='badge rounded-pill approved'>{$row['event_status']}</span>";
+                                            } elseif ($row['event_status'] == 'Disapproved') {
+                                                echo "<span class='badge rounded-pill disapproved'>{$row['event_status']}</span>";
+                                            }
+                                            echo "</td>
+                                            <td>
+                                                <input type='checkbox' class='form-check-input' onclick='showConfirmationModal({$row['event_id']}, this.checked)' $checked $disabled>
+                                            </td>
+                                            <td>
+                                                <button class='btn btn-primary btn-sm edit-btn' data-bs-toggle='modal' data-bs-target='#editEventModal' data-id='{$row['event_id']}'>
+                                                    <i class='fa-solid fa-pen'></i> Edit
+                                                </button>
+                                                <button class='btn btn-danger btn-sm archive-btn' data-id='{$row['event_id']}'>
+                                                    <i class='fa-solid fa-box-archive'></i> Archive
+                                                </button>
+                                            </td>
+                                        </tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='8' class='text-center'>No events found</td></tr>";
                                 }
-                                echo "
-                                    {$row['event_status']}
-                                    </span>
-                                    </td>
-                                    <td>
-                                        <input type='checkbox' 
-                                        class='form-check-input' 
-                                        onclick='showConfirmationModal({$row['event_id']}, this.checked)' 
-                                        $checked 
-                                        $disabled>
-                                    </td>
-                                    <td>
-                                        <button class='btn btn-primary btn-sm edit-btn mb-3' 
-                                                data-bs-toggle='modal' 
-                                                data-bs-target='#editEventModal' 
-                                                data-id='{$row['event_id']}'>
-                                            <i class='fa-solid fa-pen'></i> Edit
-                                        </button>
-                                        <button class='btn btn-danger btn-sm archive-btn mb-3' 
-                                                data-id='{$row['event_id']}'>
-                                            <i class='fa-solid fa-box-archive'></i> Archive
-                                        </button>
-                                    </td>
-                                </tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='9' class='text-center'>No events found</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <style>
+                @media (max-width: 576px) {
+                    .pagination {
+                        justify-content: center; /* Center pagination */
+                    }
+                }
+            </style>
             </div>
         </div>
     </div>

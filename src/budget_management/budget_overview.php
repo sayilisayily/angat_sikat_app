@@ -40,7 +40,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Budget Management</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <!--Custom CSS for Sidebar-->
     <link rel="stylesheet" href="../html/sidebar.css" />
@@ -59,6 +59,7 @@
 </head>
 
 <body>
+    <style>
 .left-sidebar {
     width: 250px; /* Full width of sidebar */
     border-radius: 0; /* Remove border radius */
@@ -73,7 +74,110 @@
     width: 80px; /* Adjust this for collapsed sidebar */
     height: 100vh; /* Maintain full height when collapsed */
 }
-</div>
+</style>
+
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+        data-sidebar-position="fixed" data-header-position="fixed">
+        <!-- Sidebar Start -->
+        <aside class="left-sidebar" id="sidebar">
+            <div class="top-bar">
+                <div id="toggleSidebar" class="burger-icon">
+                <i class="bx bx-menu"></i>
+                </div>
+            </div>
+            <!-- Sidebar scroll -->
+            <div>
+                <!-- Brand Logo -->
+                <div class="brand-logo logo-container">
+                <a href="../html/officer_dashboard.html" class="logo-img">
+                    <img src="angat sikat.png" alt="Angat Sikat Logo" class="sidebar-logo">
+                </a>
+                <span class="logo-text">ANGATSIKAT</span>
+                </div>
+                <!-- Sidebar navigation -->
+                <nav class="sidebar-nav mx-4">
+                    <ul id="sidebarnav">
+                        <li class="sidebar-item">
+                        <a class="sidebar-link" href="../dashboard/officer_dashboard.php" aria-expanded="false" data-tooltip="Dashboard">
+                            <i class="bx bxs-dashboard"></i>
+                            <span class="hide-menu">Dashboard</span>
+                        </a>
+                        </li>
+                        
+                        <li class="sidebar-item">
+                        <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false"
+                            data-tooltip="Manage Events">
+                            <i class="bx bx-calendar"></i>
+                            <span class="hide-menu">Activities</span>
+                        </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                        <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget">
+                            <i class="bx bx-wallet"></i>
+                            <span class="hide-menu">Budget</span>
+                        </a>
+                        <div class="submenu">
+                            <a href="../budget_management/budget_overview.php">› Overall</a>
+                            <a href="#purchases">› Purchases</a>
+                            <a href="#moe">› MOE</a>
+                            <a href="../budget_management/budget_approval_table.php">› Approval</a>
+                        </div>
+                        </li>
+                        
+                        <li class="sidebar-item">
+                        <a class="sidebar-link" aria-expanded="false" data-tooltip="Income & Expenses">
+                            <i class="bx bx-chart"></i>
+                            <span class="hide-menu">Income & Expenses</span>
+                        </a>
+                        <div class="submenu">
+                            <a href="#income">› Income</a>
+                            <a href="../income_and_expenses/expenses.php">› Expenses</a>
+                        </div>
+                        </li>
+                        <li class="sidebar-item">
+                        <a class="sidebar-link" href="reports.php" aria-expanded="false" data-tooltip="Reports">
+                            <i class="bx bx-file"></i>
+                            <span class="hide-menu">Reports</span>
+                        </a>
+                        </li>
+                        <li class="sidebar-item profile-container">
+                        <a class="sidebar-link" href="../user/profile.html" aria-expanded="false" data-tooltip="Profile">
+                            <div class="profile-pic-border">
+                            <img src="byte.png" alt="Profile Picture" class="profile-pic" />
+                            </div>
+                            <span class="profile-name">BYTE</span>
+                        </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- End Sidebar navigation -->
+            </div>
+            <!-- End Sidebar scroll-->
+        </aside>
+        <!-- Sidebar End -->
+         <!-- JavaScript to toggle submenu visibility -->
+        <script>
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    // Toggle the submenu for the clicked item
+                    this.classList.toggle('show-submenu');
+
+                    // Close other submenus
+                    document.querySelectorAll('.sidebar-item').forEach(otherItem => {
+                        if (otherItem !== this) {
+                            otherItem.classList.remove('show-submenu');
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+        <!-- JavaScript to toggle the sidebar -->
+        <script>
+            document.getElementById('toggleSidebar').addEventListener('click', function () { document.getElementById('sidebar').classList.toggle('collapsed'); });
+        </script>
         <!--  2nd Body wrapper -->
         <div class="body-wrapper">
             <!-- Header Start -->
@@ -138,65 +242,66 @@
                         <div class="card text-white gradient-card mb-3 py-4">
                             <div class="card-header">Balance</div>
                             <div class="card-body">
-                                <h3 class="card-title">₱
-                                    <?php echo number_format($balance, 2); ?>
-                                </h3>
+                                <h5 class="card-title">
+                                    <span class="balance-value" style="display: none;">₱
+                                        <?php echo number_format($balance, 2); ?>
+                                    </span>
+                                    <span class="balance-placeholder">****</span> <!-- Placeholder text when hidden -->
+                                    <i class="fa-solid fa-eye toggle-eye" style="cursor: pointer;"></i>
+                                </h5>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
 
-                    <!-- Beginning Balance Card -->
-                    <div class="col-md-4">
-                        <div class="card gradient-card-2 text-white mb-3 py-4">
-                            <div class="card-body">
-                                <h5 class="card-title">₱
-                                    <?php echo number_format($beginning_balance, 2); ?>
-                                </h5>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between align-items-center">
-                                <span>Beginning Balance</span>
-                                <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal"
-                                    data-bs-target="#editBeginningBalanceModal"
-                                    data-id="<?php echo $organization_id; ?>"><i class="fa-solid fa-pen"></i>
-                                    Edit</button>
-                            </div>
+                <!-- Beginning Balance Card -->
+                <div class="col-md-4">
+                    <div class="card gradient-card-2 text-white mb-3 py-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span class="balance-value" style="display: none;">₱<?php echo number_format($beginning_balance, 2); ?></span>
+                                <span class="balance-placeholder">****</span> <!-- Placeholder text when hidden -->
+                                <i class="fa-solid fa-eye toggle-eye" style="cursor: pointer;"></i> <!-- Default eye icon for hidden -->
+                            </h5>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <span>Beginning Balance</span>
+                            <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal" data-bs-target="#editBeginningBalanceModal" data-id="<?php echo $organization_id; ?>"><i class="fa-solid fa-pen"></i> Edit</button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Cash on Bank Card -->
-                    <div class="col-md-4">
-                        <div class="card text-white gradient-card-3 mb-3 py-4">
-                            <div class="card-body">
-                                <h5 class="card-title">₱
-                                    <?php echo number_format($cash_on_bank, 2); ?>
-                                </h5>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between align-items-center">
-                                <span>Cash on Bank</span>
-                                <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal"
-                                    data-bs-target="#editCashOnBankModal" data-id="<?php echo $organization_id; ?>"><i
-                                        class="fa-solid fa-pen"></i> Edit</button>
-                            </div>
+                <!-- Cash on Bank Card -->
+                <div class="col-md-4">
+                    <div class="card text-white gradient-card-3 mb-3 py-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span class="balance-value" style="display: none;">₱<?php echo number_format($cash_on_bank, 2); ?></span>
+                                <span class="balance-placeholder">****</span> <!-- Placeholder text when hidden -->
+                                <i class="fa-solid fa-eye toggle-eye" style="cursor: pointer;"></i> <!-- Default eye icon for hidden -->
+                            </h5>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <span>Cash on Bank</span>
+                            <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal" data-bs-target="#editCashOnBankModal" data-id="<?php echo $organization_id; ?>"><i class="fa-solid fa-pen"></i> Edit</button>
                         </div>
                     </div>
+                </div>
 
-
-                    <!-- Cash on Hand Card -->
-                    <div class="col-md-4">
-                        <div class="card text-white gradient-card-1 mb-3 py-4">
-                            <div class="card-body">
-                                <h5 class="card-title">₱
-                                    <?php echo number_format($cash_on_hand, 2); ?>
-                                </h5>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between align-items-center">
-                                <span>Cash on Hand</span>
-                                <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal"
-                                    data-bs-target="#editCashOnHandModal" data-id="<?php echo $organization_id; ?>"><i
-                                        class="fa-solid fa-pen"></i> Edit</button>
-                            </div>
+                <!-- Cash on Hand Card -->
+                <div class="col-md-4">
+                    <div class="card text-white gradient-card-1 mb-3 py-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span class="balance-value" style="display: none;">₱<?php echo number_format($cash_on_hand, 2); ?></span>
+                                <span class="balance-placeholder">****</span> <!-- Placeholder text when hidden -->
+                                <i class="fa-solid fa-eye toggle-eye" style="cursor: pointer;"></i> <!-- Default eye icon for hidden -->
+                            </h5>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <span>Cash on Hand</span>
+                            <button class="btn btn-light edit-balance-btn" data-bs-toggle="modal" data-bs-target="#editCashOnHandModal" data-id="<?php echo $organization_id; ?>"><i class="fa-solid fa-pen"></i> Edit</button>
                         </div>
                     </div>
                 </div>
@@ -417,7 +522,7 @@
                     </div>
                 </div>
             </div>
-
+        </div>
             <!-- Add Budget Modal -->
 <div class="modal fade" id="addBudgetModal" tabindex="-1" aria-labelledby="addBudgetModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -437,28 +542,28 @@
                     <div class="mb-3">
                         <label for="category" class="form-label">Category</label>
                         <select class="form-control" id="category" name="category" required>
-                            <option value="">Select Category</option>
-                            <?php
-                            // Fetch categories
-                            $category_query = "SELECT category_id, category FROM categories"; // Updated column names as per convention
-                            $category_result = mysqli_query($conn, $category_query);
+                        <option value="">Select Category</option>
+                        <?php
+                        // Fetch categories
+                        $category_query = "SELECT category_id, category FROM categories"; // Fetch both category_id and category name
+                        $category_result = mysqli_query($conn, $category_query);
 
-                            if (!$category_result) {
-                                // Query error
-                                echo '<option value="">Error loading categories</option>';
-                            } else {
-                                if (mysqli_num_rows($category_result) > 0) {
-                                    while ($category_row = mysqli_fetch_assoc($category_result)) {
-                                        // Use htmlspecialchars to prevent XSS
-                                        echo '<option value="' . htmlspecialchars($category_row['category_id']) . '">' . htmlspecialchars($category_row['category']) . '</option>';
-                                    }
-                                } else {
-                                    // No categories available
-                                    echo '<option value="">No categories available</option>';
+                        if (!$category_result) {
+                            // Query error
+                            echo '<option value="">Error loading categories</option>';
+                        } else {
+                            if (mysqli_num_rows($category_result) > 0) {
+                                while ($category_row = mysqli_fetch_assoc($category_result)) {
+                                    // Use category name as the value for the select option
+                                    echo '<option value="' . htmlspecialchars($category_row['category']) . '">' . htmlspecialchars($category_row['category']) . '</option>';
                                 }
+                            } else {
+                                // No categories available
+                                echo '<option value="">No categories available</option>';
                             }
-                            ?>
-                        </select>
+                        }
+                        ?>
+                    </select>
                     </div>
                     <input type="hidden" name="organization_id" value="<?php echo htmlspecialchars($organization_id); ?>">
                 </form>
@@ -552,7 +657,7 @@
                         <?php
 
                             // Fetch budget allocation data from the database
-                            $query = "SELECT category, allocated_budget FROM budget_allocation";
+                            $query = "SELECT category, allocated_budget FROM budget_allocation WHERE organization_id = $organization_id";
                             $result = mysqli_query($conn, $query);
 
                             // Loop through the results and output them as JavaScript array elements

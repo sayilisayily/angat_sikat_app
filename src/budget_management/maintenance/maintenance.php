@@ -20,10 +20,8 @@ $result = $conn->query($sql);
 
 <head>
     <title>MOE Table</title>
-    <link rel="shortcut icon" type="image/png" href="../../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../../assets/css/styles.min.css" />
-    <!--Custom CSS for Sidebar-->
-    <link rel="stylesheet" href="../../html/sidebar.css" />
     <!--Custom CSS for Activities-->
     <link rel="stylesheet" href="../../activity_management/css/activities.css" />
     <!--Boxicon-->
@@ -53,305 +51,82 @@ $result = $conn->query($sql);
 </head>
 
 <body>
-    <!-- 2nd Body wrapper -->
-    <div class="body-wrapper">
-        <!-- Header Start -->
-        <header class="app-header">
-            <nav class="navbar navbar-expand-lg navbar-light">
-                <ul class="navbar-nav">
-                    <li class="nav-item d-block d-xl-none">
-                        <a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)">
-                            <i class="ti ti-menu-2"></i>
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
-                    <div class="container-fluid d-flex justify-content-end align-items-center" style="padding: 0 1rem;">
-                        <!-- Notification Icon -->
-                        <button id="notificationBtn" style="background-color: transparent; border: none; padding: 0;">
-                            <lord-icon src="https://cdn.lordicon.com/lznlxwtc.json" trigger="hover"
-                                colors="primary:#004024" style="width:30px; height:30px;">
-                            </lord-icon>
-                        </button>
-
-                        <!-- Profile Dropdown -->
-                        <div class="dropdown">
-                            <a href="#" class="dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown"
-                                aria-expanded="false" style="text-decoration: none;">
-                                <img class="border border-dark rounded-circle" src="<?php echo !empty($profile_picture) ? 'default.png' . htmlspecialchars($profile_picture) : 'default.png'; ?>" alt="Profile"
-                                    style="width: 40px; height: 40px; margin-left: 10px;">
-                                <span class="visually-hidden"><?php echo htmlspecialchars($user['username']); ?></span>
-                                <div class="d-flex flex-column align-items-start ms-2">
-                                    <span style="font-weight: bold; color: #004024;"><?php echo htmlspecialchars($fullname); ?></span>
-                                    <span style="font-size: 0.85em; color: #6c757d;"><?php echo htmlspecialchars($email); ?></span>
-                                </div>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="../user/profile.html"><i class="bx bx-user"></i> My Profile</a></li>
-                                <li><a class="dropdown-item" href="../user/logout.php"><i class="bx bx-log-out"></i> Logout</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        </header>
-        <!-- Header End -->
-    </div>
-    <!-- End of 2nd Body Wrapper -->
-
-    <style>
-        /* Navbar styles */
-        .app-header {
-            position: fixed; /* Fix the position of the navbar */
-            width: calc(100% - 250px); /* Adjust width based on sidebar */
-            top: 0; /* Align to the top */
-            left: 250px; /* Align next to the sidebar */
-            transition: width 0.3s ease-in-out, left 0.3s ease-in-out; /* Smooth transition */
-            z-index: 1000; /* Keep navbar above other content */
-        }
-
-        /* Adjust navbar width when sidebar is collapsed */
-        .left-sidebar.collapsed + .app-header {
-            width: calc(100% - 70px);
-            left: 70px;
-        }
-    </style>
+    <?php include '../../navbar.php';?>
     <!-- Overall Body Wrapper -->
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
         data-sidebar-position="fixed" data-header-position="fixed">
-        <!-- Sidebar Start -->
-        <aside class="left-sidebar" id="sidebar">
-            <div class="top-bar">
-                <div id="toggleSidebar" class="burger-icon">
-                    <i class="bx bx-menu"></i>
-                </div>
-            </div>
-            <!-- Sidebar scroll -->
-            <div>
-                <!-- Brand Logo -->
-                <div class="brand-logo logo-container">
-                    <a href="../html/officer_dashboard.html" class="logo-img">
-                        <img src="angat sikat.png" alt="Angat Sikat Logo" class="sidebar-logo">
-                    </a>
-                    <span class="logo-text">ANGATSIKAT</span>
-                </div>
-                <!-- Sidebar navigation -->
-                <nav class="sidebar-nav mx-4">
-                    <ul id="sidebarnav">
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="../../dashboard/officer_dashboard.php" aria-expanded="false" data-tooltip="Dashboard">
-                                <i class="bx bxs-dashboard"></i>
-                                <span class="hide-menu">Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget">
-                                <i class="bx bx-wallet"></i>
-                                <span class="hide-menu">Budget</span>
-                            </a>
-                            <div class="submenu">
-                                <a href="../budget_overview.php"> Overview </a>
-                                <a href="../financial_plan.php"> Plan </a>
-                                <a href="../purchases/purchases.php"> Purchases</a>
-                                <a href="../maintenance/maintenance.php"> MOE</a>
-                                <a href="../budget_approval_table.php"> Approval</a>
+                <div class="container mt-5 p-5">
+                <h2 class="mb-4 d-flex flex-column flex-sm-row align-items-start justify-content-between">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="flex d-flex align-items-center">
+                                <span class="text-warning fw-bold me-2 d-none d-sm-block">|</span> 
+                                <span>Maintenance and Other Expenses</span>
                             </div>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="../../activity_management/activities.php" aria-expanded="false" data-tooltip="Manage Events">
-                                <i class="bx bx-calendar"></i>
-                                <span class="hide-menu">Manage Events</span>
+                            <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addModal"
+                                style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                                <i class="fa-solid fa-plus"></i> Add MOE
+                            </button>
+                            <a href="maintenance_archive.php" class="text-gray text-decoration-none fw-bold mt-2" 
+                                style="font-size: 14px;">
+                                View Archive
                             </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="#transactions" aria-expanded="false" data-tooltip="Transactions">
-                                <i class="bx bx-dollar-circle"></i>
-                                <span class="hide-menu">Transactions</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" aria-expanded="false" data-tooltip="Income & Expenses">
-                                <i class="bx bx-chart"></i>
-                                <span class="hide-menu">Income & Expenses</span>
-                            </a>
-                            <div class="submenu">
-                                <a href="#income"> Income</a>
-                                <a href="../../income_and_expenses/expenses.php"> Expenses</a>
-                            </div>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="#reports.php" aria-expanded="false" data-tooltip="Reports">
-                                <i class="bx bx-file"></i>
-                                <span class="hide-menu">Reports</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item profile-container">
-                            <a class="sidebar-link" href="../user/profile.html" aria-expanded="false" data-tooltip="Profile">
-                                <div class="profile-pic-border">
-                                    <img src="<?php echo !empty($profile_picture) ? 'default.png' . htmlspecialchars($profile_picture) : 'default.png'; ?>" alt="Profile Picture" class="profile-pic" />
-                                </div>
-                                <span class="profile-name"><?php echo htmlspecialchars($user['first_name']) . ' ' . htmlspecialchars($user['last_name']); ?></span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </aside>
-        <!-- Sidebar End -->
+                        </div>
+                    </h2>
+                    <div class="table-responsive">
+                        <table id="maintenanceTable" class="table">
+                            <thead>
+                                <tr> 
+                                    <th>Title</th>
+                                    <th>Total Budget</th>
+                                    <th>Status</th>
+                                    <th>Completed</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                if ($result->num_rows > 0) {
+                                    while($row = $result->fetch_assoc()) {
+                                        $checked = $row['completion_status'] ? 'checked' : '';
+                                        $disabled = ($row['maintenance_status'] !== 'Approved') ? 'disabled' : '';
+                                        echo "<tr>
+                                                <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='maintenance_details.php?maintenance_id={$row['maintenance_id']}'>{$row['title']}</a></td>
+                                                <td>{$row['total_amount']}</td>
+                                                <td>";
+                                        
+                                        if ($row['maintenance_status'] == 'Pending') {
+                                            echo "<span class='badge rounded-pill pending'> ";
+                                        } else if ($row['maintenance_status'] == 'Approved') {
+                                            echo "<span class='badge rounded-pill approved'> ";
+                                        } else if ($row['maintenance_status'] == 'Disapproved') {
+                                            echo "<span class='badge rounded-pill disapproved'> ";
+                                        }
 
-        <!-- JavaScript to toggle submenu visibility -->
-        <script>
-            document.querySelectorAll('.sidebar-item > .sidebar-link').forEach(item => {
-                item.addEventListener('click', function (e) {
-                    const submenu = this.nextElementSibling; // Get the submenu if it exists
-                    const sidebar = document.getElementById('sidebar'); // Reference to sidebar
-
-                    // Check if the clicked link is "Budget"
-                    if (this.textContent.includes('Budget') && sidebar.classList.contains('collapsed')) {
-                        // Expand the sidebar if it is collapsed
-                        sidebar.classList.remove('collapsed');
-                        const mainWrapper = document.getElementById('main-wrapper');
-                        const appHeader = document.querySelector('.app-header');
-
-                        // Adjust navbar width based on sidebar state
-                        appHeader.style.width = 'calc(100% - 250px)';
-                        appHeader.style.left = '250px';
-                        mainWrapper.classList.remove('expanded'); // Adjust main wrapper margin
-                    }
-
-                    // Toggle submenu visibility only if there is a submenu
-                    if (submenu) {
-                        e.preventDefault(); // Prevent default only if there's a submenu
-                        this.parentElement.classList.toggle('show-submenu'); // Toggle submenu visibility
-                    }
-                });
-            });
-
-            // Sidebar toggle functionality
-            document.getElementById('toggleSidebar').addEventListener('click', function () {
-                const sidebar = document.getElementById('sidebar');
-                const mainWrapper = document.getElementById('main-wrapper');
-                const appHeader = document.querySelector('.app-header');
-
-                sidebar.classList.toggle('collapsed');
-                mainWrapper.classList.toggle('expanded');
-
-                // Adjust navbar width based on sidebar state
-                if (sidebar.classList.contains('collapsed')) {
-                    appHeader.style.width = 'calc(100% - 70px)';
-                    appHeader.style.left = '70px';
-                } else {
-                    appHeader.style.width = 'calc(100% - 250px)';
-                    appHeader.style.left = '250px';
-                }
-            });
-        </script>
-
-        <style>
-            /* Sidebar initial styles */
-            .left-sidebar {
-                width: 250px;
-                position: fixed;
-                top: 0;
-                left: 10px;
-                height: 100%;
-                background-color: #00542F;
-                overflow: hidden;
-                transition: width 0.3s ease-in-out;
-            }
-
-            .left-sidebar.collapsed {
-                width: 70px;
-            }
-
-            #main-wrapper {
-                margin-left: 250px;
-                transition: margin-left 0.3s ease-in-out;
-            }
-
-            #main-wrapper.expanded {
-                margin-left: 70px;
-            }
-
-            .left-sidebar.collapsed .hide-menu {
-                display: none;
-            }
-
-            .left-sidebar.collapsed i {
-                text-align: center;
-                width: 100%;
-            }
-
-            .submenu {
-                display: none;
-                padding-left: 20px;
-                background-color: #006f4e;
-            }
-
-            .sidebar-item.show-submenu .submenu {
-                display: block;
-            }
-        </style>
-
-            <div class="container mt-5 p-5">
-                <h2 class="mb-4 d-flex align-items-center justify-content-between">
-                    <div>    
-                        <span class="text-warning fw-bold me-2">|</span> Maintenance and Other Expenses
-                        <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addModal"
-                        style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                            <i class="fa-solid fa-plus"></i> Add MOE
-                        </button>
-                    </div>
-                    <a href="maintenance_archive.php" class="text-gray text-decoration-none fw-bold" 
-                    style="font-size: 14px;">
-                        View Archive
-                    </a>
-                </h2>
-                    <table id="maintenanceTable" class="table">
-                    <thead>
-                        <tr> 
-                            <th>Title</th>
-                            <th>Total Budget</th>
-                            <th>Status</th>
-                            <th>Completed</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        if ($result->num_rows > 0) {
-                            while($row = $result->fetch_assoc()) {
-                                $checked = $row['completion_status'] ? 'checked' : '';
-                                $disabled = ($row['maintenance_status'] !== 'Approved') ? 'disabled' : '';
-                                echo "<tr>
-                                        <td><a class='link-offset-2 link-underline link-underline-opacity-0' href='maintenance_details.php?maintenance_id={$row['maintenance_id']}'>{$row['title']}</a></td>
-                                        <td>{$row['total_amount']}</td>
-                                        <td>";
-                                
-                                if ($row['maintenance_status'] == 'Pending') {
-                                    echo "<span class='badge rounded-pill pending'> ";
-                                } else if ($row['maintenance_status'] == 'Approved') {
-                                    echo "<span class='badge rounded-pill approved'> ";
-                                } else if ($row['maintenance_status'] == 'Disapproved') {
-                                    echo "<span class='badge rounded-pill disapproved'> ";
+                                        echo "{$row['maintenance_status']}</span></td>
+                                            <td><input type='checkbox' class='form-check-input' onclick='showConfirmationModal({$row['maintenance_id']}, this.checked)' $checked $disabled></td>
+                                            <td>
+                                                <button class='btn btn-primary btn-sm edit-btn mb-3' data-bs-toggle='modal' data-bs-target='#editMaintenanceModal' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-pen'></i> Edit</button>
+                                                <button class='btn btn-danger btn-sm archive-btn mb-3' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-box-archive'></i> Archive</button>
+                                            </td>
+                                            </tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='5' class='text-center'>No maintenance or other expenses found</td></tr>";
                                 }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                                echo "{$row['maintenance_status']}</span></td>
-                                    <td><input type='checkbox' class='form-check-input' onclick='showConfirmationModal({$row['maintenance_id']}, this.checked)' $checked $disabled></td>
-                                    <td>
-                                        <button class='btn btn-primary btn-sm edit-btn mb-3' data-bs-toggle='modal' data-bs-target='#editMaintenanceModal' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-pen'></i> Edit</button>
-                                        <button class='btn btn-danger btn-sm archive-btn mb-3' data-id='{$row['maintenance_id']}'><i class='fa-solid fa-box-archive'></i> Archive</button>
-                                    </td>
-                                    </tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='5' class='text-center'>No maintenance or other expenses found</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
+                <style>
+                @media (max-width: 576px) {
+                    .btn {
+                        width: 100%;
+                        margin-top: 10px;
+                    }
+                }
+                </style>
         </div>
     </div>
     <!-- End of Overall Body Wrapper -->
@@ -479,33 +254,41 @@ $result = $conn->query($sql);
     </div>
 
 
-    <!-- Archive Confirmation Modal -->
-    <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="archiveModalLabel">Archive Maintenance or Other Expense</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to archive this Maintence or Other Expense?
-                    <input type="hidden" id="archiveMaintenanceId">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="confirmArchiveBtn" class="btn btn-danger">Archive</button>
-                </div>
-                <!-- Success Message Alert -->
-                <div id="archiveSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
-                        Maintenance or Other Expense archived successfully!
-                </div>  
-                <!-- Error Message Alert -->
-                <div id="archiveErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
-                    <ul id="archiveErrorList"></ul>
+   <!-- Archive Confirmation Modal -->
+            <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="archiveModalLabel">Archive Maintenance or Other Expense</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to archive this Maintenance or Other Expense?
+                            <input type="hidden" id="archiveMaintenanceId">
+                        </div>
+                        <div class="modal-footer flex-column flex-sm-row">
+                            <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" id="confirmArchiveBtn" class="btn btn-danger w-100 w-sm-auto mt-2 mt-sm-0">Archive</button>
+                        </div>
+                        <!-- Success Message Alert -->
+                        <div id="archiveSuccessMessage" class="alert alert-success d-none mt-3" role="alert">
+                            Maintenance or Other Expense archived successfully!
+                        </div>  
+                        <!-- Error Message Alert -->
+                        <div id="archiveErrorMessage" class="alert alert-danger d-none mt-3" role="alert">
+                            <ul id="archiveErrorList"></ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <style>
+            @media (max-width: 576px) {
+                .modal-body {
+                    padding: 1rem;
+                }
+            }
+            </style>
 
     <!-- BackEnd -->
     <script src="../js/maintenance.js"></script>

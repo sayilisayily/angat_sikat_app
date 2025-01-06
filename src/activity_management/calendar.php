@@ -5,10 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendar</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
-    <!--Custom CSS for Sidebar-->
-    <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Custom CSS for Activities-->
     <link rel="stylesheet" href="../activity_management/activities.css" />
     <!--Boxicon-->
@@ -51,7 +49,6 @@
     <?php include '../navbar.php';?>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
         data-sidebar-position="fixed" data-header-position="fixed">
-        <?php include '../sidebar.php'; ?>
 
         <!--  2nd Body wrapper -->
         <div class="body-wrapper">

@@ -52,6 +52,11 @@ $result = $conn->query($sql);
 </head>
 
 <body>
+    <!-- Overall Body Wrapper -->
+    <?php include '../../navbar.php';?>
+    <div class="page-wrapper d-flex flex-column h-100" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+        data-sidebar-position="fixed" data-header-position="fixed">
+        <?php include '../../sidebar.php'; ?>
     <!-- 2nd Body wrapper -->
     <div class="body-wrapper">
         <!-- Header Start -->

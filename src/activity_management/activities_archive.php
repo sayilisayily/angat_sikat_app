@@ -20,10 +20,8 @@ $result = $conn->query($sql);
 
 <head>
     <title>Activities Archive</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
-    <!--Custom CSS for Sidebar-->
-    <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Custom CSS for Activities-->
     <link rel="stylesheet" href="css/activities.css" />
     <!--Boxicon-->
@@ -56,7 +54,7 @@ $result = $conn->query($sql);
     <!-- Overall Body Wrapper -->
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
         data-sidebar-position="fixed" data-header-position="fixed">
-        <?php include '../sidebar.php'; ?>
+        
 
         <?php include '../navbar.php';?>
     </div>

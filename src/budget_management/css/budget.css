@@ -24,6 +24,11 @@ h1 {
 .gradient-card-3 {
   background: linear-gradient(135deg, #6a82fb, #fc5c7d);
 }
+
+.gradient-card-4 {
+  background: linear-gradient(135deg, #34a853, #b4ec51); /* Green tones */
+}
+
 .card-title {
   color: white;
 }
@@ -105,4 +110,22 @@ table {
 .badge.rounded-pill.pending {
   background-color: #929292;
   color: #fff;
+}
+
+.hidden {
+  display: none;
+}
+
+.notification-item:hover {
+  background-color: #f9f9f9;
+}
+
+#notificationDropdown {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+#notificationList {
+  max-height: 250px;
+  overflow-y: auto;
 }

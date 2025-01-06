@@ -336,7 +336,7 @@ address {
 
 ol,
 ul {
-  padding-left: 2rem;
+  padding-left: 0;
 }
 
 ol,
@@ -19175,7 +19175,7 @@ ul {
 
 #sidebar.collapsed {
   width: 90px;
-  border-radius: 55px; /* Add radius for collapsed state */
+  border-radius: 0; /* Remove radius for collapsed state */
   margin-top: 20px; /* Adjust as needed to add space above */
   margin-bottom: 20px; /* Adjust as needed to add space below */
   height: calc(
@@ -19700,3 +19700,5 @@ button.btn-secondary:hover {
   object-fit: contain; /* Ensures the entire image is visible without cropping */
   border-radius: 10px;
 }
+
+

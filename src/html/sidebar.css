@@ -82,7 +82,7 @@
 
 /* Adjust main content position based on sidebar state */
 .main-content {
-  margin-left: 290px; /* Default margin for sidebar */
+  margin-left: 0; /* Remove left margin for main content */
   transition: margin-left 0.3s; /* Smooth transition for sidebar */
 }
 
@@ -90,4 +90,19 @@
   margin-left: 90px; /* Adjust the margin when sidebar is collapsed */
 }
 
+/* Responsive Styles */
+@media (max-width: 768px) {
+  #sidebar {
+    width: 100%; /* Full width on mobile */
+    height: auto; /* Adjust height */
+    position: relative; /* Change to relative for mobile */
+  }
 
+  #sidebar.collapsed {
+    width: 0; /* Hide sidebar when collapsed */
+  }
+
+  .main-content {
+    margin-left: 0; /* No margin when sidebar is hidden */
+  }
+}

@@ -35,22 +35,22 @@ if (!empty($errors)) {
 $organization_id = (int)$_POST['edit_organization_id'];
 $allocation_id = (int)$_POST['edit_allocation_id']; // Assign allocation_id properly
 
-// Fetch the beginning balance for the organization
-$balance_query = "SELECT beginning_balance FROM organizations WHERE organization_id = ?";
+// Fetch the balance for the organization
+$balance_query = "SELECT balance FROM organizations WHERE organization_id = ?";
 $balance_stmt = $conn->prepare($balance_query);
 
 if ($balance_stmt) {   
     $balance_stmt->bind_param('i', $organization_id);
     if ($balance_stmt->execute()) {
-        $balance_stmt->bind_result($beginning_balance);
+        $balance_stmt->bind_result($balance);
         $balance_stmt->fetch();
         $balance_stmt->close();
 
-        if (!$beginning_balance) {
-            $errors['beginning_balance'] = 'Organization balance not found.';
+        if (!$balance) {
+            $errors['balance'] = 'Organization balance not found.';
         }
     } else {
-        $errors['sql'] = 'Error fetching beginning balance: ' . $balance_stmt->error;
+        $errors['sql'] = 'Error fetching balance: ' . $balance_stmt->error;
     }
 } else {
     $errors['sql'] = 'Error preparing balance query: ' . $conn->error;
@@ -88,9 +88,9 @@ $new_budget = $current_allocated_budget + $add_budget - $subtract_budget;
 // Add the new or updated allocation to the total
 $total_allocated += $new_budget;
 
-// Validate if the total allocated budget exceeds the beginning balance
-if ($total_allocated > $beginning_balance) {
-    $errors['allocated_budget'] = 'Total allocated budget exceeds the beginning balance.';
+// Validate if the total allocated budget exceeds the balance
+if ($total_allocated > $balance) {
+    $errors['allocated_budget'] = 'Total allocated budget exceeds the balance.';
     $data['success'] = false;
     $data['errors'] = $errors;
 } else {

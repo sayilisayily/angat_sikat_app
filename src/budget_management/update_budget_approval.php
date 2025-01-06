@@ -4,24 +4,47 @@ include 'connection.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $approval_id = $_POST['approval_id'];
     $title = $_POST['title'];
-    $attachment = $_FILES['attachment']['name'];
+    $attachment = $_FILES['attachment'];
 
-    // Check if a new file is uploaded
-    if (!empty($attachment)) {
-        $target_dir = "uploads/";
-        $target_file = $target_dir . basename($attachment);
-        
-        if (move_uploaded_file($_FILES['attachment']['tmp_name'], $target_file)) {
-            // Update query with the new attachment
-            $query = "UPDATE budget_approvals SET title = ?, attachment = ? WHERE approval_id = ?";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("ssi", $title, $attachment, $approval_id);
+    // File upload handling
+    $uploaded_file = '';
+    if (isset($attachment) && $attachment['error'] !== UPLOAD_ERR_NO_FILE) {
+        if ($attachment['error'] === UPLOAD_ERR_OK) {
+            $file_tmp = $attachment['tmp_name'];
+            $file_name = $attachment['name'];
+            $file_extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+            $allowed_extensions = ['doc', 'docx', 'xls', 'xlsx', 'pdf'];
+
+            if (!in_array($file_extension, $allowed_extensions)) {
+                echo json_encode(['success' => false, 'message' => 'Invalid file type. Only DOC, DOCX, XLS, XLSX, and PDF are allowed.']);
+                exit;
+            }
+
+            $upload_dir = 'uploads/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+
+            $file_path = $upload_dir . basename($file_name);
+            if (move_uploaded_file($file_tmp, $file_path)) {
+                $uploaded_file = $file_name;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to move the uploaded file.']);
+                exit;
+            }
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to upload file']);
+            echo json_encode(['success' => false, 'message' => 'File upload error.']);
             exit;
         }
+    }
+
+    // Update query
+    if (!empty($uploaded_file)) {
+        $query = "UPDATE budget_approvals SET title = ?, attachment = ? WHERE approval_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ssi", $title, $uploaded_file, $approval_id);
     } else {
-        // Update only the title if no new attachment is provided
+        // If no new file is uploaded, update only the title
         $query = "UPDATE budget_approvals SET title = ? WHERE approval_id = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("si", $title, $approval_id);
@@ -40,21 +63,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $admin_id = $row['user_id'];
 
                 // Insert notification for the admin
-                $insert_notification_query_admin = "INSERT INTO notifications (recipient_id, message, is_read, created_at) 
-                                                     VALUES ($admin_id, '$notification_message', 0, NOW())";
+                $insert_notification_query = "INSERT INTO notifications (recipient_id, message, is_read, created_at) 
+                                              VALUES ($admin_id, '$notification_message', 0, NOW())";
 
-                if (!mysqli_query($conn, $insert_notification_query_admin)) {
+                if (!mysqli_query($conn, $insert_notification_query)) {
                     error_log("Admin Notification Error: " . mysqli_error($conn));
-                    error_log("Query: " . $insert_notification_query_admin);
+                    error_log("Query: " . $insert_notification_query);
                 }
             }
         } else {
             error_log("Admin query failed or returned no results: " . mysqli_error($conn));
         }
 
-        echo json_encode(['success' => true, 'message' => 'Budget approval updated successfully']);
+        echo json_encode(['success' => true, 'message' => 'Budget approval updated successfully.']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Failed to update budget approval']);
+        echo json_encode(['success' => false, 'message' => 'Failed to update budget approval.']);
     }
 }
 ?>

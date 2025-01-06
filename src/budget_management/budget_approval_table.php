@@ -18,10 +18,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'officer') {
 <head>
     <meta charset="UTF-8">
     <title>Budget Approvals</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/angat sikat.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
-    <!--Custom CSS for Sidebar-->
-    <link rel="stylesheet" href="../html/sidebar.css" />
     <!--Custom CSS for Budget Overview-->
     <link rel="stylesheet" href="../budget_management/css/budget.css" />
     <!--Boxicon-->
@@ -41,289 +39,109 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'officer') {
 </head>
 
 <body>
-    <!-- Overall Body Wrapper -->
-    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    <?php include '../navbar.php';?>
+    <div class="page-wrapper d-flex flex-column h-100" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
         data-sidebar-position="fixed" data-header-position="fixed">
-        <!-- Sidebar Start -->
-        <aside class="left-sidebar" id="sidebar">
-            <div class="top-bar">
-                <div id="toggleSidebar" class="burger-icon">
-                <i class="bx bx-menu"></i>
-                </div>
-            </div>
-            <!-- Sidebar scroll -->
-            <div>
-                <!-- Brand Logo -->
-                <div class="brand-logo logo-container">
-                <a href="../html/officer_dashboard.html" class="logo-img">
-                    <img src="angat sikat.png" alt="Angat Sikat Logo" class="sidebar-logo">
-                </a>
-                <span class="logo-text">ANGATSIKAT</span>
-                </div>
-                <!-- Sidebar navigation -->
-                <nav class="sidebar-nav">
-                    <ul id="sidebarnav">
-                        <li class="sidebar-item">
-                        <a class="sidebar-link" href="../dashboard/officer_dashboard.php" aria-expanded="false" data-tooltip="Dashboard">
-                            <i class="bx bxs-dashboard"></i>
-                            <span class="hide-menu">Dashboard</span>
-                        </a>
-                        </li>
-                        <li class="sidebar-item">
-                        <a class="sidebar-link" href="../activity_management/activities.php" aria-expanded="false"
-                            data-tooltip="Manage Events">
-                            <i class="bx bx-calendar"></i>
-                            <span class="hide-menu">Manage Events</span>
-                        </a>
-                        </li>
-                        <li class="sidebar-item">
-                        <a class="sidebar-link" aria-expanded="false" data-tooltip="Budget">
-                            <i class="bx bx-wallet"></i>
-                            <span class="hide-menu">Budget</span>
-                        </a>
-                        <div class="submenu">
-                            <a href="../budget_management/budget_overview.php">› Overall</a>
-                            <a href="#purchases">› Purchases</a>
-                            <a href="#moe">› MOE</a>
-                            <a href="../budget_management/budget_approval_table.php">› Approval</a>
-                        </div>
-                        </li>
-                        <li class="sidebar-item">
-                        <a class="sidebar-link" href="#transactions" aria-expanded="false" data-tooltip="Transactions">
-                            <i class="bx bx-dollar-circle"></i>
-                            <span class="hide-menu">Transactions</span>
-                        </a>
-                        </li>
-                        <li class="sidebar-item">
-                        <a class="sidebar-link" aria-expanded="false" data-tooltip="Income & Expenses">
-                            <i class="bx bx-chart"></i>
-                            <span class="hide-menu">Income & Expenses</span>
-                        </a>
-                        <div class="submenu">
-                            <a href="#income">› Income</a>
-                            <a href="../income_and_expenses/expenses.php">› Expenses</a>
-                        </div>
-                        </li>
-                        <li class="sidebar-item">
-                        <a class="sidebar-link" href="reports.php" aria-expanded="false" data-tooltip="Reports">
-                            <i class="bx bx-file"></i>
-                            <span class="hide-menu">Reports</span>
-                        </a>
-                        </li>
-                        <li class="sidebar-item profile-container">
-                        <a class="sidebar-link" href="../user/profile.html" aria-expanded="false" data-tooltip="Profile">
-                            <div class="profile-pic-border">
-                            <img src="byte.png" alt="Profile Picture" class="profile-pic" />
-                            </div>
-                            <span class="profile-name">BYTE</span>
-                        </a>
-                        </li>
-                    </ul>
-                </nav>
-                <!-- End Sidebar navigation -->
-            </div>
-            <!-- End Sidebar scroll-->
-        </aside>
-        <!-- Sidebar End -->
-
-        <!-- JavaScript to toggle submenu visibility -->
-        <script>
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.addEventListener('click', function () {
-                    // Toggle the submenu for the clicked item
-                    this.classList.toggle('show-submenu');
-
-                    // Close other submenus
-                    document.querySelectorAll('.sidebar-item').forEach(otherItem => {
-                        if (otherItem !== this) {
-                        otherItem.classList.remove('show-submenu');
-                        }
-                    });
-                });
-            });
-        </script>
-
-
-        <!-- JavaScript to toggle the sidebar -->
-        <script>
-            document.getElementById('toggleSidebar').addEventListener('click', function () { document.getElementById('sidebar').classList.toggle('collapsed'); });
-        </script>
-
-        <!--  2nd Body wrapper -->
-        <div class="body-wrapper">
-            <!-- Header Start -->
-            <header class="app-header">
-                <nav class="navbar navbar-expand-lg navbar-light">
-                    <ul class="navbar-nav">
-                        <li class="nav-item d-block d-xl-none">
-                            <a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)">
-                                <i class="ti ti-menu-2"></i>
-                            </a>
-                        </li>
-                    </ul>
-
-                    <!-- Custom Search and Profile Section -->
-                    <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
-                        <div class="container-fluid d-flex justify-content-end align-items-center"
-                            style="padding: 0 1rem; background-color: transparent;">
-                            <!-- Search Bar -->
-                            <div class="d-none d-sm-flex position-relative" style=" width: 250px; margin-right: 10px;">
-                                <input class="form-control py-1 ps-4 pe-3 border border-dark rounded-pill" type="search"
-                                    placeholder="Search" id="searchInput" style="width: 100%; padding: 0.25rem 1rem;">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary"
-                                    width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                    id="searchIcon" style="margin-left: 8px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 19l-2-2m0 0a7 7 0 1110 0l-2 2m-2-2a7 7 0 110-14 7 7 0 010 14z" />
-                                </svg>
-                            </div>
-
-                            <!-- Notification Icon -->
-                            <div style="position: relative; display: inline-block;">
-                            <button id="notificationBtn" style="background-color: transparent; border: none; padding: 0; position: relative;">
-                                <lord-icon
-                                    src="https://cdn.lordicon.com/lznlxwtc.json"
-                                    trigger="hover"
-                                    colors="primary:#004024"
-                                    style="width:30px; height:30px;">
-                                </lord-icon>
-                                <!-- Notification Count Badge -->
-                                <span id="notificationCount" style="
-                                    position: absolute;
-                                    top: -5px;
-                                    right: -5px;
-                                    background-color: red;
-                                    color: white;
-                                    font-size: 12px;
-                                    padding: 2px 6px;
-                                    border-radius: 50%;
-                                    display: none;">0</span>
-                            </button>
-
-
-                                <!-- Notification Dropdown -->
-                                <div id="notificationDropdown" class="dropdown-menu p-2 shadow" 
-                                    style="display: none; position: absolute; right: 0; top: 35px; width: 300px; max-height: 400px; 
-                                    overflow-y: auto; background-color: white; border-radius: 5px; z-index: 1000;">
-                                    <p style="margin: 0; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
-                                        Notifications
-                                    </p>
-                                    <div id="notificationList">
-                                        <!-- Notifications will be dynamically loaded here -->
-                                    </div>
-                                    <p id="noNotifications" style="text-align: center; margin-top: 10px; color: gray; display: none;">
-                                        No new notifications
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Profile Dropdown -->
-                            <div class="dropdown">
-                                <a href="#" class="dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown"
-                                    aria-expanded="false" style="text-decoration: none;">
-                                    <img class="border border-dark rounded-circle" src="byte.png" alt="Profile"
-                                        style="width: 40px; height: 40px; margin-left: 10px;">
-                                    <div class="d-flex flex-column align-items-start ms-2">
-                                        <span style="font-weight: bold; color: #004024; text-decoration: none;">BYTE
-                                            ORG</span>
-                                        <span
-                                            style="font-size: 0.85em; color: #6c757d; text-decoration: none;">byte.org@gmail.com</span>
-                                    </div>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="../user/profile.html"><i class="bx bx-user"></i> My
-                                            Profile</a></li>
-                                    <li><a class="dropdown-item" href="../user/login.html"><i
-                                                class="bx bx-log-out"></i>
-                                            Logout</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-            </header>
-            <!-- Header End -->
+        <?php include '../sidebar.php'; ?>
 
             <div class="container mt-4 p-5">
-                <h2 class="mb-4 d-flex align-items-center justify-content-between">
-                    <div>    
-                        <span class="text-warning fw-bold me-2">|</span> Budget Approvals 
-                        <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal"
+            <div class="container mt-4 p-5">
+                    <h2 class="mb-4 d-flex flex-column flex-sm-row align-items-center justify-content-between">
+                        <div class="d-flex align-items-center mb-2 mb-sm-0">    
+                            <span class="text-warning fw-bold me-2">|</span> Budget Approvals 
+                        </div>
+                        <a href="budget_approvals_archive.php" class="text-gray text-decoration-none fw-bold" 
+                        style="font-size: 14px;">
+                            View Archive
+                        </a>
+                    </h2>
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-between mb-3">
+                        <button type="button" class="btn btn-primary ms-0 ms-sm-3" data-bs-toggle="modal"
                             data-bs-target="#budgetApprovalModal"
                             style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
                             <i class="fa-solid fa-paper-plane"></i> Request Budget Approval
                         </button>
                     </div>
-                    <a href="budget_approvals_archive.php" class="text-gray text-decoration-none fw-bold" 
-                    style="font-size: 14px;">
-                        View Archive
-                    </a>
 
-                </h2>
-
-                <!-- Approval Table -->
-                <table id="budgetApprovalsTable" class="table mt-4">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Category</th>
-                            <th>Attachment</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                    // Fetch data from budget_approvals table for non-admin users
-                    $approvalsQuery = "SELECT * FROM budget_approvals WHERE organization_id = $organization_id AND archived = 0"; // Hardcoded for testing
-                    $approvalsResult = mysqli_query($conn, $approvalsQuery);
-                    while ($row = mysqli_fetch_assoc($approvalsResult)) {
-                        ?>
-                        <tr>
-                            <td>
-                                <?php echo $row['title']; ?>
-                            </td>
-                            <td>
-                                <?php echo ucfirst($row['category']); ?>
-                            </td>
-                            <td><a href="uploads/<?php echo $row['attachment']; ?>"
-                                    class='link-offset-2 link-underline link-underline-opacity-0' target="_blank">
-                                    <?php echo $row['attachment']; ?>
-                                </a></td>
-                            <td>
-                                <?php 
-                                // Display status but don't allow editing
-                                if ($row['status'] == 'Pending') {
-                                    echo " <span class='badge rounded-pill pending'> ";
-                                } else if ($row['status'] == 'Approved') {
-                                    echo " <span class='badge rounded-pill approved'> ";
-                                } else if ($row['status'] == 'Disapproved') {
-                                    echo " <span class='badge rounded-pill disapproved'> ";
+                    <!-- Approval Table -->
+                    <div class="table-responsive">
+                        <table id="budgetApprovalsTable" class="table mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Attachment</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                // Fetch data from budget_approvals table for non-admin users
+                                $approvalsQuery = "SELECT * FROM budget_approvals WHERE organization_id = $organization_id AND archived = 0";
+                                $approvalsResult = mysqli_query($conn, $approvalsQuery);
+                                while ($row = mysqli_fetch_assoc($approvalsResult)) {
+                                    ?>
+                                    <tr>
+                                        <td><?php echo $row['title']; ?></td>
+                                        <td><?php echo ucfirst($row['category']); ?></td>
+                                        <td>
+                                            <a href="uploads/<?php echo $row['attachment']; ?>"
+                                            class='link-offset-2 link-underline link-underline-opacity-0' target="_blank">
+                                            <?php echo $row['attachment']; ?>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <?php 
+                                            // Display status
+                                            $statusClass = '';
+                                            if ($row['status'] == 'Pending') {
+                                                $statusClass = 'pending';
+                                            } else if ($row['status'] == 'Approved') {
+                                                $statusClass = 'approved';
+                                            } else if ($row['status'] == 'Disapproved') {
+                                                $statusClass = 'disapproved';
+                                            }
+                                            ?>
+                                            <span class='badge rounded-pill <?php echo $statusClass; ?>'>
+                                                <?php echo ucfirst($row['status']); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class='btn btn-primary btn-sm edit-btn mb-3'
+                                                    data-bs-toggle='modal'
+                                                    data-bs-target='#editBudgetApprovalModal'
+                                                    data-id="<?php echo $row['approval_id']; ?>">
+                                                <i class='fa-solid fa-pen'></i> Edit
+                                            </button>
+                                            <button class='btn btn-danger btn-sm archive-btn mb-3'
+                                                    data-id="<?php echo $row['approval_id']; ?>">
+                                                <i class='fa-solid fa-box-archive'></i> Archive
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <?php
                                 }
-                                echo ucfirst($row['status']); 
                                 ?>
-                                </span>
-                            </td>
-                            <td>
-                                <!-- Non-admin users can edit other fields except status -->
-                                <button class='btn btn-primary btn-sm edit-btn mb-3' data-bs-toggle='modal'
-                                    data-bs-target='#editBudgetApprovalModal'
-                                    data-id="<?php echo $row['approval_id']; ?>"><i class='fa-solid fa-pen'></i> Edit
-                                </button>
-                                <button class='btn btn-danger btn-sm archive-btn mb-3'
-                                    data-id="<?php echo $row['approval_id']; ?>"><i class='fa-solid fa-box-archive'></i>
-                                    Archive</button>
-                            </td>
-                        </tr>
-                        <?php
-                    }
-                    ?>
-                    </tbody>
-                </table>
-            </div>
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
 
+                <style>
+                @media (max-width: 576px) {
+                    .table-responsive {
+                        overflow-x: auto;
+                    }
+
+                    .btn {
+                        width: 100%; /* Make buttons full width on small screens */
+                        margin-bottom: 10px; /* Space between buttons */
+                    }
+                }
+                </style>
 
 
             <!-- Add Budget Approval Modal -->
