@@ -1,3 +1,17 @@
+<?php
+include '../connection.php';
+include '../session_check.php'; 
+include '../user_query.php';
+
+// Check if user is logged in and has officer role
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'officer') {
+    header("Location: ../user/login.html");
+    exit();
+}
+
+$sql = "SELECT * FROM events WHERE archived = 0 AND organization_id = $organization_id";
+$result = $conn->query($sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
