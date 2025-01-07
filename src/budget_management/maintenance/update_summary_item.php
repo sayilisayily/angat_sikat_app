@@ -118,6 +118,41 @@ if (empty($errors)) {
             }
             $stmt->close();
         }
+        
+            // Check for budget overrun and create notification
+            $stmt = $conn->prepare("SELECT COALESCE(amount, 0) FROM financial_plan WHERE plan_id = ?");
+            $stmt->bind_param("i", $plan_id);
+            $stmt->execute();
+            $stmt->bind_result($allocated_budget);
+            $stmt->fetch();
+            $stmt->close();
+            
+            if ($new_total_amount > $allocated_budget) {
+                // Retrieve the event title
+                $stmt = $conn->prepare("SELECT title FROM maintenance WHERE maintenance_id = ?");
+                $stmt->bind_param("i", $maintenance_id);
+                $stmt->execute();
+                $stmt->bind_result($maintenance_title);
+                $stmt->fetch();
+                $stmt->close();
+
+                if ($maintenance_title) {
+                    // Create notification for users in the organization
+                    $notification_message = "The total amount for '$maintenance_title' has exceeded the allocated budget.";
+                    $stmt = $conn->prepare("
+                        INSERT INTO notifications (recipient_id, organization_id, message, is_read, created_at)
+                        SELECT user_id, organization_id, ?, 0, NOW()
+                        FROM users
+                        WHERE organization_id = (SELECT organization_id FROM maintenance WHERE maintenance_id = ?)
+                    ");
+                    $stmt->bind_param("si", $notification_message, $maintenance_id);
+
+                    if (!$stmt->execute()) {
+                        throw new Exception('Failed to create notification.');
+                    }
+                    $stmt->close();
+                }
+            }
 
         $conn->commit(); // Commit transaction
         $data['success'] = true;

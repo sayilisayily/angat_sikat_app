@@ -1,5 +1,5 @@
 <?php
-require 'connection.php';
+require '../connection.php';
 
 $response = ['success' => false, 'errors' => []];
 
@@ -29,15 +29,15 @@ if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST[
         $conn->begin_transaction();
 
         try {
-            // Retrieve event type
-            $stmt = $conn->prepare("SELECT event_type FROM events WHERE event_id = ?");
+            // Retrieve event type and plan_id
+            $stmt = $conn->prepare("SELECT event_type, plan_id FROM events WHERE event_id = ?");
             $stmt->bind_param("i", $event_id);
             $stmt->execute();
-            $stmt->bind_result($event_type);
+            $stmt->bind_result($event_type, $plan_id);
             $stmt->fetch();
             $stmt->close();
 
-            if (!$event_type) {
+            if (!$event_type || !$plan_id) {
                 throw new Exception('Invalid event ID.');
             }
 
@@ -102,6 +102,42 @@ if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST[
                 throw new Exception('Failed to update event totals.');
             }
             $stmt->close();
+
+            // Check for budget overrun and create notification
+            $stmt = $conn->prepare("SELECT COALESCE(amount, 0) FROM financial_plan WHERE plan_id = ?");
+            $stmt->bind_param("i", $plan_id);
+            $stmt->execute();
+            $stmt->bind_result($allocated_budget);
+            $stmt->fetch();
+            $stmt->close();
+            
+            if ($new_total_amount > $allocated_budget) {
+                // Retrieve the event title
+                $stmt = $conn->prepare("SELECT title FROM events WHERE event_id = ?");
+                $stmt->bind_param("i", $event_id);
+                $stmt->execute();
+                $stmt->bind_result($event_title);
+                $stmt->fetch();
+                $stmt->close();
+
+                if ($event_title) {
+                    // Create notification for users in the organization
+                    $notification_message = "The total amount for the event '$event_title' has exceeded the allocated budget.";
+                    $stmt = $conn->prepare("
+                        INSERT INTO notifications (recipient_id, organization_id, message, is_read, created_at)
+                        SELECT user_id, organization_id, ?, 0, NOW()
+                        FROM users
+                        WHERE organization_id = (SELECT organization_id FROM events WHERE event_id = ?)
+                    ");
+                    $stmt->bind_param("si", $notification_message, $event_id);
+
+                    if (!$stmt->execute()) {
+                        throw new Exception('Failed to create notification.');
+                    }
+                    $stmt->close();
+                }
+            }
+
 
             $conn->commit();
             $response['success'] = true;
