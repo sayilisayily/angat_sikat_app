@@ -162,27 +162,16 @@ include '../user_query.php';
                             
 
                             <!-- Notification Icon -->
-                            <div style="position: relative; display: inline-block;">
-                            <button id="notificationBtn" style="background-color: transparent; border: none; padding: 0; position: relative;">
-                                <lord-icon
-                                    src="https://cdn.lordicon.com/lznlxwtc.json"
-                                    trigger="hover"
-                                    colors="primary:#004024"
-                                    style="width:30px; height:30px;">
-                                </lord-icon>
-                                <!-- Notification Count Badge -->
-                                <span id="notificationCount" style="
-                                    position: absolute;
-                                    top: -5px;
-                                    right: -5px;
-                                    background-color: red;
-                                    color: white;
-                                    font-size: 12px;
-                                    padding: 2px 6px;
-                                    border-radius: 50%;
-                                    display: none;">0</span>
-                            </button>
-
+                                                        <div style="position: relative; display: inline-block;">
+                                <button id="notificationBtn" style="background-color: transparent; border: none; padding: 0;">
+                                    <lord-icon src="https://cdn.lordicon.com/lznlxwtc.json" trigger="hover" 
+                                        colors="primary:#004024" style="width:30px; height:30px;">
+                                    </lord-icon>
+                                    <!-- Notification Count Badge -->
+                                    <span id="notificationCount" style="position: absolute; top: -5px; right: -5px; 
+                                        background-color: red; color: white; font-size: 12px; padding: 2px 6px; 
+                                        border-radius: 50%; display: none;">0</span>
+                                </button>
 
                                 <!-- Notification Dropdown -->
                                 <div id="notificationDropdown" class="dropdown-menu p-2 shadow" 
@@ -199,6 +188,7 @@ include '../user_query.php';
                                     </p>
                                 </div>
                             </div>
+
 
                             <!-- Profile Dropdown -->
                             <div class="dropdown">

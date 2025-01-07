@@ -10,95 +10,101 @@ $(document).ready(function () {
   });
 });
 
-$(document).ready(function () {
-  const notificationBtn = $("#notificationBtn");
-  const notificationBadge = $("#notificationBadge");
-  const notificationDropdown = $("#notificationDropdown");
-  const notificationList = $("#notificationList");
+const notificationBtn = document.getElementById("notificationBtn");
+const notificationDropdown = document.getElementById("notificationDropdown");
+const notificationList = document.getElementById("notificationList");
+const notificationCount = document.getElementById("notificationCount");
+const noNotifications = document.getElementById("noNotifications");
 
-  // Fetch notifications when the page loads
-  function fetchNotifications() {
-    $.ajax({
-      url: "../get_notifications.php", // Adjust path as needed
-      method: "GET",
-      dataType: "json",
-      success: function (data) {
-        // Clear the notification list
-        notificationList.empty();
+// Toggle Dropdown Visibility
+notificationBtn.addEventListener("click", () => {
+  const isVisible = notificationDropdown.style.display === "block";
+  notificationDropdown.style.display = isVisible ? "none" : "block";
+});
 
-        if (data.length > 0) {
-          let hasUnread = false;
+// Load Notifications Dynamically
+function loadNotifications() {
+  fetch("../get_notifications.php")
+    .then((response) => response.json())
+    .then((data) => {
+      notificationList.innerHTML = ""; // Clear existing notifications
+      if (data.length > 0) {
+        data.forEach((notification) => {
+          const notificationItem = document.createElement("div");
+          notificationItem.classList.add("notification-item");
+          notificationItem.style.padding = "10px";
+          notificationItem.style.borderBottom = "1px solid #ccc";
+          notificationItem.textContent = notification.message;
 
-          data.forEach((notification) => {
-            const isReadClass = notification.is_read == 1 ? "read" : "unread";
-            if (notification.is_read == 0) hasUnread = true;
+          // Add data-id attribute for the notification ID
+          notificationItem.dataset.id = notification.id;
 
-            notificationList.append(`
-                            <div class="notification-item ${isReadClass} p-2 border-bottom" data-id="${
-              notification.id
-            }" style="cursor: pointer;">
-                                <p style="margin: 0;">${
-                                  notification.message
-                                }</p>
-                                <small class="text-muted">${new Date(
-                                  notification.created_at
-                                ).toLocaleString()}</small>
-                            </div>
-                        `);
+          // Attach click event to mark as read
+          notificationItem.addEventListener("click", () => {
+            markAsRead(notification.id);
+            notificationItem.style.opacity = 0.5; // Visual indicator (optional)
           });
 
-          // Show or hide the badge based on unread notifications
-          if (hasUnread) {
-            notificationBadge.removeClass("d-none");
-          } else {
-            notificationBadge.addClass("d-none");
-          }
-        } else {
-          notificationList.html(`
-                        <p id="noNotifications" class="text-center text-muted mt-2">
-                            No new notifications
-                        </p>
-                    `);
-          notificationBadge.addClass("d-none");
-        }
-      },
-      error: function (err) {
-        console.error("Error fetching notifications:", err);
-        notificationList.html(`
-                    <p id="noNotifications" class="text-center text-danger mt-2">
-                        Failed to load notifications
-                    </p>
-                `);
-      },
-    });
-  }
+          notificationList.appendChild(notificationItem);
+        });
 
-  // Toggle dropdown visibility on button click
-  notificationBtn.click(function () {
-    notificationDropdown.toggleClass("d-none");
-    if (!notificationDropdown.hasClass("d-none")) {
-      fetchNotifications(); // Fetch notifications when opening the dropdown
+        notificationCount.textContent = data.length;
+        notificationCount.style.display = "inline-block";
+        noNotifications.style.display = "none";
+      } else {
+        noNotifications.style.display = "block";
+        notificationCount.style.display = "none";
+      }
+    })
+    .catch((error) => {
+      console.error("Error loading notifications:", error);
+    });
+}
+
+function updateNotificationCount() {
+  const currentCount = parseInt(notificationCount.textContent, 10) || 0;
+  if (currentCount > 0) {
+    notificationCount.textContent = currentCount - 1;
+    if (currentCount - 1 === 0) {
+      notificationCount.style.display = "none";
+      noNotifications.style.display = "block";
     }
-  });
+  }
+}
 
-  // Mark notification as read on click (optional functionality)
-  $(document).on("click", ".notification-item", function () {
-    const notificationId = $(this).data("id");
+// Initial Load
+loadNotifications();
 
-    // Make an AJAX call to mark the notification as read
-    $.ajax({
-      url: "../notification_read.php", // Create this PHP file to handle marking as read
-      method: "POST",
-      data: { id: notificationId },
-      success: function () {
-        fetchNotifications(); // Refresh notifications
-      },
-      error: function (err) {
-        console.error("Error marking notification as read:", err);
-      },
-    });
-  });
+// Optionally, refresh notifications periodically (e.g., every 30 seconds)
+setInterval(loadNotifications, 30000);
+
+// Close dropdown if clicked outside
+document.addEventListener("click", (e) => {
+  if (
+    !notificationBtn.contains(e.target) &&
+    !notificationDropdown.contains(e.target)
+  ) {
+    notificationDropdown.style.display = "none";
+  }
 });
+
+// Function to mark a notification as read
+async function markAsRead(notificationId) {
+  try {
+    await fetch("../notification_read.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: notificationId }),
+    });
+
+    // Optional: update notification count after marking as read
+    updateNotificationCount();
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+  }
+}
 
 // Add an event listener to the title selector dropdown
 document.getElementById("title").addEventListener("change", function () {
