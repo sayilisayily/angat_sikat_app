@@ -106,6 +106,27 @@ async function markAsRead(notificationId) {
   }
 }
 
+// JavaScript to handle the modal data population
+document.addEventListener("DOMContentLoaded", function () {
+  const confirmationModal = document.getElementById("confirmationModal");
+  const confirmIdInput = document.getElementById("confirmId");
+  const confirmActionInput = document.getElementById("confirmAction");
+  const actionText = document.getElementById("actionText");
+
+  confirmationModal.addEventListener("show.bs.modal", function (event) {
+    const button = event.relatedTarget; // Button that triggered the modal
+    const action = button.getAttribute("data-action"); // Extract action from data attributes
+    const id = button.getAttribute("data-id"); // Extract ID from data attributes
+
+    // Set the form values
+    confirmIdInput.value = id;
+    confirmActionInput.value = action;
+
+    // Update modal text
+    actionText.textContent = action === "approve" ? "approve" : "disapprove";
+  });
+});
+
 // Handle confirmation when "Confirm" button in modal is clicked
 $("#confirmationForm").on("submit", function (e) {
   e.preventDefault(); // Prevent default form submission
