@@ -1,12 +1,10 @@
-<?php
-require_once('../../libs/tcpdf/TCPDF-main/tcpdf.php'); // Include the TCPDF library
-require_once('../connection.php'); // Include database connection
-include '../session_check.php';
-// Start output buffering
-ob_start();
+<?php 
+require_once('../../libs/tcpdf/TCPDF-main/tcpdf.php');
+require_once('../connection.php');
+include('../session_check.php');
 
 // Get form data
-$event_id = $_POST['event_id'] ?? ''; // Fetch event_id from form
+$event_id = 30;
 $org_query = "SELECT organization_name FROM organizations WHERE organization_id = $organization_id";
                                     $org_result = mysqli_query($conn, $org_query);
 
@@ -230,5 +228,5 @@ $pdf->SetFont($arial, 'B', 11);
 $pdf->Cell(0, 0, "Coordinator, SDS", 0, 1, 'C', 0, '', 1);
 
 $pdfOutputPath = 'generated_pdfs/' . $eventTitle . '_budget_request.pdf';
-$pdf->Output($pdfOutputPath, 'D');
+$pdf->Output();
 ?>

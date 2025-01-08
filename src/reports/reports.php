@@ -275,6 +275,15 @@
                 </div>
             </div>
 
+            <button id="generatePDF">Generate PDF</button>
+
+            <script>
+                document.getElementById("generatePDF").addEventListener("click", function () {
+                    // Open the PHP script in a new tab to trigger the download
+                    window.location.href = "generate_pdf.php";
+                });
+            </script>
+            
             <!-- Reports Table -->
             <div class="tablecontainer mt-3 p-4">
                 <h4 class="mb-4">Reports
@@ -323,7 +332,7 @@
             <div class="modal fade" id="budgetRequestModal" tabindex="-1" role="dialog" aria-labelledby="budgetRequestLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <form id="budgetRequestForm">
+                        <form id="budgetRequestForm" action="generate_pdf.php" method="POST">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="budgetRequestLabel">Generate Budget Request Report</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

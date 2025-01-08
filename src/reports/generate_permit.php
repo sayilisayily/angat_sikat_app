@@ -1,12 +1,10 @@
-<?php
-require_once('../../libs/tcpdf/TCPDF-main/tcpdf.php'); // Include the TCPDF library
-require_once('../connection.php'); // Include database connection
-include '../session_check.php';
-// Start output buffering
-ob_start();
+<?php 
+require_once('../../libs/tcpdf/TCPDF-main/tcpdf.php');
+require_once('../connection.php');
+include('../session_check.php');
 
 // Get form data
-$event_id = $_POST['event_id'] ?? ''; // Fetch event_id from form
+$event_id = 30;
 $org_query = "SELECT organization_name FROM organizations WHERE organization_id = $organization_id";
                                     $org_result = mysqli_query($conn, $org_query);
 
@@ -19,18 +17,18 @@ $org_query = "SELECT organization_name FROM organizations WHERE organization_id 
 
 class CustomPDF extends TCPDF {
     public function Header() {
-        $this->SetFont('arial', 'I', 10); // Set font to Arial, size 11
-        $this->Cell(0, 10, 'SGOA FORM 10', 0, 1, 'R'); // Right-aligned header text
+        $this->SetFont('play', 'I', 10); // Set font to Arial, size 11
+        $this->Cell(0, 10, 'SGOA FORM 11', 0, 1, 'R'); // Right-aligned header text
     }
 
     // Footer Method
     public function Footer() {
         $this->SetY(-30.48); // Position 1.2 inches from the bottom
-        $this->SetFont('arial', '', 10); // Set font to Arial
+        $this->SetFont('play', '', 10); // Set font to Arial
 
         // First line: SASCO and Budget Request
         $this->Cell(0, 10, 'SASCO', 0, 0, 'L');
-        $this->Cell(0, 10, 'Budget Request', 0, 1, 'R');
+        $this->Cell(0, 10, 'Permit to Withdraw', 0, 1, 'R');
         
         // Second line: Organization Name and Page Number
         $this->Cell(0, 10, 'Name of Organization', 0, 0, 'L');
@@ -87,100 +85,116 @@ $html = '
 $pdf->Ln(10); // Add space after header
 
 
+// Function to convert numbers to words
+function convertNumberToWord($number = false)
+{
+    $number = str_replace(array(',', ' '), '' , trim($number));
+    if(! $number) {
+        return false;
+    }
+    $number = (int) $number;
+    $words = array();
+    $list1 = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
+        'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'
+    );
+    $list2 = array('', 'ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety', 'hundred');
+    $list3 = array('', 'thousand', 'million', 'billion', 'trillion', 'quadrillion', 'quintillion', 'sextillion', 'septillion',
+        'octillion', 'nonillion', 'decillion', 'undecillion', 'duodecillion', 'tredecillion', 'quattuordecillion',
+        'quindecillion', 'sexdecillion', 'septendecillion', 'octodecillion', 'novemdecillion', 'vigintillion'
+    );
+    $number_length = strlen($number);
+    $levels = (int) (($number_length + 2) / 3);
+    $max_length = $levels * 3;
+    $number = substr('00' . $number, -$max_length);
+    $number_levels = str_split($number, 3);
+    for ($i = 0; $i < count($number_levels); $i++) {
+        $levels--;
+        $hundreds = (int) ($number_levels[$i] / 100);
+        $hundreds = ($hundreds ? ' ' . $list1[$hundreds] . ' hundred' . ' ' : '');
+        $tens = (int) ($number_levels[$i] % 100);
+        $singles = '';
+        if ( $tens < 20 ) {
+            $tens = ($tens ? ' ' . $list1[$tens] . ' ' : '' );
+        } else {
+            $tens = (int)($tens / 10);
+            $tens = ' ' . $list2[$tens] . ' ';
+            $singles = (int) ($number_levels[$i] % 10);
+            $singles = ' ' . $list1[$singles] . ' ';
+        }
+        $words[] = $hundreds . $tens . $singles . ( ( $levels && ( int ) ( $number_levels[$i] ) ) ? ' ' . $list3[$levels] . ' ' : '' );
+    } //end for loop
+    $commas = count($words);
+    if ($commas > 1) {
+        $commas = $commas - 1;
+    }
+    return strtoupper(implode(' ', $words));
+}
 
-// Query to fetch the event title and start date
-$query = "SELECT title, event_start_date FROM events WHERE event_id = ?";
+// Query to fetch the title and total amount
+$query = "SELECT title, total_amount FROM events WHERE event_id = ?";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $event_id);
+$stmt->bind_param("i", $event_id); // Changed "id" to "i" for integer
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
-    $eventTitle = ($row['title']); // Convert the title to uppercase
-    $eventStartDate = date("F j, Y", strtotime($row['event_start_date'])); // Format the start date
+    $eventTitle = strtoupper($row['title']); // Convert the title to uppercase
+    $eventAmount = number_format($row['total_amount'], 2); // Format the amount
+    $eventAmountWords = convertNumberToWord($row['total_amount']); // Convert amount to words
 } else {
     $eventTitle = strtoupper("Event Not Found"); // Default title if event is not found
-    $eventStartDate = "N/A"; // Default date if event is not found
+    $eventAmount = "N/A"; // Default amount if event is not found
+    $eventAmountWords = "N/A"; // Default words if event is not found
 }
 
 
 $stmt->close();
 
 // Add titles
-$pdf->SetFont($arialBold, '', 12);
+$pdf->SetFont($arialBold, '', 11);
 $pdf->Cell(0, 0, strtoupper($organization_name), 0, 1, 'C', 0, '', 1);
 $pdf->Ln(5);
-$pdf->Cell(0, 0, "BUDGET REQUEST", 0, 1, 'C', 0, '', 1);
+$pdf->Cell(0, 0, "PERMIT TO WITHDRAW", 0, 1, 'C', 0, '', 1);
 $pdf->Cell(0, 0, $eventTitle, 0, 1, 'C', 0, '', 1);
 $pdf->Ln(10);
 
-// Add letter body
-// Bold font for date and name
-$pdf->SetFont($arialBold, '', 11);
-$pdf->Cell(0, 0, date("F j, Y"), 0, 1, 'L', 0, '', 1);
-$pdf->Cell(0, 0, 'JIMPLE JAY R. MALIGRO', 0, 1, 'L', 0, '', 1);
+// Date
+$pdf->SetFont('arial', '', 11);
+// Amount Label
+$pdf->Cell(30, 10, 'Amount:', 0, 0, 'L');
 
-// Normal font for the rest
-$pdf->SetFont($arial, '', 11);
-$pdf->MultiCell(0, 0, "Coordinator, SDS\nThis Campus\n\nSir:\n\nGreetings of peace. I am writing this letter to request for budget disbursement allotted for ". $eventTitle ." scheduled on " . $eventStartDate . ". This budget will be utilized as follows:", 0, 'L', 0, 1, '', '', true);
-$pdf->Ln(5);
+// Amount Text
+$pdf->Cell(0, 10, $eventAmountWords .' PESOS (P '. $eventAmount .')', 0, 1, 'L');
 
+// Underline the Amount Text
+$pdf->SetY($pdf->GetY() - 10);  // Adjust Y position to draw the line under the text
+$pdf->Cell(0, 10, '____________________________________________________________', 0, 1, 'L');
 
-// Add table title spanning all columns
-$pdf->SetFont($arialBold, '', 11);
-$pdf->SetFillColor(230, 230, 230); // Optional: Highlight the title background
-$pdf->Cell(160, 10, "PROJECTED EXPENSES", 1, 1, 'L'); // Spans all columns (60 + 30 + 30 + 40 = 160)
+// Name of Organization
+$pdf->SetFont('arial', '', 11);
 
-// Add table header
-$pdf->SetFont($arialBold, '', 11);
-$pdf->Cell(50, 10, "Description", 1, 0, 'L');
-$pdf->Cell(25, 10, "QTY", 1, 0, 'C');
-$pdf->Cell(25, 10, "UNIT PRICE", 1, 0, 'C');
-$pdf->Cell(30, 10, "TOTAL", 1, 0, 'C');
-$pdf->Cell(30, 10, "", 1, 1, 'C');  
+// Name of Organization with underline directly below
+$pdf->Cell(60, 10, 'Name of Organization:', 0, 0, 'L'); // Label
+$pdf->Cell(80, 10, '__________________________', 0, 0, 'L'); // Underline
+$pdf->SetX($pdf->GetX() - 80); // Move back to write over the underline
+$pdf->Cell(60, 10, $organization_name, 0, 0, 'L'); // Organization name written over the underline
 
+// Organization Type
+$pdf->Cell(0, 10, '□ Academic □ Non-Academic', 0, 1, 'L'); // Options with checkboxes
 
+// Purpose
+$pdf->Cell(30, 10, 'Purpose:', 0, 0, 'L');
+$pdf->Cell(0, 10, $eventTitle, 0, 1, 'L');
+$pdf->SetY($pdf->GetY() - 9);
+$pdf->Cell(0, 10, '______________________________________________________________', 0, 1, 'R');
 
-$query = "SELECT description, quantity, amount AS unit_price FROM event_items WHERE event_id = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("i", $event_id);
-$stmt->execute();
-$result = $stmt->get_result();
+// Amount
+$pdf->Cell(30, 10, 'Amount:', 0, 0, 'L');
+$pdf->Cell(0, 10, $eventAmountWords .' PESOS (P '. $eventAmount .')', 0, 1, 'L');
+$pdf->Cell(0, 10, '____________________________________________________________', 0, 1, 'R');
 
-$items = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $items[] = $row;
-    }
-} else {
-    http_response_code(404); // Not Found
-    echo json_encode(['error' => 'No items found for the given event ID.']);
-    exit;
-}
-// Table rows
-$pdf->SetFont($arial, '', 11);
-$totalAmount = 0;
-
-foreach ($items as $item) {
-    $description = $item['description'];
-    $quantity = $item['quantity'];
-    $unitPrice = $item['unit_price'];
-    $total = $quantity * $unitPrice;
-    $totalAmount += $total;
-
-    $pdf->Cell(50, 10, $description, 1, 0, 'C', 0);
-    $pdf->Cell(25, 10, $quantity, 1, 0, 'C', 0);
-    $pdf->Cell(25, 10, number_format($unitPrice), 1, 0, 'C', 0);
-    $pdf->Cell(30, 10, number_format($total), 1, 0, 'C', 0);
-    $pdf->Cell(30, 10, "", 1, 1, 'C'); 
-}
-
-// Total row
-$pdf->SetFont($arialBold, '', 11);
-$pdf->Cell(130, 10, "TOTAL", 1, 0, 'L', 0);
-$pdf->Cell(30, 10, number_format($totalAmount), 1, 1, 'C', 0);
-$pdf->Ln(10);
+$pdf->Ln(10); // Space for signatures above names
 
 // Prepared By Section
 $pdf->SetFont($arial, '', 11); 
@@ -229,6 +243,6 @@ $pdf->Cell(0, 0, "JIMPLE JAY R. MALIGRO", 0, 1, 'C', 0, '', 1);
 $pdf->SetFont($arial, 'B', 11);
 $pdf->Cell(0, 0, "Coordinator, SDS", 0, 1, 'C', 0, '', 1);
 
-$pdfOutputPath = 'generated_pdfs/' . $eventTitle . '_budget_request.pdf';
-$pdf->Output($pdfOutputPath, 'D');
+$pdfOutputPath = 'generated_pdfs/' . $eventTitle . '_permit.pdf';
+$pdf->Output();
 ?>
