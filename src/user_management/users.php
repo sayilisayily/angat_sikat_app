@@ -219,11 +219,19 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
         </div>
         <!-- End of 2nd Body Wrapper -->
          <div class="container mt-5 p-5">
-            <h2 class="mb-4">Users
-                <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addUserModal"
-                    style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
-                    <i class="fa-solid fa-plus"></i> Add User
-                </button>
+            <h2 class="mb-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-warning fw-bold me-2">|</span> Users
+                    <button class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#addUserModal"
+                        style="height: 40px; width: 200px; border-radius: 8px; font-size: 12px;">
+                        <i class="fa-solid fa-plus"></i> Add User
+                    </button>
+                    
+                </div>
+                <a href="users_archive.php" class="text-gray text-decoration-none fw-bold" 
+                    style="font-size: 14px;">
+                        View Archive
+                </a>
             </h2>
             <table id="usersTable" class="table">
                 <thead>
