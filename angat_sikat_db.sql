@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 08, 2025 at 07:05 AM
+-- Generation Time: Jan 10, 2025 at 03:30 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -72,7 +72,9 @@ INSERT INTO `balance_history` (`history_id`, `organization_id`, `balance`, `upda
 (18, 1, 106501.00, '2025-01-07 07:29:08'),
 (19, 1, 106502.00, '2025-01-07 07:29:44'),
 (20, 1, 106503.00, '2025-01-07 07:30:26'),
-(21, 1, 106303.00, '2025-01-07 07:51:59');
+(21, 1, 106303.00, '2025-01-07 07:51:59'),
+(22, 1, 106253.00, '2025-01-09 09:34:03'),
+(23, 1, 106263.00, '2025-01-09 09:45:56');
 
 -- --------------------------------------------------------
 
@@ -95,7 +97,7 @@ CREATE TABLE `budget_allocation` (
 --
 
 INSERT INTO `budget_allocation` (`allocation_id`, `organization_id`, `category`, `allocated_budget`, `total_spent`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Activities', 50000.00, 40000.00, '2024-09-22 17:46:30', '2024-12-25 15:07:15'),
+(1, 1, 'Activities', 50000.00, 40050.00, '2024-09-22 17:46:30', '2025-01-09 09:34:03'),
 (2, 1, 'Purchases', 6500.00, 200.00, '2024-09-22 17:46:30', '2025-01-07 07:51:59'),
 (3, 1, 'Maintenance and Other Expenses', 28000.00, 500.00, '2024-09-22 17:46:30', '2024-12-25 15:43:38'),
 (4, 3, 'Activities', 60000.00, 0.00, '2024-12-23 14:12:49', '2024-12-23 14:12:49'),
@@ -123,17 +125,8 @@ CREATE TABLE `budget_approvals` (
 --
 
 INSERT INTO `budget_approvals` (`approval_id`, `title`, `category`, `attachment`, `status`, `organization_id`, `created_at`, `archived`) VALUES
-(23, 'Test MOE', 'Maintenance', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:20:20', 0),
-(24, 'Test Purchase', 'Purchases', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:20:50', 0),
-(25, 'Test Event', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:25:28', 0),
-(26, 'Test Expense Event ', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-03 14:25:43', 1),
-(34, 'Test Event 3', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-10 15:09:28', 0),
-(35, 'Test Expense Event 2', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-10 18:14:56', 0),
-(36, 'Merchandise Sale', 'Activities', 'Lecture-2-ITEC-100.docx', 'Approved', 1, '2024-12-22 17:10:16', 0),
-(37, 'Eduk Week', 'Activities', 'byte.png', 'Approved', 3, '2024-12-23 14:20:00', 0),
-(38, 'TechFusion', 'Activities', 'lesson-1.pdf', 'Approved', 4, '2024-12-23 16:54:14', 0),
-(39, 'Film Festival', 'Activities', 'lesson-1.pdf', 'Approved', 1, '2024-12-25 15:54:57', 0),
-(40, 'Test 2', 'Purchases', 'SGOA FORM 10 - Budget Request.docx.pdf', 'Approved', 1, '2025-01-07 07:40:01', 0);
+(41, 'General Assembly', 'Activities', 'SGOA FORM 10 - Budget Request.docx.pdf', 'Approved', 1, '2025-01-08 20:59:51', 0),
+(42, 'Merchandise Sale', 'Activities', 'example_014.pdf', 'Approved', 1, '2025-01-09 09:37:05', 0);
 
 -- --------------------------------------------------------
 
@@ -184,16 +177,9 @@ CREATE TABLE `events` (
 --
 
 INSERT INTO `events` (`event_id`, `plan_id`, `title`, `event_venue`, `event_start_date`, `event_end_date`, `event_type`, `event_status`, `accomplishment_status`, `total_amount`, `total_profit`, `organization_id`, `created_by`, `created_at`, `archived`) VALUES
-(21, 1, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 'Approved', 1, 2.00, 1.00, 1, NULL, '2024-12-03 10:01:13', 1),
-(22, 4, 'Test Expense Event ', 'Court I', '2024-12-03', '2024-12-04', 'Expense', 'Approved', 0, 3600.00, 0.00, 1, NULL, '2024-12-03 12:51:09', 0),
-(23, 5, 'Seminar', 'Tagaytay Room, Technovation Building', '2024-12-07', '2024-12-07', 'Expense', 'Approved', 1, 0.00, 0.00, 1, NULL, '2024-12-03 16:54:48', 0),
-(24, 6, 'TechFusion', 'Court I', '2024-12-09', '2024-12-10', 'Expense', 'Approved', 1, 25000.00, 0.00, 1, NULL, '2024-12-09 08:40:53', 0),
-(25, 1, 'Merchandise Sale', 'DCS', '2024-12-06', '2024-12-25', 'Income', 'Approved', 1, 0.00, 0.00, 1, NULL, '2024-12-22 16:53:24', 0),
-(26, 7, 'Eduk Week', 'DTE', '2024-12-23', '2024-12-27', 'Expense', 'Approved', 1, 50000.00, 0.00, 3, NULL, '2024-12-23 14:19:41', 0),
-(27, 8, 'TechFusion', 'DCS', '2024-12-31', '2025-01-04', 'Income', 'Approved', 0, 0.00, 0.00, 4, NULL, '2024-12-23 16:36:09', 0),
-(28, 9, 'Film Festival', 'Tagaytay Room, Technovation Building', '2024-12-27', '2024-12-28', 'Income', 'Approved', 1, 15300.00, 15000.00, 1, NULL, '2024-12-25 15:52:45', 0),
-(29, 10, 'Drag Race', 'Court I', '2024-12-31', '2025-01-01', 'Income', 'Pending', 0, 0.00, 0.00, 3, NULL, '2024-12-30 15:53:45', 0),
-(30, 11, 'Year-End Party', 'DTE', '2025-01-03', '2025-01-03', 'Expense', 'Pending', 0, 5000.00, 0.00, 3, NULL, '2024-12-30 15:56:51', 0);
+(31, 14, 'General Assembly', 'Court I', '2025-01-11', '2025-01-11', 'Expense', 'Approved', 0, 1.00, 0.00, 1, NULL, '2025-01-08 19:34:03', 0),
+(32, 15, 'CyberCon 2025', 'Court I', '2025-01-13', '2025-01-18', 'Expense', 'Pending', 0, 1.00, 0.00, 1, NULL, '2025-01-08 20:57:55', 0),
+(33, 16, 'Merchandise Sale', 'DCS', '2025-01-10', '2025-01-10', 'Income', 'Approved', 1, 0.00, 0.00, 1, NULL, '2025-01-09 09:35:57', 0);
 
 -- --------------------------------------------------------
 
@@ -224,17 +210,8 @@ CREATE TABLE `events_summary` (
 --
 
 INSERT INTO `events_summary` (`summary_id`, `event_id`, `title`, `venue`, `start_date`, `end_date`, `type`, `organization_id`, `total_amount`, `total_profit`, `status`, `accomplishment_status`, `archived`, `created_at`, `updated_at`) VALUES
-(1, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 2.00, 1.00, 'Approved', NULL, 0, '2024-12-03 16:44:19', '2024-12-09 08:42:45'),
-(2, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 2.00, 1.00, 'Approved', NULL, 0, '2024-12-09 08:25:18', '2024-12-09 08:42:45'),
-(3, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 2.00, 1.00, 'Approved', NULL, 0, '2024-12-09 08:25:39', '2024-12-09 08:42:45'),
-(4, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 2.00, 1.00, 'Approved', NULL, 0, '2024-12-09 08:26:06', '2024-12-09 08:42:45'),
-(5, 21, 'Test Event', 'Court I', '2024-12-06', '2024-12-07', 'Income', 1, 0.00, 0.00, 'Approved', NULL, 0, '2024-12-22 16:23:14', '2024-12-22 16:23:14'),
-(6, 25, 'Merchandise Sale', 'DCS', '2024-12-06', '2024-12-25', 'Income', 1, 73500.00, 25500.00, 'Approved', NULL, 0, '2024-12-23 18:49:30', '2024-12-23 19:34:32'),
-(7, 24, 'TechFusion', 'Court I', '2024-12-09', '2024-12-10', 'Expense', 1, 25000.00, 0.00, 'Approved', NULL, 0, '2024-12-23 19:45:15', '2024-12-24 06:11:23'),
-(8, 23, 'Seminar', 'Tagaytay Room, Technovation Building', '2024-12-07', '2024-12-07', 'Expense', 1, 15001.00, 0.00, 'Approved', NULL, 0, '2024-12-25 15:04:42', '2025-01-07 07:27:47'),
-(9, 28, 'Film Festival', 'Tagaytay Room, Technovation Building', '2024-12-27', '2024-12-28', 'Income', 1, 22800.00, 22500.00, 'Approved', NULL, 0, '2024-12-25 15:56:36', '2024-12-25 16:00:01'),
-(10, 28, 'Film Festival', 'Tagaytay Room, Technovation Building', '2024-12-27', '2024-12-28', 'Income', 1, 22800.00, 22500.00, 'Approved', NULL, 0, '2024-12-25 15:59:30', '2024-12-25 16:00:01'),
-(11, 26, 'Eduk Week', 'DTE', '2024-12-23', '2024-12-27', 'Expense', 3, 75000.00, 0.00, 'Approved', NULL, 0, '2025-01-07 03:31:20', '2025-01-07 04:15:03');
+(12, 31, 'General Assembly', 'Court I', '2025-01-11', '2025-01-11', 'Expense', 1, 50.00, 0.00, 'Approved', NULL, 0, '2025-01-08 21:11:25', '2025-01-09 03:02:57'),
+(13, 33, 'Merchandise Sale', 'DCS', '2025-01-10', '2025-01-10', 'Income', 1, 60.00, 10.00, 'Approved', NULL, 0, '2025-01-09 09:44:23', '2025-01-09 09:45:35');
 
 -- --------------------------------------------------------
 
@@ -259,26 +236,8 @@ CREATE TABLE `event_items` (
 --
 
 INSERT INTO `event_items` (`item_id`, `event_id`, `description`, `quantity`, `unit`, `amount`, `total_amount`, `profit`, `total_profit`) VALUES
-(1, 5, 'Test I', 5, '1', 30.00, 150.00, 0.00, 0.00),
-(2, NULL, 'Test I', 5, '1', 30.00, 150.00, 0.00, 0.00),
-(5, 6, 'Food Allowance', 20, '0', 45.00, 900.00, 0.00, 0.00),
-(8, 7, 'Test', 5, '1', 46.00, 230.00, 0.00, 0.00),
-(9, 10, 'Speakers', 2, '1', 40.00, 80.00, 0.00, 0.00),
-(10, 10, 'Laptop', 1, '1', 25.00, 25.00, 0.00, 0.00),
-(11, 10, 'Chairs', 50, '1', 30.00, 1500.00, 0.00, 0.00),
-(13, 13, 'Food Allowance', 40, '1', 75.00, 3000.00, 0.00, 0.00),
-(14, 19, 'Food Allowance', 40, '1', 75.00, 3000.00, 0.00, 0.00),
-(15, 8, 'BYTE Lanyard', 300, '1', 80.00, 24000.00, 0.00, 0.00),
-(16, 8, 'BYTE Shirt', 300, '1', 400.00, 120000.00, 0.00, 0.00),
-(17, 20, 'Multimedia Fees', 1, '1', 1000.00, 1000.00, 0.00, 0.00),
-(23, 21, 'Test', 1, '1', 1.00, 2.00, 1.00, 1.00),
-(24, 24, 'Test', 1, '1', 25000.00, 25000.00, 0.00, 0.00),
-(25, 28, 'Tickets', 300, '1', 1.00, 15300.00, 50.00, 15000.00),
-(26, 22, 'Tickets', 300, '1', 1.00, 300.00, 0.00, 0.00),
-(27, 22, 'Tickets 2', 300, '1', 1.00, 300.00, 0.00, 0.00),
-(28, 22, 'Food Allowance', 1, '1', 3000.00, 3000.00, 0.00, 0.00),
-(29, 30, 'Food Allowance', 100, '1', 50.00, 5000.00, 0.00, 0.00),
-(30, 26, 'Food Allowance', 500, '1', 100.00, 50000.00, 0.00, 0.00);
+(31, 31, 'Food Allowance', 1, '1', 1.00, 1.00, 0.00, 0.00),
+(32, 32, 'Test', 1, '1', 1.00, 1.00, 0.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -296,24 +255,17 @@ CREATE TABLE `event_summary_items` (
   `profit` decimal(15,2) NOT NULL,
   `total_amount` decimal(15,2) NOT NULL,
   `total_profit` decimal(15,2) NOT NULL,
-  `reference` varchar(255) NOT NULL
+  `reference` varchar(255) NOT NULL,
+  `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `event_summary_items`
 --
 
-INSERT INTO `event_summary_items` (`summary_item_id`, `event_id`, `description`, `quantity`, `unit`, `amount`, `profit`, `total_amount`, `total_profit`, `reference`) VALUES
-(1, 21, 'Test', 1, 1, 1.00, 1.00, 2.00, 1.00, 'lesson-1.pdf'),
-(2, 25, 'BYTE Shirt', 100, 1, 400.00, 225.00, 62500.00, 22500.00, 'lesson-1.pdf'),
-(3, 25, 'BYTE Lanyard', 100, 1, 80.00, 30.00, 11000.00, 3000.00, 'lesson-1.pdf'),
-(4, 24, 'Test', 1, 1, 25000.00, 0.00, 25000.00, 0.00, 'lesson-1.pdf'),
-(5, 23, 'Food Allowance (Breakfast)', 100, 1, 75.00, 0.00, 7500.00, 0.00, 'lesson-1.pdf'),
-(6, 23, 'Food Allowance (Lunch)', 100, 1, 75.00, 0.00, 7500.00, 0.00, 'lesson-1.pdf'),
-(7, 28, 'Tickets', 300, 1, 1.00, 75.00, 22800.00, 22500.00, 'lesson-1.pdf'),
-(10, 26, 'Food Allowance', 500, 1, 100.00, 0.00, 50000.00, 0.00, 'SGOA FORM 10 - Budget Request.docx.pdf'),
-(13, 26, 'Test', 1, 1, 25000.00, 0.00, 25000.00, 0.00, 'SGOA FORM 10 - Budget Request.docx.pdf'),
-(14, 23, 'Test', 1, 1, 1.00, 0.00, 1.00, 0.00, 'SGOA FORM 10 - Budget Request.docx.pdf');
+INSERT INTO `event_summary_items` (`summary_item_id`, `event_id`, `description`, `quantity`, `unit`, `amount`, `profit`, `total_amount`, `total_profit`, `reference`, `date`) VALUES
+(15, 31, 'Food Allowance', 1, 1, 50.00, 0.00, 50.00, 0.00, 'Liquidation_GENERAL ASSEMBLY_1736371304.pdf', '0000-00-00'),
+(16, 33, 'Food Allowance', 1, 1, 50.00, 10.00, 60.00, 10.00, 'Liquidation_GENERAL ASSEMBLY_1736371304.pdf', '2025-01-10');
 
 -- --------------------------------------------------------
 
@@ -342,7 +294,8 @@ INSERT INTO `expenses` (`expense_id`, `organization_id`, `summary_id`, `category
 (18, 1, 8, 'Activities', 'Seminar', 15000.00, 'lesson-1.pdf', '2024-12-25 15:07:15', 0),
 (20, 1, 1, '', 'Test MOE', 500.00, 'lesson-1.pdf', '2024-12-25 15:43:38', 1),
 (21, 1, 1, '', 'Test Purchase', 1001.00, 'lesson-1.pdf', '2024-12-25 15:46:58', 0),
-(22, 1, 2, 'Purchases', 'Test 2', 200.00, 'SGOA FORM 10 - Budget Request.docx.pdf', '2025-01-07 07:51:59', 0);
+(22, 1, 2, 'Purchases', 'Test 2', 200.00, 'SGOA FORM 10 - Budget Request.docx.pdf', '2025-01-07 07:51:59', 0),
+(23, 1, 12, 'Activities', 'General Assembly', 50.00, 'Liquidation_General Assembly_1736370703.pdf', '2025-01-09 09:34:03', 0);
 
 -- --------------------------------------------------------
 
@@ -364,7 +317,8 @@ CREATE TABLE `expense_history` (
 INSERT INTO `expense_history` (`history_id`, `organization_id`, `expense`, `updated_at`) VALUES
 (1, 1, 500.00, '2024-12-25 15:43:38'),
 (2, 1, 1001.00, '2024-12-25 15:46:58'),
-(3, 1, 200.00, '2025-01-07 07:51:59');
+(3, 1, 200.00, '2025-01-07 07:51:59'),
+(4, 1, 50.00, '2025-01-09 09:34:03');
 
 -- --------------------------------------------------------
 
@@ -387,19 +341,9 @@ CREATE TABLE `financial_plan` (
 --
 
 INSERT INTO `financial_plan` (`plan_id`, `title`, `category`, `organization_id`, `type`, `date`, `amount`) VALUES
-(1, 'Merchandise Sale', '', 1, 'Income', '2024-12-06', 100000.00),
-(2, 'Test MOE', 'Maintenance and Other Expenses', 1, 'Expense', '0000-00-00', 5000.00),
-(3, 'Test Purchase', 'Purchases', 1, 'Expense', '0000-00-00', 5000.00),
-(4, 'Test Expense Event ', 'Activities', 1, 'Expense', '2024-12-03', 15000.00),
-(5, 'Test Expense Event 2', 'Activities', 1, 'Expense', '2024-12-07', 10000.00),
-(6, 'TechFusion', 'Activities', 1, 'Expense', '2024-12-09', 25000.00),
-(7, 'Eduk Week', 'Activities', 3, 'Expense', '2024-12-23', 50000.00),
-(8, 'TechFusion', '', 4, 'Income', '2024-12-31', 100000.00),
-(9, 'Film Festival', '', 1, 'Income', '2024-12-27', 15000.00),
-(10, 'Drag Race', '', 3, 'Income', '2024-12-31', 100000.00),
-(11, 'Year-End Party', 'Activities', 3, 'Expense', '2025-01-03', 10000.00),
-(12, 'Test 2', 'Purchases', 1, 'Expense', '0000-00-00', 1.00),
-(13, 'Test Income', '', 1, 'Income', '2025-01-09', 5000.00);
+(14, 'General Assembly', 'Activities', 1, 'Expense', '2025-01-11', 1.00),
+(15, 'CyberCon 2025', 'Activities', 1, 'Expense', '2025-01-13', 10000.00),
+(16, 'Merchandise Sale', '', 1, 'Income', '2025-01-10', 100000.00);
 
 -- --------------------------------------------------------
 
@@ -429,7 +373,8 @@ INSERT INTO `income` (`income_id`, `organization_id`, `summary_id`, `category`, 
 (6, 1, 1, '', 'Test Event', 1.00, 'SGOA FORM 10 - Budget Request.docx.pdf', '2025-01-07 07:28:41', 0),
 (7, 1, 2, '', 'Test Event', 1.00, 'SGOA FORM 10 - Budget Request.docx.pdf', '2025-01-07 07:29:08', 0),
 (8, 1, 3, '', 'Test Event', 1.00, 'SGOA FORM 10 - Budget Request.docx.pdf', '2025-01-07 07:29:44', 0),
-(9, 1, 4, '', 'Test Event', 1.00, 'SGOA FORM 10 - Budget Request.docx.pdf', '2025-01-07 07:30:26', 0);
+(9, 1, 4, '', 'Test Event', 1.00, 'SGOA FORM 10 - Budget Request.docx.pdf', '2025-01-07 07:30:26', 0),
+(10, 1, 13, '', 'Merchandise Sale', 10.00, 'Liquidation_General Assembly_1736370703.pdf', '2025-01-09 09:45:56', 0);
 
 -- --------------------------------------------------------
 
@@ -453,7 +398,8 @@ INSERT INTO `income_history` (`history_id`, `organization_id`, `income`, `update
 (2, 1, 1.00, '2025-01-07 07:28:41'),
 (3, 1, 1.00, '2025-01-07 07:29:08'),
 (4, 1, 1.00, '2025-01-07 07:29:44'),
-(5, 1, 1.00, '2025-01-07 07:30:26');
+(5, 1, 1.00, '2025-01-07 07:30:26'),
+(6, 1, 10.00, '2025-01-09 09:45:56');
 
 -- --------------------------------------------------------
 
@@ -474,13 +420,6 @@ CREATE TABLE `maintenance` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `maintenance`
---
-
-INSERT INTO `maintenance` (`maintenance_id`, `plan_id`, `title`, `total_amount`, `maintenance_status`, `completion_status`, `organization_id`, `archived`, `created_at`, `updated_at`) VALUES
-(3, 2, 'Test MOE', 500.00, 'Approved', 1, 1, 0, '2024-12-03 12:44:50', '2024-12-25 15:25:45');
-
 -- --------------------------------------------------------
 
 --
@@ -496,13 +435,6 @@ CREATE TABLE `maintenance_items` (
   `amount` decimal(15,2) NOT NULL,
   `total_amount` decimal(15,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `maintenance_items`
---
-
-INSERT INTO `maintenance_items` (`item_id`, `maintenance_id`, `description`, `quantity`, `unit`, `amount`, `total_amount`) VALUES
-(1, 3, 'Test MOE Item', 10, 1, 50.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -523,13 +455,6 @@ CREATE TABLE `maintenance_summary` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `maintenance_summary`
---
-
-INSERT INTO `maintenance_summary` (`summary_id`, `maintenance_id`, `title`, `organization_id`, `total_amount`, `maintenance_status`, `completion_status`, `archived`, `created_at`, `updated_at`) VALUES
-(1, 3, 'Test MOE', 1, 20500.00, 'Approved', 1, 0, '2024-12-25 15:25:45', '2025-01-07 13:06:50');
-
 -- --------------------------------------------------------
 
 --
@@ -546,14 +471,6 @@ CREATE TABLE `maintenance_summary_items` (
   `total_amount` decimal(15,2) NOT NULL,
   `reference` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `maintenance_summary_items`
---
-
-INSERT INTO `maintenance_summary_items` (`summary_item_id`, `maintenance_id`, `description`, `quantity`, `unit`, `amount`, `total_amount`, `reference`) VALUES
-(1, 3, 'Test MOE Item', 10, 1, 50.00, 500.00, 'lesson-1.pdf'),
-(2, 3, 'Food Allowance', 100, 1, 200.00, 20000.00, 'SGOA FORM 10 - Budget Request.docx.pdf');
 
 -- --------------------------------------------------------
 
@@ -575,56 +492,6 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`id`, `recipient_id`, `organization_id`, `message`, `is_read`, `created_at`) VALUES
-(1, 3, 0, 'A new budget approval request titled \'Test Expense Event 2\' has been submitted.', 1, '2024-12-09 00:48:27'),
-(2, 3, 0, 'A new budget approval request for \'Test Expense Event 2\' has been submitted.', 1, '2024-12-09 01:36:28'),
-(3, 1, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-09 04:00:10'),
-(4, 2, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 1, '2024-12-09 04:00:10'),
-(5, 3, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 1, '2024-12-09 04:00:10'),
-(6, 1, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-09 16:34:24'),
-(7, 2, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 1, '2024-12-09 16:34:24'),
-(8, 3, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 1, '2024-12-09 16:34:24'),
-(9, 3, 0, 'A new budget approval request for \'Test Expense Event 2\' has been submitted.', 1, '2024-12-10 23:06:22'),
-(10, 1, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 1, '2024-12-10 23:06:51'),
-(11, 2, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 1, '2024-12-10 23:06:51'),
-(12, 3, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 1, '2024-12-10 23:06:51'),
-(13, 3, 0, 'A new budget approval request for \'Test Event 3\' has been submitted.', 0, '2024-12-10 23:09:28'),
-(14, 1, 1, 'Your budget request for \'Test Event 3\' has been approved.', 0, '2024-12-10 23:10:21'),
-(15, 2, 1, 'Your budget request for \'Test Event 3\' has been approved.', 0, '2024-12-10 23:10:21'),
-(16, 3, 1, 'Your budget request for \'Test Event 3\' has been approved.', 0, '2024-12-10 23:10:21'),
-(17, 3, 0, 'A new budget approval request for \'Test Expense Event 2\' has been submitted.', 0, '2024-12-11 02:14:56'),
-(18, 1, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-11 02:15:36'),
-(19, 2, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-11 02:15:36'),
-(20, 3, 1, 'Your budget request for \'Test Expense Event 2\' has been approved.', 0, '2024-12-11 02:15:36'),
-(21, 3, 0, 'A new budget approval request for \'Merchandise Sale\' has been submitted.', 0, '2024-12-23 01:10:16'),
-(22, 3, 0, 'A new budget approval request for \'Eduk Week\' has been submitted.', 0, '2024-12-23 22:20:00'),
-(23, 5, 3, 'Your budget request for \'Eduk Week\' has been approved.', 1, '2024-12-23 22:21:25'),
-(24, 3, 0, 'A new budget approval request for \'TechFusion\' has been submitted.', 0, '2024-12-24 00:54:14'),
-(25, 6, 4, 'Your budget request for \'TechFusion\' has been approved.', 0, '2024-12-24 01:00:31'),
-(26, 1, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2024-12-24 02:48:34'),
-(27, 2, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2024-12-24 02:48:34'),
-(28, 3, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2024-12-24 02:48:34'),
-(29, 3, 0, 'A new budget approval request for \'Film Festival\' has been submitted.', 0, '2024-12-25 23:54:57'),
-(30, 6, 4, 'Your budget request for \'TechFusion\' has been approved.', 0, '2024-12-25 23:55:09'),
-(31, 1, 1, 'Your budget request for \'Film Festival\' has been approved.', 0, '2024-12-25 23:55:45'),
-(32, 2, 1, 'Your budget request for \'Film Festival\' has been approved.', 0, '2024-12-25 23:55:45'),
-(33, 3, 1, 'Your budget request for \'Film Festival\' has been approved.', 0, '2024-12-25 23:55:45'),
-(34, 1, 1, 'Your budget request for \'Test MOE\' has been approved.', 0, '2025-01-06 15:49:09'),
-(35, 2, 1, 'Your budget request for \'Test MOE\' has been approved.', 0, '2025-01-06 15:49:09'),
-(36, 3, 1, 'Your budget request for \'Test MOE\' has been approved.', 0, '2025-01-06 15:49:09'),
-(37, 5, 0, 'Test Notif', 1, '2025-01-07 10:45:09'),
-(38, 5, 0, 'Test Notif', 1, '2025-01-07 10:47:24'),
-(39, 5, 3, 'The total amount for an event in your plan has exceeded the allocated budget.', 1, '2025-01-07 11:51:06'),
-(40, 7, 3, 'The total amount for an event in your plan has exceeded the allocated budget.', 0, '2025-01-07 11:51:06'),
-(42, 5, 3, 'The total amount for 26 has exceeded the allocated budget.', 1, '2025-01-07 11:52:43'),
-(43, 7, 3, 'The total amount for 26 has exceeded the allocated budget.', 0, '2025-01-07 11:52:43'),
-(45, 5, 3, 'The total amount for the event \'Eduk Week\' has exceeded the allocated budget.', 0, '2025-01-07 11:56:37'),
-(46, 7, 3, 'The total amount for the event \'Eduk Week\' has exceeded the allocated budget.', 0, '2025-01-07 11:56:37'),
-(48, 5, 3, 'The total amount for the event \'Eduk Week\' has exceeded the allocated budget.', 0, '2025-01-07 12:15:03'),
-(49, 7, 3, 'The total amount for the event \'Eduk Week\' has exceeded the allocated budget.', 0, '2025-01-07 12:15:03'),
-(50, 1, 1, 'The total amount for the event \'Seminar\' has exceeded the allocated budget.', 0, '2025-01-07 15:27:47'),
-(51, 2, 1, 'The total amount for the event \'Seminar\' has exceeded the allocated budget.', 1, '2025-01-07 15:27:47'),
-(52, 3, 1, 'The total amount for the event \'Seminar\' has exceeded the allocated budget.', 0, '2025-01-07 15:27:47'),
-(53, 8, 1, 'The total amount for the event \'Seminar\' has exceeded the allocated budget.', 0, '2025-01-07 15:27:47'),
 (57, 3, 0, 'A new budget approval request for \'Test 2\' has been submitted.', 0, '2025-01-07 15:40:01'),
 (58, 1, 1, 'Your budget request for \'Test 2\' has been approved.', 0, '2025-01-07 15:47:44'),
 (59, 2, 1, 'Your budget request for \'Test 2\' has been approved.', 1, '2025-01-07 15:47:44'),
@@ -635,17 +502,31 @@ INSERT INTO `notifications` (`id`, `recipient_id`, `organization_id`, `message`,
 (67, 3, 1, 'The total amount for \'Test MOE\' has exceeded the allocated budget.', 0, '2025-01-07 21:06:02'),
 (68, 8, 1, 'The total amount for \'Test MOE\' has exceeded the allocated budget.', 0, '2025-01-07 21:06:02'),
 (72, 1, 1, 'The total amount for \'Test MOE\' has exceeded the allocated budget.', 0, '2025-01-07 21:06:50'),
-(73, 2, 1, 'The total amount for \'Test MOE\' has exceeded the allocated budget.', 0, '2025-01-07 21:06:50'),
+(73, 2, 1, 'The total amount for \'Test MOE\' has exceeded the allocated budget.', 1, '2025-01-07 21:06:50'),
 (74, 3, 1, 'The total amount for \'Test MOE\' has exceeded the allocated budget.', 0, '2025-01-07 21:06:50'),
 (75, 8, 1, 'The total amount for \'Test MOE\' has exceeded the allocated budget.', 0, '2025-01-07 21:06:50'),
 (79, 1, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 0, '2025-01-07 21:27:06'),
-(80, 2, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 0, '2025-01-07 21:27:06'),
+(80, 2, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 1, '2025-01-07 21:27:06'),
 (81, 3, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 0, '2025-01-07 21:27:06'),
 (82, 8, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 0, '2025-01-07 21:27:06'),
 (86, 1, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 0, '2025-01-07 21:30:28'),
-(87, 2, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 0, '2025-01-07 21:30:28'),
+(87, 2, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 1, '2025-01-07 21:30:28'),
 (88, 3, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 0, '2025-01-07 21:30:28'),
-(89, 8, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 0, '2025-01-07 21:30:28');
+(89, 8, 1, 'The total amount for the event \'Test 2\' has exceeded the allocated budget.', 0, '2025-01-07 21:30:28'),
+(90, 3, 0, 'A new budget approval request for \'General Assembly\' has been submitted.', 0, '2025-01-09 04:59:51'),
+(91, 1, 1, 'Your budget request for \'General Assembly\' has been approved.', 0, '2025-01-09 05:01:03'),
+(92, 2, 1, 'Your budget request for \'General Assembly\' has been approved.', 0, '2025-01-09 05:01:03'),
+(93, 3, 1, 'Your budget request for \'General Assembly\' has been approved.', 0, '2025-01-09 05:01:03'),
+(94, 8, 1, 'Your budget request for \'General Assembly\' has been approved.', 0, '2025-01-09 05:01:03'),
+(95, 1, 1, 'The total amount for the event \'General Assembly\' has exceeded the allocated budget.', 0, '2025-01-09 11:02:57'),
+(96, 2, 1, 'The total amount for the event \'General Assembly\' has exceeded the allocated budget.', 0, '2025-01-09 11:02:57'),
+(97, 3, 1, 'The total amount for the event \'General Assembly\' has exceeded the allocated budget.', 0, '2025-01-09 11:02:57'),
+(98, 8, 1, 'The total amount for the event \'General Assembly\' has exceeded the allocated budget.', 0, '2025-01-09 11:02:57'),
+(99, 3, 0, 'A new budget approval request for \'Merchandise Sale\' has been submitted.', 0, '2025-01-09 17:37:05'),
+(100, 1, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2025-01-09 17:37:42'),
+(101, 2, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2025-01-09 17:37:42'),
+(102, 3, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2025-01-09 17:37:42'),
+(103, 8, 1, 'Your budget request for \'Merchandise Sale\' has been approved.', 0, '2025-01-09 17:37:42');
 
 -- --------------------------------------------------------
 
@@ -675,7 +556,7 @@ CREATE TABLE `organizations` (
 --
 
 INSERT INTO `organizations` (`organization_id`, `organization_name`, `organization_logo`, `organization_members`, `organization_status`, `organization_color`, `archived`, `created_at`, `balance`, `beginning_balance`, `income`, `expense`, `cash_on_bank`, `cash_on_hand`) VALUES
-(1, 'Beacon of Youth Technology Enthusiasts', 'byte.png', 500, 'Level I', '#1c7d60', 0, '2024-09-22 12:16:55', 106303.00, 100000.00, 48004.00, 41701.00, 22000.00, 500.00),
+(1, 'Beacon of Youth Technology Enthusiasts', 'byte.png', 500, 'Level I', '#1c7d60', 0, '2024-09-22 12:16:55', 106263.00, 100000.00, 48014.00, 41751.00, 22000.00, 500.00),
 (3, 'Future Educators Organization', 'feo.png', 400, 'Level I', '#3193b4', 0, '2024-12-22 17:13:27', 100000.00, 100000.00, 0.00, 0.00, 0.00, 0.00),
 (4, 'Computer Scientists and Developers Society', 'code.png', 400, 'Level I', '#3f99ee', 0, '2024-12-22 17:50:51', 125000.00, 125000.00, 0.00, 0.00, 125000.00, 0.00),
 (5, 'Artrads Dance Crew', 'logo_67695ef3d92895.89449814.png', 35, 'Level I', '#f9db1a', 1, '2024-12-23 13:00:35', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00),
@@ -700,14 +581,6 @@ CREATE TABLE `purchases` (
   `organization_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `purchases`
---
-
-INSERT INTO `purchases` (`purchase_id`, `plan_id`, `title`, `total_amount`, `purchase_status`, `completion_status`, `archived`, `created_at`, `organization_id`) VALUES
-(3, 3, 'Test Purchase', 1001.00, 'Approved', 1, 0, '2024-12-03 11:40:19', 1),
-(4, 12, 'Test 2', 1.00, 'Approved', 1, 0, '2025-01-07 07:33:54', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -727,14 +600,6 @@ CREATE TABLE `purchases_summary` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `purchases_summary`
---
-
-INSERT INTO `purchases_summary` (`summary_id`, `purchase_id`, `title`, `organization_id`, `total_amount`, `purchase_status`, `completion_status`, `archived`, `created_at`, `updated_at`) VALUES
-(1, 3, 'Test Purchase', 1, 1001.00, 'Approved', 1, 0, '2024-12-25 15:26:08', '2024-12-25 15:27:43'),
-(2, 4, 'Test 2', 1, 500.00, 'Approved', 1, 0, '2025-01-07 07:49:58', '2025-01-07 13:30:28');
-
 -- --------------------------------------------------------
 
 --
@@ -750,14 +615,6 @@ CREATE TABLE `purchase_items` (
   `amount` decimal(10,2) NOT NULL,
   `total_amount` decimal(10,2) GENERATED ALWAYS AS (`quantity` * `amount`) STORED
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `purchase_items`
---
-
-INSERT INTO `purchase_items` (`item_id`, `purchase_id`, `description`, `quantity`, `unit`, `amount`) VALUES
-(2, 3, 'Test', 1.00, '1', 1001.00),
-(3, 4, 'Food Allowance', 1.00, '1', 1.00);
 
 -- --------------------------------------------------------
 
@@ -775,15 +632,6 @@ CREATE TABLE `purchase_summary_items` (
   `total_amount` decimal(15,2) NOT NULL,
   `reference` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `purchase_summary_items`
---
-
-INSERT INTO `purchase_summary_items` (`summary_item_id`, `purchase_id`, `description`, `quantity`, `unit`, `amount`, `total_amount`, `reference`) VALUES
-(1, 3, 'Test', 1, 1, 1001.00, 1001.00, 'lesson-1.pdf'),
-(2, 4, 'Food Allowance', 1, 1, 200.00, 200.00, 'SGOA FORM 10 - Budget Request.docx.pdf'),
-(3, 4, 'Food Allowance', 1, 1, 300.00, 300.00, 'SGOA FORM 10 - Budget Request.docx.pdf');
 
 -- --------------------------------------------------------
 
@@ -1106,7 +954,7 @@ ALTER TABLE `advisers`
 -- AUTO_INCREMENT for table `balance_history`
 --
 ALTER TABLE `balance_history`
-  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `budget_allocation`
@@ -1118,7 +966,7 @@ ALTER TABLE `budget_allocation`
 -- AUTO_INCREMENT for table `budget_approvals`
 --
 ALTER TABLE `budget_approvals`
-  MODIFY `approval_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `approval_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -1130,55 +978,55 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `events_summary`
 --
 ALTER TABLE `events_summary`
-  MODIFY `summary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `summary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `event_items`
 --
 ALTER TABLE `event_items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `event_summary_items`
 --
 ALTER TABLE `event_summary_items`
-  MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `summary_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `expense_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `expense_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `expense_history`
 --
 ALTER TABLE `expense_history`
-  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `financial_plan`
 --
 ALTER TABLE `financial_plan`
-  MODIFY `plan_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `plan_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `income`
 --
 ALTER TABLE `income`
-  MODIFY `income_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `income_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `income_history`
 --
 ALTER TABLE `income_history`
-  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `maintenance`
@@ -1208,7 +1056,7 @@ ALTER TABLE `maintenance_summary_items`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
 
 --
 -- AUTO_INCREMENT for table `organizations`
