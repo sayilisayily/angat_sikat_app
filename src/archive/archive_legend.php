@@ -1,9 +1,6 @@
 <?php
 include '../connection.php';
 include '../session_check.php'; 
-
-$sql = "SELECT * FROM archive_legend"; // Adjust the organization_id as needed
-$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
