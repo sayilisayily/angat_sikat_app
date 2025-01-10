@@ -9,6 +9,7 @@ if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST[
     $quantity = intval($_POST['quantity']);
     $unit = trim($_POST['unit']);
     $amount = floatval($_POST['amount']);
+    $date = trim($_POST['date']); 
     $profit = isset($_POST['profit']) ? floatval($_POST['profit']) : 0;
 
     // Validation checks
@@ -23,6 +24,12 @@ if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST[
     }
     if ($amount <= 0) {
         $response['errors']['amount'] = 'Amount must be greater than zero.';
+    }
+
+     // Validate date
+    $date_regex = '/^\d{4}-\d{2}-\d{2}$/'; // Ensure the date is in YYYY-MM-DD format
+    if (!preg_match($date_regex, $date)) {
+        $response['errors']['date'] = 'Invalid date format. Use YYYY-MM-DD.';
     }
 
     if (empty($response['errors'])) {
@@ -78,9 +85,9 @@ if (isset($_POST['event_id'], $_POST['description'], $_POST['quantity'], $_POST[
 
             // Insert new summary item
             $stmt = $conn->prepare("INSERT INTO event_summary_items 
-                (event_id, description, quantity, unit, amount, profit, total_profit, total_amount, reference) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("isiddddss", $event_id, $description, $quantity, $unit, $amount, $profit, $total_profit, $total_amount, $reference);
+                (event_id, date, description, quantity, unit, amount, profit, total_profit, total_amount, reference) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("issiddddss", $event_id, $date, $description, $quantity, $unit, $amount, $profit, $total_profit, $total_amount, $reference);
 
             if (!$stmt->execute()) {
                 throw new Exception('Failed to insert the summary item.');
