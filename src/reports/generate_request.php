@@ -1,12 +1,12 @@
-<?php
-require_once('../../libs/tcpdf/TCPDF-main/tcpdf.php'); // Include the TCPDF library
-require_once('../connection.php'); // Include database connection
-include '../session_check.php';
-// Start output buffering
-ob_start();
+<?php 
+require_once('../../libs/tcpdf/TCPDF-main/tcpdf.php');
+require_once('../connection.php');
+include('../session_check.php');
+header('Content-Type: application/json');
 
+try {
 // Get form data
-$event_id = $_POST['event_id'] ?? ''; // Fetch event_id from form
+$event_id = $_POST['event_id'];
 $org_query = "SELECT organization_name FROM organizations WHERE organization_id = $organization_id";
                                     $org_result = mysqli_query($conn, $org_query);
 
@@ -25,16 +25,28 @@ class CustomPDF extends TCPDF {
 
     // Footer Method
     public function Footer() {
-        $this->SetY(-30.48); // Position 1.2 inches from the bottom
-        $this->SetFont('arial', '', 10); // Set font to Arial
+        $this->SetY(-25.4); // Position 1 inch from the bottom
+        $this->SetFont('play', '', 10); // Set font
+        global $organization_name;
+        // HTML content for footer with adjusted left and right margins
+        $html = '
+        <div style="border-top: 1px solid #000; font-size: 10px; font-family: Play, sans-serif; line-height: 1; padding-left: 38.1mm; padding-right: 25.4mm;">
+            <div style="width: 100%; text-align: left; margin: 0; padding: 0;">
+                SASCO
+            </div>
+            <div style="width: 100%; text-align: left; margin: 0; padding: 0;">
+                Budget Request
+            </div>
+            <div style="width: 100%; text-align: left; margin: 0; padding: 0;">
+                '.$organization_name.'
+            </div>
+            <div style="width: 100%; text-align: left; margin: 0; padding: 0;">
+                Page ' . $this->getAliasNumPage() . ' of ' . $this->getAliasNbPages() . '
+            </div>
+        </div>';
 
-        // First line: SASCO and Budget Request
-        $this->Cell(0, 10, 'SASCO', 0, 0, 'L');
-        $this->Cell(0, 10, 'Budget Request', 0, 1, 'R');
-        
-        // Second line: Organization Name and Page Number
-        $this->Cell(0, 10, 'Name of Organization', 0, 0, 'L');
-        $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . ' of ' . $this->getAliasNbPages(), 0, 0, 'R');
+        // Write the HTML footer with the border
+        $this->writeHTML($html, true, false, true, false, 'L');
     }
 }
 
@@ -52,38 +64,42 @@ $pdf->AddPage();
 $pdf->SetMargins(25.4, 25.4, 25.4); // 1-inch margins (25.4mm)
 $pdf->SetAutoPageBreak(true, 30.48); // 1.2-inch bottom margin
 
-$pdf->SetFont($centurygothic, 'B', 11);
-$pdf->Cell(0, 0, '', 0, 1, 'C', 0, '', 1);
-$pdf->Cell(0, 0, 'Republic of the Philippines', 0, 1, 'C', 0, '', 1);
-
-$pdf->SetFont('Bookman Old Style', 'B', 11);
-$pdf->Cell(0, 0, 'CAVITE STATE UNIVERSITY', 0, 1, 'C', 0, '', 1);
-
-$pdf->SetFont($centuryGothicBold, 'B', 11);
-$pdf->Cell(0, 0, 'CCAT Campus', 0, 1, 'C', 0, '', 1);
-
-$pdf->SetFont($centurygothic, 'B', 11);
-$pdf->Cell(0, 0, 'Rosario, Cavite', 0, 1, 'C', 0, '', 1);
-
-$pdf->Ln(2);
-$pdf->Cell(0, 0, '(046) 437-9507 / (046) 437-6659', 0, 1, 'C', 0, '', 1);
-$pdf->Cell(0, 0, 'cvsurosario@cvsu.edu.ph', 0, 1, 'C', 0, '', 1);
-$pdf->Cell(0, 0, 'www.cvsu-rosario.edu.ph', 0, 1, 'C', 0, '', 1);
-
-// Now add the logos using HTML for images
-$html = '
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <div style="flex: 1; text-align: left;">
-            <img src="img/cvsu.jpg" width="40" height="40" />
-        </div>
-        <div style="flex: 1; text-align: right;">
-            <img src="img/cvsu.jpg" width="40" height="40" />
-        </div>
+// Set left logo using HTML
+$htmlLeftLogo = '
+    <div style="text-align: left;">
+        <img src="img/cvsu.jpg" style="width: 100px; height: 100px; margin-top: 5px;" />
     </div>
 ';
 
-// Write the HTML (images only)
-//$pdf->writeHTML($html, true, false, true, false, 'C');
+// Set right logo using HTML
+$htmlRightLogo = '
+    <div style="text-align: right;">
+        <img src="img/bagongpilipinas.jpg" style="width: 100px; height: 100px; margin-top: 5px;" />
+    </div>
+';
+
+// Add the left logo
+$pdf->writeHTMLCell(30, 40, 15, 15, $htmlLeftLogo, 0, 0, false, true, 'L', true);
+
+// Add the right logo
+$pdf->writeHTMLCell(30, 40, 165, 15, $htmlRightLogo, 0, 0, false, true, 'R', true);
+
+// Center-align the header text
+$pdf->SetFont($centurygothic, 'B', 11);
+$pdf->SetY(15); // Adjust Y to align with logos
+$pdf->Cell(0, 5, 'Republic of the Philippines', 0, 1, 'C');
+$pdf->SetFont('Bookman Old Style', 'B', 11);
+$pdf->Cell(0, 5, 'CAVITE STATE UNIVERSITY', 0, 1, 'C');
+$pdf->SetFont($centuryGothicBold, 'B', 11);
+$pdf->Cell(0, 5, 'CCAT Campus', 0, 1, 'C');
+$pdf->SetFont($centurygothic, 'B', 11);
+$pdf->Cell(0, 5, 'Rosario, Cavite', 0, 1, 'C');
+
+$pdf->Ln(2);
+$pdf->Cell(0, 5, '(046) 437-9507 / (046) 437-6659', 0, 1, 'C');
+$pdf->Cell(0, 5, 'cvsurosario@cvsu.edu.ph', 0, 1, 'C');
+$pdf->Cell(0, 5, 'www.cvsu-rosario.edu.ph', 0, 1, 'C');
+
 $pdf->Ln(10); // Add space after header
 
 
@@ -212,7 +228,7 @@ $pdf->Ln(10); // Space between sections
 // Example Names for Signatures
 $pdf->SetFont($arialBold, '', 11);
 $pdf->Ln(10); // Space for signatures above names
-$pdf->Cell(80, 10, "JAMES MATHEW S. BELEN", 0, 0, 'L', 0);
+$pdf->Cell(80, 10, "GUILLIER T. PARULAN", 0, 0, 'L', 0);
 $pdf->Cell(80, 10, "MICHAEL EDWARD T. ARMINTIA, REE", 0, 1, 'L', 0);
 $pdf->SetFont($arial, 'B', 11);
 $pdf->Cell(80, 10, "President, CSG", 0, 0, 'L', 0);
@@ -228,7 +244,20 @@ $pdf->SetFont($arialBold, 'B', 11);
 $pdf->Cell(0, 0, "JIMPLE JAY R. MALIGRO", 0, 1, 'C', 0, '', 1);
 $pdf->SetFont($arial, 'B', 11);
 $pdf->Cell(0, 0, "Coordinator, SDS", 0, 1, 'C', 0, '', 1);
+// Generate the file name
+    $file_name = "Budget_Request_" . $eventTitle . '_' . time() . ".pdf";
 
-$pdfOutputPath = 'generated_pdfs/' . $eventTitle . '_budget_request.pdf';
-$pdf->Output($pdfOutputPath, 'D');
+    // Use the 'D' parameter to force download
+    $pdf->Output($file_name, 'I'); // Forces the PDF to be downloaded with the given filename
+
+    // Exit to ensure no extra output
+    exit;
+} catch (Exception $e) {
+    // Return error response
+    echo json_encode([
+        "success" => false,
+        "errors" => [$e->getMessage()],
+    ]);
+}
+
 ?>

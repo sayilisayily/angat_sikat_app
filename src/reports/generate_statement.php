@@ -6,7 +6,7 @@ header('Content-Type: application/json');
 
 try {
 // Get form data
-$event_id = $_POST['event_id'];
+$event_id = 31;
 $org_query = "SELECT organization_name FROM organizations WHERE organization_id = $organization_id";
                                     $org_result = mysqli_query($conn, $org_query);
 
@@ -20,14 +20,14 @@ $org_query = "SELECT organization_name FROM organizations WHERE organization_id 
 class CustomPDF extends TCPDF {
     public function Header() {
         $this->SetFont('play', 'I', 10); // Set font to Arial, size 11
-        $this->Cell(0, 10, 'SGOA FORM 11', 0, 1, 'R'); // Right-aligned header text
+        $this->Cell(0, 10, 'SGOA FORM 05', 0, 1, 'R'); // Right-aligned header text
     }
 
     // Footer Method
     public function Footer() {
         $this->SetY(-25.4); // Position 1 inch from the bottom
         $this->SetFont('play', '', 10); // Set font
-        global $organization_name;
+
         // HTML content for footer with adjusted left and right margins
         $html = '
         <div style="border-top: 1px solid #000; font-size: 10px; font-family: Play, sans-serif; line-height: 1; padding-left: 38.1mm; padding-right: 25.4mm;">
@@ -35,10 +35,10 @@ class CustomPDF extends TCPDF {
                 SASCO
             </div>
             <div style="width: 100%; text-align: left; margin: 0; padding: 0;">
-                Permit to Withdraw
+                Financial Statement
             </div>
             <div style="width: 100%; text-align: left; margin: 0; padding: 0;">
-                '.$organization_name.'
+                Name of Organization
             </div>
             <div style="width: 100%; text-align: left; margin: 0; padding: 0;">
                 Page ' . $this->getAliasNumPage() . ' of ' . $this->getAliasNbPages() . '
@@ -61,8 +61,9 @@ $centurygothic = TCPDF_FONTS::addTTFfont('../../libs/tcpdf/TCPDF-main/fonts/cent
 $play = TCPDF_FONTS::addTTFfont('../../libs/tcpdf/TCPDF-main/fonts/play/Play-Regular.ttf"', 'TrueTypeUnicode', '', 96);
 
 $pdf->AddPage();
-$pdf->SetMargins(25.4, 25.4, 25.4); // 1-inch margins (25.4mm)
-$pdf->SetAutoPageBreak(true, 30.48); // 1.2-inch bottom margin
+$pdf->SetMargins(25.4, 25.4, 25.4); // Set 1-inch margins (top, left, right)
+$pdf->SetAutoPageBreak(true, 31.75); // Set 1.25-inch bottom margin (31.75mm)
+
 
 // Set left logo using HTML
 $htmlLeftLogo = '
@@ -102,125 +103,211 @@ $pdf->Cell(0, 5, 'www.cvsu-rosario.edu.ph', 0, 1, 'C');
 
 $pdf->Ln(10); // Add space after header
 
-
-// Function to convert numbers to words
-function convertNumberToWord($number = false)
-{
-    $number = str_replace(array(',', ' '), '' , trim($number));
-    if(! $number) {
-        return false;
-    }
-    $number = (int) $number;
-    $words = array();
-    $list1 = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
-        'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'
-    );
-    $list2 = array('', 'ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety', 'hundred');
-    $list3 = array('', 'thousand', 'million', 'billion', 'trillion', 'quadrillion', 'quintillion', 'sextillion', 'septillion',
-        'octillion', 'nonillion', 'decillion', 'undecillion', 'duodecillion', 'tredecillion', 'quattuordecillion',
-        'quindecillion', 'sexdecillion', 'septendecillion', 'octodecillion', 'novemdecillion', 'vigintillion'
-    );
-    $number_length = strlen($number);
-    $levels = (int) (($number_length + 2) / 3);
-    $max_length = $levels * 3;
-    $number = substr('00' . $number, -$max_length);
-    $number_levels = str_split($number, 3);
-    for ($i = 0; $i < count($number_levels); $i++) {
-        $levels--;
-        $hundreds = (int) ($number_levels[$i] / 100);
-        $hundreds = ($hundreds ? ' ' . $list1[$hundreds] . ' hundred' . ' ' : '');
-        $tens = (int) ($number_levels[$i] % 100);
-        $singles = '';
-        if ( $tens < 20 ) {
-            $tens = ($tens ? ' ' . $list1[$tens] . ' ' : '' );
-        } else {
-            $tens = (int)($tens / 10);
-            $tens = ' ' . $list2[$tens] . ' ';
-            $singles = (int) ($number_levels[$i] % 10);
-            $singles = ' ' . $list1[$singles] . ' ';
-        }
-        $words[] = $hundreds . $tens . $singles . ( ( $levels && ( int ) ( $number_levels[$i] ) ) ? ' ' . $list3[$levels] . ' ' : '' );
-    } //end for loop
-    $commas = count($words);
-    if ($commas > 1) {
-        $commas = $commas - 1;
-    }
-    return strtoupper(implode(' ', $words));
-}
-
-// Query to fetch the title and total amount
-$query = "SELECT title, total_amount FROM events WHERE event_id = ?";
+$query = "SELECT title FROM events WHERE event_id = ?";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $event_id); // Changed "id" to "i" for integer
+$stmt->bind_param("i", $event_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $eventTitle = strtoupper($row['title']); // Convert the title to uppercase
-    $eventAmount = number_format($row['total_amount'], 2); // Format the amount
-    $eventAmountWords = convertNumberToWord($row['total_amount']); // Convert amount to words
 } else {
     $eventTitle = strtoupper("Event Not Found"); // Default title if event is not found
-    $eventAmount = "N/A"; // Default amount if event is not found
-    $eventAmountWords = "N/A"; // Default words if event is not found
 }
 
+// Fetching income rows
+$income_query = "SELECT amount, reference FROM income WHERE organization_id = $organization_id AND archived=0";
+$income_result = mysqli_query($conn, $income_query);
 
-$stmt->close();
+$inflows = []; // Array to store the fetched income rows
+if ($income_result && mysqli_num_rows($income_result) > 0) {
+    while ($row = mysqli_fetch_assoc($income_result)) {
+        $inflows[] = $row; // Append each row to the inflows array
+    }
+} else {
+    echo "No income records found for the organization.";
+}
+
+// Fetching total inflows
+$total_query = "SELECT SUM(amount) AS total_inflows FROM income WHERE organization_id = $organization_id AND archived=0";
+$total_result = mysqli_query($conn, $total_query);
+
+if ($total_result && mysqli_num_rows($total_result) > 0) {
+    $total_row = mysqli_fetch_assoc($total_result);
+    $total_inflows = $total_row['total_inflows'];
+} else {
+    $total_inflows = 0; // Fallback if no income rows exist
+}
 
 // Add titles
-$pdf->SetFont($arialBold, '', 11);
+$pdf->SetFont($arialBold, '', 12);
 $pdf->Cell(0, 0, strtoupper($organization_name), 0, 1, 'C', 0, '', 1);
 $pdf->Ln(5);
-$pdf->Cell(0, 0, "PERMIT TO WITHDRAW", 0, 1, 'C', 0, '', 1);
+$pdf->Cell(0, 0, "FINANCIAL STATEMENT", 0, 1, 'C', 0, '', 1);
+$pdf->Cell(0, 0, "AY 2024-2025", 0, 1, 'C', 0, '', 1);
+$pdf->Cell(0, 0, "As of ".date('F d, Y'), 0, 1, 'C', 0, '', 1);
 $pdf->Ln(10);
 
-$html = '
-    <table style="width: 100%; font-size: 11px; font-family: Arial, sans-serif; line-height: 1.5;">
-        <!-- Date -->
-        <tr>
-            <td style="width: 70%;"></td>
-            <td style="width: 30%; text-align: right;">
-                <b>Date:</b>
-                <span style="border-bottom: 1px solid #000; padding-right: 5px;">' . date('F d, Y') . '</span>
-            </td>
-        </tr>
-        <tr><td colspan="2" style="height: 10px;"></td></tr> <!-- Space after Date -->
+$pdf->SetFont('arial', '', 11);
 
-        <!-- Name of Organization and Checkboxes -->
-        <tr>
-            <td style="width: 28%; text-align: left; padding-top: 10px;"><b>Name of Organization:</b></td>
-            <td style="width: 72%; border-bottom: 1px solid #000; padding-top: 10px; vertical-align: middle;">
-                ' . htmlspecialchars($organization_name) . ' 
-            </td>
-        </tr>
-        <tr>
-            <td style="width: 100%; text-align: left; padding-top: 10px;">
-                <b>□ Academic</b> 
-                <b>□ Non-Academic</b>
-            </td>
-        
-        </tr>
+// Calculate totals
+$total_inflows = array_sum(array_column($inflows, 'amount'));
 
-        <!-- Purpose -->
-        <tr>
-            <td style="width: 12%; text-align: left; padding-top: 10px;"><b>Purpose:</b></td>
-            <td style="width: 88%; border-bottom: 1px solid #000; padding-top: 10px;">' . htmlspecialchars($eventTitle) . '</td>
-        </tr>
+// Table 1: Cash Inflows
+$html1 = '
+<table border="1" cellpadding="5" cellspacing="0" style="width:100%; text-align:left;">
+    <tr>
+        <th>Cash Inflows</th>
+        <th>Amount</th>
+        <th>Reference</th>
+    </tr>';
 
-        <!-- Amount -->
-        <tr>
-            <td style="width: 12%; text-align: left; padding-top: 10px;"><b>Amount:</b></td>
-            <td style="width: 88%; border-bottom: 1px solid #000; padding-top: 10px;">
-                ' . htmlspecialchars($eventAmountWords) . ' PESOS (P ' . htmlspecialchars($eventAmount) . ')
-            </td>
-        </tr>
-    </table>
-';
+foreach ($inflows as $inflow) {
+    $html1 .= '
+    <tr>
+        <td>Income</td>
+        <td>' . number_format($inflow['amount'], 2) . '</td>
+        <td>' . htmlspecialchars($inflow['reference']) . '</td>
+    </tr>';
+}
+$html1 .= '
+    <tr>
+        <td><b>Total Inflows</b></td>
+        <td colspan="2">' . number_format($total_inflows, 2) . '</td>
+    </tr>
+</table>';
 
-// Output the HTML to TCPDF
-$pdf->writeHTML($html, true, false, true, false, '');
+// Fetch outflows grouped by category
+$query = "
+    SELECT 
+        category,
+        SUM(amount) AS subtotal,
+        GROUP_CONCAT(CONCAT(description, ' (', reference, ')') SEPARATOR ', ') AS details
+    FROM expenses
+    WHERE organization_id = $organization_id
+    GROUP BY category
+";
+
+// Execute the query
+$result = mysqli_query($conn, $query);
+
+// Initialize arrays for subtotals and total outflows
+$outflows = [];
+$total_outflows = 0;
+
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $outflows[] = [
+            'category' => $row['category'],
+            'subtotal' => $row['subtotal'],
+            'details' => $row['details'],
+        ];
+        $total_outflows += $row['subtotal'];
+    }
+}
+
+$html2 = '
+<table border="1" cellpadding="5" cellspacing="0" style="width:100%; text-align:left;">
+    <tr>
+        <th>Cash Outflows</th>
+        <th>Amount</th>
+        <th>Reference</th>
+    </tr>';
+
+foreach ($outflows as $outflow) {
+    $html2 .= '
+    <tr>
+        <td>' . htmlspecialchars($outflow['category']) . '</td>
+        <td>' . number_format($outflow['subtotal'], 2) . '</td>
+        <td>' . htmlspecialchars($outflow['details']) . '</td>
+    </tr>';
+}
+
+$html2 .= '
+    <tr>
+        <td><b>TOTAL OUTFLOWS</b></td>
+        <td colspan="2">' . number_format($total_outflows, 2) . '</td>
+    </tr>
+</table>';
+
+// Fetch Cash Balance Beginning, Cash on Bank, and Cash on Hand from organizations table
+$organization_query = "
+    SELECT 
+        beginning_balance, 
+        cash_on_bank, 
+        cash_on_hand 
+    FROM organizations 
+    WHERE organization_id = $organization_id
+";
+$organization_result = mysqli_query($conn, $organization_query);
+
+if ($organization_result && mysqli_num_rows($organization_result) > 0) {
+    $organization_row = mysqli_fetch_assoc($organization_result);
+    $beginning_balance = $organization_row['beginning_balance'];
+    $cash_on_bank = $organization_row['cash_on_bank'];
+    $cash_on_hand = $organization_row['cash_on_hand'];
+} else {
+    $beginning_balance = 0;
+    $cash_on_bank = 0;
+    $cash_on_hand = 0;
+}
+
+// Fetch the latest Cash Balance End from balance_history table
+$balance_query = "
+    SELECT 
+        cash_balance_end 
+    FROM balance_history 
+    WHERE organization_id = $organization_id 
+    ORDER BY balance_date DESC 
+    LIMIT 1
+";
+$balance_result = mysqli_query($conn, $balance_query);
+
+if ($balance_result && mysqli_num_rows($balance_result) > 0) {
+    $balance_row = mysqli_fetch_assoc($balance_result);
+    $cash_balance_end = $balance_row['cash_balance_end'];
+} else {
+    $cash_balance_end = 0; // Fallback if no record is found
+}
+
+// Table 3: Cash Balance
+$html3 = '
+<table border="1" cellpadding="5" cellspacing="0" style="width:100%; text-align:left;">
+    <tr>
+        <td><b>Cash Balance Beginning (from previous term)</b></td>
+        <td>' . number_format($beginning_balance, 2) . '</td>
+    </tr>
+    <tr>
+        <td><b>TOTAL INFLOWS</b></td>
+        <td>' . number_format($total_inflows, 2) . '</td>
+    </tr>
+    <tr>
+        <td><b>Total Outflows</b></td>
+        <td>' . number_format($total_outflows, 2) . '</td>
+    </tr>
+    <tr>
+        <td><b>Accounted as follows:</b></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Cash on Bank</td>
+        <td>' . number_format($cash_on_bank, 2) . '</td>
+    </tr>
+    <tr>
+        <td>Cash on Hand</td>
+        <td>' . number_format($cash_on_hand, 2) . '</td>
+    </tr>
+    <tr>
+        <td><b>Cash Balance End</b></td>
+        <td>' . number_format($cash_balance_end, 2) . '</td>
+    </tr>
+</table>';
+
+// Write HTML to PDF
+$pdf->writeHTML($html1, true, false, true, false, '');
+$pdf->writeHTML($html2, true, false, true, false, '');
+$pdf->writeHTML($html3, true, false, true, false, '');
 
 // Add final spacing
 $pdf->Ln(10);
@@ -256,7 +343,7 @@ $pdf->Ln(10); // Space between sections
 // Example Names for Signatures
 $pdf->SetFont($arialBold, '', 11);
 $pdf->Ln(10); // Space for signatures above names
-$pdf->Cell(80, 10, "GUILLIER E. PARULAN", 0, 0, 'L', 0);
+$pdf->Cell(80, 10, "JAMES MATHEW S. BELEN", 0, 0, 'L', 0);
 $pdf->Cell(80, 10, "MICHAEL EDWARD T. ARMINTIA, REE", 0, 1, 'L', 0);
 $pdf->SetFont($arial, 'B', 11);
 $pdf->Cell(80, 10, "President, CSG", 0, 0, 'L', 0);
@@ -277,7 +364,7 @@ $pdf->Cell(0, 0, "Coordinator, SDS", 0, 1, 'C', 0, '', 1);
     $file_name = "Permit_to_Withdraw_" . $eventTitle . '_' . time() . ".pdf";
 
     // Use the 'D' parameter to force download
-    $pdf->Output($file_name, 'I'); // Forces the PDF to be downloaded with the given filename
+    $pdf->Output($file_name, 'I'); 
 
     // Exit to ensure no extra output
     exit;

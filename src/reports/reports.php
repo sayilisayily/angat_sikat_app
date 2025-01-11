@@ -266,23 +266,14 @@
                 <div class="col-md">
                     <div class="card text-white gradient-card-1 mb-3 py-4"
                         data-bs-toggle="modal" 
-                        data-bs-target="#accomplishmentModal">
+                        data-bs-target="#statementModal">
                         <div class="card-body text-center">
-                            <i class="fa-solid fa-trophy fa-2x mb-2"></i>
-                            <h5 class="card-title">Accomplishment Report</h5>
+                            <i class="fa-solid fa-receipt fa-2x mb-2"></i>
+                            <h5 class="card-title">Financial Statement</h5>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <button id="generatePDF">Generate PDF</button>
-
-            <script>
-                document.getElementById("generatePDF").addEventListener("click", function () {
-                    // Open the PHP script in a new tab to trigger the download
-                    window.location.href = "generate_pdf.php";
-                });
-            </script>
             
             <!-- Reports Table -->
             <div class="tablecontainer mt-3 p-4">
@@ -332,7 +323,7 @@
             <div class="modal fade" id="budgetRequestModal" tabindex="-1" role="dialog" aria-labelledby="budgetRequestLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <form id="budgetRequestForm" action="generate_pdf.php" method="POST">
+                        <form id="budgetRequestForm" action="generate_request.php" method="POST" target="_blank">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="budgetRequestLabel">Generate Budget Request Report</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -383,13 +374,6 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group row mb-2">
-                                    <!-- Event Start Date -->
-                                    <div class="col-12">
-                                        <label for="event_start_date">Event Start Date</label>
-                                        <input type="text" class="form-control" id="event_start_date" name="event_start_date" readonly>
-                                    </div>
-                                </div>
                                 <!-- Hidden input fields-->
                                 <input type="hidden" class="form-control" id="organization_name" name="organization_name" 
                                     value="<?php echo htmlspecialchars($organization_name); ?>" readonly>
@@ -406,7 +390,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Generate Report</button>
+                                <button type="submit" class="btn btn-primary" id="">Generate Report</button>
                             </div>
                         </form>
                     </div>
@@ -455,20 +439,6 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group row mb-2">
-                                    <!-- Event Start Date -->
-                                    <div class="col-12">
-                                        <label for="event_start_date">Event Start Date</label>
-                                        <input type="text" class="form-control" id="proposal_start_date" name="event_start_date" readonly>
-                                    </div>
-                                </div>
-                                <div class="form-group row mb-2">
-                                    <!-- Event Start Date -->
-                                    <div class="col-12">
-                                        <label for="proposal_venue">Event Venue</label>
-                                        <input type="text" class="form-control" id="proposal_venue" name="event_venue" readonly>
-                                        </div>
-                                </div>
                                 <!-- Hidden input fields-->
                                 <input type="hidden" class="form-control" id="proposal_name" name="organization_name" 
                                     value="<?php echo htmlspecialchars($organization_name); ?>" readonly>
@@ -497,9 +467,9 @@
             <div class="modal fade" id="permitModal" tabindex="-1" role="dialog" aria-labelledby="permitLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <form id="permitForm">
+                        <form id="permitForm" action="generate_permit.php" method="POST" target="_blank">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="permitLabel">Generate Project Proposal Report</h5>
+                                <h5 class="modal-title" id="permitLabel">Generate Permit to Withdraw</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
@@ -532,13 +502,8 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group row mb-2">
-                                    <!-- Event Start Date -->
-                                    <div class="col-12">
-                                        <label for="total_amount">Amount</label>
-                                        <input type="text" class="form-control" id="total_amount" name="total_amount" readonly>
-                                        </div>
-                                </div>
+                                        <input type="hidden" class="form-control" id="total_amount" name="total_amount" readonly>
+                                       
                                 <!-- Hidden input fields-->
                                 <input type="hidden" class="form-control" id="permit_name" name="organization_name" 
                                     value="<?php echo htmlspecialchars($organization_name); ?>" readonly>
@@ -567,7 +532,7 @@
             <div class="modal fade" id="liquidationModal" tabindex="-1" role="dialog" aria-labelledby="liquidationLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <form id="liquidationForm">
+                        <form id="liquidationForm" action="generate_liquidation.php" method="POST" target="_blank">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="liquidationLabel">Generate Liquidation Report</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -601,11 +566,14 @@
                                         </select>
                                     </div>
                                 </div>
+                                        <input type="hidden" class="form-control" id="liquidation_amount" name="total_amount" readonly>
+                                        
+                                        
                                 <div class="form-group row mb-2">
                                     <!-- Event Start Date -->
                                     <div class="col-12">
-                                        <label for="liquidation_amount">Amount</label>
-                                        <input type="text" class="form-control" id="liquidation_amount" name="total_amount" readonly>
+                                        <label for="cash_received">Cash Received</label>
+                                        <input type="number" class="form-control" id="cash_received" name="cash_received" required>
                                         </div>
                                 </div>
                                 <!-- Hidden input fields-->
@@ -632,68 +600,27 @@
                 </div>
             </div>
 
-            <!-- Accomplishment Report Modal -->
-            <div class="modal fade" id="accomplishmentModal" tabindex="-1" role="dialog" aria-labelledby="accomplishmentLabel" aria-hidden="true">
+            <!-- Financial Statement Modal -->
+            <div class="modal fade" id="statementModal" tabindex="-1" role="dialog" aria-labelledby="statementLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <form id="accomplishmentForm">
+                        <form id="statementForm" action="generate_statement.php" method="POST" target="_blank">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="accomplishmentLabel">Generate Accomplishment Report</h5>
+                                <h5 class="modal-title" id="statementLabel">Generate Financial Statement</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <!-- Form fields -->
                                     
-                                <div class="form-group row mb-2">
-                                    <!-- Event Title -->
-                                    <div class="col-12">
-                                        <label for="accomplishment_title">Event Title</label>
-                                        <select class="form-control" id="accomplishment_title" name="event_title" required>
-                                            <option value="">Select Event Title</option>
-                                            <?php
-                                            // Fetch event titles with event_type 'expense' and accomplishment_status = 0
-                                            $accomplishment_query = "SELECT title, event_id, start_date, venue FROM events_summary
-                                                            WHERE organization_id = $organization_id AND archived=0";
-                                            $accomplishment_result = mysqli_query($conn, $accomplishment_query);
-
-                                            if ($accomplishment_result && mysqli_num_rows($accomplishment_result) > 0) {
-                                                while ($accomplishment = mysqli_fetch_assoc($accomplishment_result)) {
-                                                    echo '<option value="' . htmlspecialchars($accomplishment['title']) . '" 
-                                                        data-event-id="' . htmlspecialchars($accomplishment['event_id']) . '" 
-                                                        data-start-date="' . htmlspecialchars($accomplishment['start_date']) . '" 
-                                                        data-venue="' . htmlspecialchars($accomplishment['venue']) . '">' 
-                                                        . htmlspecialchars($accomplishment['title']) . '</option>';
-                                                }
-                                            } else {
-                                                echo '<option value="">No events available</option>';
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group row mb-2">
-                                    <!-- Event Start Date -->
-                                    <div class="col-12">
-                                        <label for="accomplishment_start_date">Date</label>
-                                        <input type="text" class="form-control" id="accomplishment_start_date" name="start_date" readonly>
-                                        </div>
-                                </div>
-                                <div class="form-group row mb-2">
-                                    <!-- Event Start Date -->
-                                    <div class="col-12">
-                                        <label for="accomplishment_venue">Venue</label>
-                                        <input type="text" class="form-control" id="accomplishment_venue" name="venue" readonly>
-                                        </div>
-                                </div>
-                                <!-- Hidden input fields-->
-                                <input type="hidden" class="form-control" id="accomplishment_name" name="organization_name" 
+                                <div class="form-group">
+                                    <label for="organization_name">Organization</label>
+                                    <input type="text" class="form-control" id="organization_name" name="organization_name" 
                                     value="<?php echo htmlspecialchars($organization_name); ?>" readonly>
-                                <input type="hidden" class="form-control" id="accomplishment_id" name="event_id">
+                                </div>
                                 
-
                                 <!-- Success Message Alert -->
                                 <div id="successMessage4" class="alert alert-success d-none mt-3" role="alert">
-                                    Accomplishment Report generated successfully!
+                                    Financial Statement generated successfully!
                                 </div>
                                 <!-- Error Message Alert -->
                                 <div id="errorMessage4" class="alert alert-danger d-none mt-3" role="alert">

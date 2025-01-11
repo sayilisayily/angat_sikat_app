@@ -1,36 +1,123 @@
-$("#budgetRequestForm").submit(function (e) {
-  e.preventDefault(); // Prevent the form from submitting normally
+document.addEventListener("DOMContentLoaded", () => {
+  // Prefill the event start date when an event is selected
+  document
+    .getElementById("event_title")
+    .addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      document.getElementById("event_start_date").value =
+        selectedOption.getAttribute("data-start-date");
+      document.getElementById("event_id").value =
+        selectedOption.getAttribute("data-event-id");
+    });
 
-  var formData = $(this).serialize(); // Serialize the form data
+  // Handle form submission
+  document
+    .getElementById("generateReportBtn")
+    .addEventListener("click", function () {
+      const form = document.getElementById("budgetRequestForm");
+      const formData = new FormData(form);
 
-  $.ajax({
-    url: "generate_pdf.php", // The server-side script to generate the PDF
-    type: "POST",
-    data: formData,
-    success: function (response) {
-      // On success, handle the response (e.g., open PDF file or show success message)
-      $("#successMessage").removeClass("d-none"); // Show success message
-      window.location.href = response; // Assuming the server sends a URL to the PDF file
-    },
-    error: function (xhr, status, error) {
-      // Handle errors
-      var errors = JSON.parse(xhr.responseText);
-      $("#errorList").empty();
-      errors.forEach(function (error) {
-        $("#errorList").append("<li>" + error + "</li>");
-      });
-      $("#errorMessage").removeClass("d-none"); // Show error message
-    },
-  });
+      // Reset alerts
+      document.getElementById("successMessage").classList.add("d-none");
+      const errorMessage = document.getElementById("errorMessage");
+      errorMessage.classList.add("d-none");
+      errorMessage.querySelector("#errorList").innerHTML = "";
+
+      // Send AJAX request
+      fetch("generate_pdf.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Show success alert
+            document
+              .getElementById("successMessage")
+              .classList.remove("d-none");
+            document.getElementById("budgetRequestForm").reset();
+
+            // Optionally download the generated PDF
+            const link = document.createElement("a");
+            link.href = data.file_url; // PDF file path returned from the server
+            link.download = data.file_name; // Suggested file name
+            link.click();
+          } else {
+            // Show error messages
+            errorMessage.classList.remove("d-none");
+            data.errors.forEach((error) => {
+              const li = document.createElement("li");
+              li.textContent = error;
+              errorMessage.querySelector("#errorList").appendChild(li);
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          errorMessage.classList.remove("d-none");
+          const li = document.createElement("li");
+          li.textContent = "An unexpected error occurred. Please try again.";
+          errorMessage.querySelector("#errorList").appendChild(li);
+        });
+    });
+
+  // Handle form submission
+  document
+    .getElementById("generateReportBtn")
+    .addEventListener("click", function () {
+      const form = document.getElementById("budgetRequestForm");
+      const formData = new FormData(form);
+
+      // Reset alerts
+      document.getElementById("successMessage").classList.add("d-none");
+      const errorMessage = document.getElementById("errorMessage");
+      errorMessage.classList.add("d-none");
+      errorMessage.querySelector("#errorList").innerHTML = "";
+
+      // Send AJAX request
+      fetch("generate_pdf.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Show success alert
+            document
+              .getElementById("successMessage")
+              .classList.remove("d-none");
+            document.getElementById("budgetRequestForm").reset();
+
+            // Optionally download the generated PDF
+            const link = document.createElement("a");
+            link.href = data.file_url; // PDF file path returned from the server
+            link.download = data.file_name; // Suggested file name
+            link.click();
+          } else {
+            // Show error messages
+            errorMessage.classList.remove("d-none");
+            data.errors.forEach((error) => {
+              const li = document.createElement("li");
+              li.textContent = error;
+              errorMessage.querySelector("#errorList").appendChild(li);
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          errorMessage.classList.remove("d-none");
+          const li = document.createElement("li");
+          li.textContent = "An unexpected error occurred. Please try again.";
+          errorMessage.querySelector("#errorList").appendChild(li);
+        });
+    });
 });
 
 document.getElementById("event_title").addEventListener("change", function () {
   const selectedOption = this.options[this.selectedIndex];
-  const eventStartDate = selectedOption.getAttribute("data-start-date");
   const eventId = selectedOption.getAttribute("data-event-id");
 
   // Set the event_start_date field
-  document.getElementById("event_start_date").value = eventStartDate || "";
   document.getElementById("event_id").value = eventId || "";
 });
 
