@@ -223,6 +223,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                         <table class="table">
                             <thead>
                                 <tr>
+                                    <th>Date</th>
                                     <th>Description</th>
                                     <th>Quantity</th>
                                     <th>Unit</th>
@@ -246,6 +247,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     foreach ($summaryItems as $item) {
                                         $total_amount = $item['total_amount'];
                                         echo "<tr>
+                                                <td>{$item['date']}</td>
                                                 <td>{$item['description']}</td>
                                                 <td>{$item['quantity']}</td>
                                                 <td>{$item['unit']}</td>
@@ -294,6 +296,7 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                     <!-- Modal content for adding item -->
                                     <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
                                     <!-- Event ID -->
+                                    
                                     <div class="form-group row mb-2">
                                         <div class="col">
                                             <label for="description">Description</label>
@@ -479,6 +482,12 @@ if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
                                             $stmt->close();
                                             ?>
                                         </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col">
+                                            <label for="date">Date</label>
+                                            <input type="date" class="form-control" id="date" name="date" required>
+                                        </div>
                                     </div>
                                     <div class="form-group row mb-2">
                                         <div class="col">
